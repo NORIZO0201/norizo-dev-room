@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>NORIZO DEV ROOM</title>
+<style>
+:root{color-scheme:dark;--bg:#0b0d10;--panel:#12161b;--line:#252b33;--muted:#8f98a3;--ok:#4ade80;--warn:#fbbf24;--bad:#fb7185;--accent:#f5f5f5}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:#f5f7fa;height:100vh;overflow:hidden}
+header{height:64px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:16px;padding:0 18px;background:#0f1216}h1{font-size:19px;letter-spacing:.06em;margin:0}.sub{font-size:12px;color:var(--muted)}.status{margin-left:auto;font-size:12px;color:var(--muted);border:1px solid var(--line);padding:7px 10px;border-radius:999px}.toolbar{height:104px;padding:10px 14px;border-bottom:1px solid var(--line);display:grid;gap:8px}.rowbar{display:flex;gap:8px;min-height:36px}input,select{background:#090b0e;border:1px solid #303640;color:white;border-radius:9px;padding:0 12px;font-size:14px}input{flex:1}select{min-width:170px}button{border:1px solid #313842;background:#1b2027;color:#fff;border-radius:9px;padding:0 14px;font-size:13px;cursor:pointer;white-space:nowrap}button.primary{background:#f3f4f6;color:#111;border-color:#f3f4f6;font-weight:700}button.active{border-color:#60a5fa;background:#15233a}button:disabled{opacity:.45;cursor:not-allowed}.grid{height:calc(100vh - 168px);display:grid;grid-template-columns:minmax(0,1fr) 330px 320px}.pane{border-right:1px solid var(--line);min-width:0;display:flex;flex-direction:column}.pane-title{height:42px;padding:0 12px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--line);font-size:13px}.pane-title span{color:var(--muted);font-size:11px}.viewer{flex:1;background:#07090b;position:relative;min-height:0}.viewer iframe{width:100%;height:100%;border:0;background:#07090b}.empty{position:absolute;inset:0;display:grid;place-items:center;color:#c8cdd4;text-align:center;font-size:14px}.side{background:#10141a;overflow:auto}.card{padding:14px;border-bottom:1px solid var(--line)}.card h3{font-size:11px;margin:0 0 9px;letter-spacing:.05em}.kv{display:flex;justify-content:space-between;gap:12px;color:#bac1ca;font-size:12px;margin:6px 0}.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#66707c;margin-right:7px}.dot.ok{background:var(--ok)}.dot.warn{background:var(--warn)}.dot.bad{background:var(--bad)}.msg{font-size:11px;line-height:1.5;color:var(--muted);word-break:break-word}.timer{font-variant-numeric:tabular-nums}.pill{font-size:10px;border:1px solid var(--line);border-radius:999px;padding:3px 7px}.pass{color:var(--ok)}.check{color:var(--warn)}.fail{color:var(--bad)}
+@media(max-width:1000px){.grid{grid-template-columns:1fr 300px}.side{display:none}}
+</style>
+</head>
+<body>
+<header><h1>NORIZO DEV ROOM</h1><div class="sub">Steel Live Bridge · V3</div><div id="status" class="status">READY</div></header>
+<div class="toolbar">
+  <div class="rowbar">
+    <select id="project">
+      <option value="">CUSTOM URL</option>
+      <option value="https://nihonwine.jp">日本ワイン.jp</option>
+      <option value="https://craft-nihon-wine.jp">CNW</option>
+      <option value="https://nihoncheese.jp">日本チーズ.jp</option>
+      <option value="https://dis.nihonwine.jp">DIS</option>
+      <option value="https://sayaka-kitchen.com">SAYAKA KITCHEN Official</option>
+      <option value="https://app.sayaka-kitchen.com">SAYAKA KITCHEN App</option>
+      <option value="https://admin.sayaka-kitchen.com">SAYAKA KITCHEN Admin</option>
+    </select>
+    <input id="url" value="https://example.com" autocomplete="off" spellcheck="false"/>
+    <button id="open" class="primary">PC + SP OPEN</button>
+    <button id="go" disabled>両方へ移動</button>
+    <button id="stop" disabled>STOP</button>
+  </div>
+  <div class="rowbar">
+    <button id="link" disabled>URL LINK: OFF</button>
+    <select id="master"><option value="pc">PC → SP</option><option value="sp">SP → PC</option></select>
+    <button id="qa" disabled>QA CHECK</button>
+    <button id="renew" disabled>SESSION 更新</button>
+    <span class="msg" style="align-self:center">リンクON時は5秒ごとに選択側のURLへ追従。12:45で自動更新。</span>
+  </div>
+</div>
+<div class="grid">
+<section class="pane"><div class="pane-title"><b>PC</b><span>1440 × 900</span><span id="pcState" style="margin-left:auto">OFFLINE</span></div><div class="viewer"><div id="pcEmpty" class="empty">PC Browser<br><small>Steel session待機中</small></div><iframe id="pc" allow="clipboard-read; clipboard-write"></iframe></div></section>
+<section class="pane"><div class="pane-title"><b>SP</b><span>mobile fingerprint</span><span id="spState" style="margin-left:auto">OFFLINE</span></div><div class="viewer"><div id="spEmpty" class="empty">SP Browser<br><small>Steel mobile session待機中</small></div><iframe id="sp" allow="clipboard-read; clipboard-write"></iframe></div></section>
+<aside class="side">
+<div class="card"><h3>AI ROOM</h3><div class="kv"><span><i class="dot ok"></i>Chatty</span><span>Browser QA</span></div><div class="kv"><span><i class="dot ok"></i>Claude Code</span><span>bridge-ready</span></div><div class="kv"><span><i class="dot ok"></i>Codex</span><span>bridge-ready</span></div></div>
+<div class="card"><h3>SESSION</h3><div class="kv"><span>PC</span><span id="pcId">—</span></div><div class="kv"><span>SP</span><span id="spId">—</span></div><div class="kv"><span>残り</span><span id="timer" class="timer">—</span></div><div class="kv"><span>LINK</span><span id="linkState">OFF</span></div></div>
+<div class="card"><h3>QA</h3><div class="kv"><span>PC</span><span id="pcQa">—</span></div><div class="kv"><span>SP</span><span id="spQa">—</span></div><div id="qaDetail" class="msg">未実行</div></div>
+<div class="card"><h3>CURRENT URL</h3><div class="msg">PC: <span id="pcUrl">—</span></div><div class="msg" style="margin-top:5px">SP: <span id="spUrl">—</span></div></div>
+<div class="card"><h3>CONTROL</h3><div class="msg">Viewerは直接操作可能。URL LINKをONにするとPC/SPの遷移を同期します。</div></div>
+<div class="card"><h3>LOG</h3><div id="log" class="msg">Ready.</div></div>
+</aside>
+</div>
+<script>
+let current=null,endAt=0,tick=null,syncTick=null,linkOn=false,renewing=false;
+const $=s=>document.querySelector(s);
+function setLog(s,bad=false){$('#log').textContent=s;$('#status').textContent=bad?'ERROR':s}
+function state(id,s){$(id).textContent=s}
+function fmtId(s){return s?`${s.slice(0,8)}…`:'—'}
+function viewerUrl(u){if(!u)return 'about:blank';const sep=u.includes('?')?'&':'?';return `${u}${sep}interactive=true&showControls=true`}
+function applySession(j){current=j;$('#pc').src=viewerUrl(j.pc.debugUrl);$('#sp').src=viewerUrl(j.sp.debugUrl);$('#pcEmpty').style.display='none';$('#spEmpty').style.display='none';state('#pcState','LIVE');state('#spState','LIVE');$('#pcId').textContent=fmtId(j.pc.id);$('#spId').textContent=fmtId(j.sp.id);for(const id of ['#stop','#go','#link','#qa','#renew'])$(id).disabled=false;endAt=Date.now()+j.expiresInMs;startTimer();setLog('LIVE')}
+function clearView(){for(const id of ['#pc','#sp'])$(id).src='about:blank';$('#pcEmpty').style.display='grid';$('#spEmpty').style.display='grid';state('#pcState','OFFLINE');state('#spState','OFFLINE');for(const id of ['#pcId','#spId','#timer','#pcUrl','#spUrl'])$(id).textContent='—';for(const id of ['#stop','#go','#link','#qa','#renew'])$(id).disabled=true;current=null;linkOn=false;$('#link').classList.remove('active');$('#link').textContent='URL LINK: OFF';$('#linkState').textContent='OFF';if(tick)clearInterval(tick);if(syncTick)clearInterval(syncTick)}
+async function api(path,body){const r=await fetch(path,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)});const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||`${path} failed`);return j}
+async function stop(){if(!current)return;const old=current;clearView();setLog('STOPPING…');try{await api('/api/stop',{pcId:old.pc.id,spId:old.sp.id})}catch{}setLog('STOPPED')}
+function startTimer(){if(tick)clearInterval(tick);tick=setInterval(async()=>{const n=Math.max(0,endAt-Date.now());const m=Math.floor(n/60000),s=Math.floor((n%60000)/1000);$('#timer').textContent=`${m}:${String(s).padStart(2,'0')}`;if(n<=75000&&!renewing&&current){await renew(true)}if(n<=0&&!renewing){clearView();setLog('SESSION EXPIRED',true)}},1000)}
+async function openPair(){if(current)await stop();const url=$('#url').value.trim();$('#open').disabled=true;setLog('STARTING…');state('#pcState','STARTING');state('#spState','STARTING');try{const j=await api('/api/start',{url});applySession(j);$('#pcUrl').textContent=url;$('#spUrl').textContent=url}catch(e){clearView();setLog(e.message,true)}finally{$('#open').disabled=false}}
+async function goBoth(){if(!current)return;const url=$('#url').value.trim();setLog('NAVIGATING…');try{await api('/api/navigate',{pcId:current.pc.id,spId:current.sp.id,url});$('#pcUrl').textContent=url;$('#spUrl').textContent=url;setLog('LIVE')}catch(e){setLog(e.message,true)}}
+async function syncOnce(){if(!current||!linkOn||renewing)return;try{const j=await api('/api/sync',{pcId:current.pc.id,spId:current.sp.id,master:$('#master').value});$('#pcUrl').textContent=j.pcUrl||'—';$('#spUrl').textContent=j.spUrl||'—';if(j.changed)$('#url').value=$('#master').value==='pc'?j.pcUrl:j.spUrl}catch(e){setLog(`SYNC: ${e.message}`,true)}}
+function toggleLink(){linkOn=!linkOn;$('#link').classList.toggle('active',linkOn);$('#link').textContent=`URL LINK: ${linkOn?'ON':'OFF'}`;$('#linkState').textContent=linkOn?`${$('#master').value.toUpperCase()} MASTER`:'OFF';if(syncTick)clearInterval(syncTick);if(linkOn){syncOnce();syncTick=setInterval(syncOnce,5000)}}
+async function qa(){if(!current)return;setLog('QA CHECK…');try{const j=await api('/api/inspect',{pcId:current.pc.id,spId:current.sp.id});for(const side of ['pc','sp']){const v=j.qa[side];const el=$(`#${side}Qa`);el.textContent=v;el.className=v==='PASS'?'pass':'check'}$('#pcUrl').textContent=j.pc.url;$('#spUrl').textContent=j.sp.url;$('#qaDetail').textContent=`PC ${j.pc.viewport.width}×${j.pc.viewport.height} / broken img ${j.pc.brokenImages} ｜ SP ${j.sp.viewport.width}×${j.sp.viewport.height} / broken img ${j.sp.brokenImages}`;setLog(`QA: PC ${j.qa.pc} / SP ${j.qa.sp}`)}catch(e){setLog(e.message,true)}}
+async function renew(auto=false){if(!current||renewing)return;renewing=true;setLog(auto?'AUTO RENEW…':'RENEW…');const old=current;try{const j=await api('/api/renew',{pc:old.pc,sp:old.sp,fallbackUrl:$('#url').value.trim()});applySession(j);$('#pcUrl').textContent=j.pcUrl;$('#spUrl').textContent=j.spUrl;setLog(auto?'AUTO RENEWED':'RENEWED')}catch(e){setLog(`RENEW: ${e.message}`,true)}finally{renewing=false}}
+$('#project').onchange=e=>{if(e.target.value){$('#url').value=e.target.value;if(current)goBoth()}};
+$('#open').onclick=openPair;$('#go').onclick=goBoth;$('#stop').onclick=stop;$('#link').onclick=toggleLink;$('#qa').onclick=qa;$('#renew').onclick=()=>renew(false);$('#master').onchange=()=>{$('#linkState').textContent=linkOn?`${$('#master').value.toUpperCase()} MASTER`:'OFF'};
+$('#url').addEventListener('keydown',e=>{if(e.key==='Enter'){current?goBoth():openPair()}});
+window.addEventListener('beforeunload',()=>{if(current)navigator.sendBeacon('/api/stop',new Blob([JSON.stringify({pcId:current.pc.id,spId:current.sp.id})],{type:'application/json'}))});
+</script>
+</body></html>
