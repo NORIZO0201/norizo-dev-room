@@ -1,0 +1,11 @@
+{
+  "name": "norizo-dev-room",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vercel dev"
+  },
+  "dependencies": {
+    "playwright-core": "^1.63.0"
+  }
+}
