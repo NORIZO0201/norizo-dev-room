@@ -2,55 +2,42 @@ import { getProvider } from './providers/index.mjs';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
-
-  const oldPc = req.body?.pc;
-  const oldSp = req.body?.sp;
-  if (!oldPc?.id || !oldSp?.id) return res.status(400).json({ error: 'Missing sessions' });
-
+  const oldSessions = req.body?.sessions || {};
+  const fallbackUrl = req.body?.fallbackUrl || 'https://example.com';
   let p;
-  let pcUrl = req.body?.fallbackUrl || 'https://example.com';
-  let spUrl = pcUrl;
-
   try {
     p = await getProvider();
-
-    [pcUrl, spUrl] = await Promise.all([
-      p.getUrl(oldPc.id).catch(() => pcUrl),
-      p.getUrl(oldSp.id).catch(() => spUrl)
-    ]);
-
-    await Promise.allSettled([p.release(oldPc.id), p.release(oldSp.id)]);
-
-    if (p.profileReady) {
-      await Promise.all([
-        p.profileReady(oldPc.profileId),
-        p.profileReady(oldSp.profileId)
-      ]);
+    const urls = {};
+    for (const [device, session] of Object.entries(oldSessions)) {
+      if (!session?.id) continue;
+      urls[device] = await p.getUrl(session.id).catch(() => fallbackUrl);
     }
 
-    const [pc, sp] = await Promise.all([
-      p.createSession({
-        dimensions: { width: 1440, height: 900 },
-        ...(oldPc.profileId ? { profileId: oldPc.profileId } : {}),
-        persistProfile: true
-      }),
-      p.createSession({
-        deviceConfig: { device: 'mobile' },
-        ...(oldSp.profileId ? { profileId: oldSp.profileId } : {}),
-        persistProfile: true
-      })
-    ]);
+    await Promise.allSettled(Object.values(oldSessions).map(s => p.release(s?.id)));
 
-    await Promise.all([p.goto(pc.id, pcUrl), p.goto(sp.id, spUrl)]);
+    const sessions = {};
+    for (const [device, old] of Object.entries(oldSessions)) {
+      if (!old?.id) continue;
+      if (device === 'pc') {
+        sessions.pc = await p.createSession({
+          dimensions: { width: 1440, height: 900 },
+          ...(old.profileId ? { profileId: old.profileId } : {}),
+          persistProfile: true
+        });
+      } else {
+        sessions[device] = await p.createSession({
+          deviceConfig: { device: 'mobile' },
+          ...(old.profileId ? { profileId: old.profileId } : {}),
+          persistProfile: true
+        });
+      }
+    }
 
-    return res.status(200).json({
-      provider: p.info().provider,
-      pc,
-      sp,
-      expiresInMs: p.SESSION_MS,
-      pcUrl,
-      spUrl
-    });
+    await Promise.all(Object.entries(sessions).map(([device, session]) =>
+      p.goto(session.id, urls[device] || fallbackUrl, device === 'pc' ? {} : { mobile: true, deviceProfile: device })
+    ));
+
+    return res.status(200).json({ provider: p.info().provider, sessions, urls, expiresInMs: p.SESSION_MS });
   } catch (e) {
     return res.status(500).json({ error: e?.message || String(e) });
   }
