@@ -9,6 +9,7 @@ on:
   push:
     branches:
       - 'ops/**'
+      - 'executor/**'
     paths:
       - 'deploy/**'
       - 'scripts/**'
@@ -31,11 +32,13 @@ jobs:
         run: |
           bash -n deploy/health/install-health-monitor.sh
           bash -n scripts/bootstrap-conoha.sh
+          bash -n scripts/execute-p1-p5.sh
 
       - name: ShellCheck
         run: |
           shellcheck deploy/health/install-health-monitor.sh
           shellcheck scripts/bootstrap-conoha.sh
+          shellcheck scripts/execute-p1-p5.sh
 
       - name: systemd unit syntax
         run: systemd-analyze verify deploy/health/norizo-health.service
