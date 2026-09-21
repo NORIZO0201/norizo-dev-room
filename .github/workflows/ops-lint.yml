@@ -1,0 +1,38 @@
+name: Ops lint
+
+on:
+  pull_request:
+    paths:
+      - 'deploy/**'
+      - 'scripts/**'
+      - '.github/workflows/ops-lint.yml'
+  push:
+    branches:
+      - 'ops/**'
+    paths:
+      - 'deploy/**'
+      - 'scripts/**'
+      - '.github/workflows/ops-lint.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Python syntax
+        run: python3 -m py_compile deploy/health/health_server.py
+
+      - name: Bash syntax
+        run: |
+          bash -n deploy/health/install-health-monitor.sh
+          bash -n scripts/bootstrap-conoha.sh
+
+      - name: ShellCheck
+        run: |
+          shellcheck deploy/health/install-health-monitor.sh
+          shellcheck scripts/bootstrap-conoha.sh
