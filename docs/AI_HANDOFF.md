@@ -116,3 +116,40 @@ Rules:
 - [ ] runner sees shared task/queue without NORIZO intervention
 - [ ] runner can invoke the approved local Claude Code workflow
 - [ ] one no-op/health task completes and writes result back
+
+
+## ARCHITECTURE CORRECTION — VPS is the autonomous executor
+
+The 24/7 execution authority is the ConoHa VPS, not the Mac and not an interactive Claude session.
+
+Correct model:
+
+ChatGPT / Claude / DEV ROOM
+→ write code, tasks, approvals, and desired state to GitHub / Supabase
+→ ConoHa resident control agent polls the queue continuously
+→ ConoHa executes allowlisted operational actions and resident jobs
+→ systemd restarts failed services
+→ results/telemetry are written back to Supabase / GitHub
+→ AI sessions inspect and improve code when available
+
+Mac-local Claude is only for:
+- one-time bootstrap/install work before the resident agent exists;
+- tasks that strictly require a human-owned local environment;
+- break-glass recovery.
+
+Mac availability MUST NOT be required for ordinary P1→P5 operation.
+
+### 24/7 non-stop requirements
+- norizo-health.service: Restart=always
+- norizo-control-agent.service: Restart=always
+- every resident worker: systemd-managed, checkpointed/idempotent
+- durable queue in Supabase
+- lease timeout + retry for commands/jobs
+- heartbeat/freshness monitoring
+- stale-worker detection
+- safe restart for failed allowlisted services
+- no dependence on ChatGPT or Claude being online
+- no dependence on NORIZO watching the screen
+
+### Progression rule
+After P0 is proven once, P1→P5 implementation and runtime must be driven by durable desired-state tasks and resident VPS workers. Interactive AI sessions may add code and adjust tasks, but the factory continues running without them.
