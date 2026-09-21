@@ -15,9 +15,15 @@ export default async function handler(req, res) {
     pc = await p.createSession({ dimensions: { width: 1440, height: 900 }, persistProfile: true });
     sp = await p.createSession({ deviceConfig: { device: 'mobile' }, persistProfile: true });
 
+    const protectedQa = /\.vercel\.app/i.test(url) && /git-dev-room-qa/i.test(url);
+    const oidc = protectedQa ? process.env.VERCEL_OIDC_TOKEN : null;
+    const extraHTTPHeaders = oidc
+      ? { 'x-vercel-trusted-oidc-idp-token': oidc }
+      : undefined;
+
     const [pcUrl, spUrl] = await Promise.all([
-      p.goto(pc.id, url),
-      p.goto(sp.id, url, { mobile: true, deviceProfile })
+      p.goto(pc.id, url, { extraHTTPHeaders }),
+      p.goto(sp.id, url, { mobile: true, deviceProfile, extraHTTPHeaders })
     ]);
 
     return res.status(200).json({
@@ -27,6 +33,8 @@ export default async function handler(req, res) {
       pcUrl,
       spUrl,
       deviceProfile,
+      protectedQa,
+      oidcAvailable: Boolean(oidc),
       expiresInMs: p.SESSION_MS,
       url
     });
