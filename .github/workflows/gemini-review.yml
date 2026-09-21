@@ -1,4 +1,4 @@
-name: Gemini PR Review
+name: Gemini CLI
 
 on:
   pull_request:
@@ -7,13 +7,10 @@ on:
     types: [created]
 
 jobs:
-  review:
+  gemini:
     if: |
-      github.event_name == 'pull_request' ||
-      (github.event_name == 'issue_comment' &&
-       github.event.issue.pull_request &&
-       contains(github.event.comment.body, '@gemini-cli') &&
-       contains(github.event.comment.body, '/review'))
+      (github.event_name == 'pull_request') ||
+      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@gemini-cli'))
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -21,63 +18,76 @@ jobs:
       pull-requests: write
       issues: write
     steps:
-      - name: Resolve PR number
+      - name: Resolve target
         id: context
         shell: bash
         run: |
           if [ "${{ github.event_name }}" = "pull_request" ]; then
-            echo "pr=${{ github.event.pull_request.number }}" >> "$GITHUB_OUTPUT"
+            echo "number=${{ github.event.pull_request.number }}" >> "$GITHUB_OUTPUT"
+            echo "kind=pr" >> "$GITHUB_OUTPUT"
           else
-            echo "pr=${{ github.event.issue.number }}" >> "$GITHUB_OUTPUT"
+            echo "number=${{ github.event.issue.number }}" >> "$GITHUB_OUTPUT"
+            if [ -n "${{ github.event.issue.pull_request.url }}" ]; then
+              echo "kind=pr" >> "$GITHUB_OUTPUT"
+            else
+              echo "kind=issue" >> "$GITHUB_OUTPUT"
+            fi
           fi
 
       - name: Acknowledge trigger
         env:
           GH_TOKEN: ${{ github.token }}
-          PR_NUMBER: ${{ steps.context.outputs.pr }}
+          NUMBER: ${{ steps.context.outputs.number }}
+          KIND: ${{ steps.context.outputs.kind }}
         run: |
-          gh pr comment "$PR_NUMBER" --repo "${{ github.repository }}" --body "GEMINI_WIRING_TRIGGERED — GitHub event reached the Gemini review workflow. Starting Gemini CLI now."
+          if [ "$KIND" = "pr" ]; then
+            gh pr comment "$NUMBER" --repo "${{ github.repository }}" --body "GEMINI_WIRING_TRIGGERED — GitHub event reached Gemini workflow."
+          else
+            gh issue comment "$NUMBER" --repo "${{ github.repository }}" --body "GEMINI_WIRING_TRIGGERED — GitHub event reached Gemini workflow."
+          fi
 
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      - name: Run Gemini review
-        id: gemini
+      - name: Run Gemini
+        id: gemini_run
         continue-on-error: true
         uses: google-github-actions/run-gemini-cli@v0
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
           gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
-          github_pr_number: ${{ steps.context.outputs.pr }}
+          github_pr_number: ${{ steps.context.outputs.kind == 'pr' && steps.context.outputs.number || '' }}
+          github_issue_number: ${{ steps.context.outputs.number }}
           prompt: |
-            Read AGENTS.md, GEMINI.md, docs/PROJECT.md, docs/SPEC.md, docs/DECISIONS.md and docs/STATUS.md.
-            Review this pull request as NORIZO DEV ROOM's independent auditor.
-            Focus on acceptance criteria, regressions, security, secret exposure, unintended Production/ConoHa/Supabase/Vercel effects, and duplicate Sources of Truth.
-            End with exactly:
+            Read AGENTS.md and GEMINI.md first.
+            If this target is a pull request, review it as NORIZO DEV ROOM's independent auditor.
+            If it is an issue, respond to the explicit request in the @gemini-cli comment.
+            Do not modify Production, ConoHa, Supabase, DNS, secrets, or paid services.
+            End with:
             VERDICT: PASS | CHANGES_REQUESTED | NEEDS_HUMAN
             BLOCKERS:
             NON_BLOCKING:
             NEXT:
 
-      - name: Publish Gemini result
+      - name: Publish result
         if: always()
         env:
           GH_TOKEN: ${{ github.token }}
-          PR_NUMBER: ${{ steps.context.outputs.pr }}
-          SUMMARY: ${{ steps.gemini.outputs.summary }}
-          ERROR_TEXT: ${{ steps.gemini.outputs.error }}
-          OUTCOME: ${{ steps.gemini.outcome }}
+          NUMBER: ${{ steps.context.outputs.number }}
+          KIND: ${{ steps.context.outputs.kind }}
+          SUMMARY: ${{ steps.gemini_run.outputs.summary }}
+          OUTCOME: ${{ steps.gemini_run.outcome }}
         run: |
           if [ "$OUTCOME" = "success" ] && [ -n "$SUMMARY" ]; then
-            body="## Gemini automated review
+            body="## Gemini result
 
 $SUMMARY"
           else
-            body="GEMINI_WIRING_AUTH_OR_RUNTIME_FAILED — trigger wiring succeeded, but Gemini CLI did not complete.
-
-- action outcome: $OUTCOME
-- likely remaining gate: Gemini authentication / action runtime setup
-- inspect the GitHub Actions job for the exact error"
+            body="GEMINI_WIRING_AUTH_OR_RUNTIME_FAILED — GitHub trigger succeeded, Gemini model execution did not. Check Actions logs; authentication/runtime setup is the remaining gate."
           fi
-          gh pr comment "$PR_NUMBER" --repo "${{ github.repository }}" --body "$body"
+          if [ "$KIND" = "pr" ]; then
+            gh pr comment "$NUMBER" --repo "${{ github.repository }}" --body "$body"
+          else
+            gh issue comment "$NUMBER" --repo "${{ github.repository }}" --body "$body"
+          fi
