@@ -14,18 +14,21 @@ header{height:64px;border-bottom:1px solid var(--line);display:flex;align-items:
 </style>
 </head>
 <body>
-<header><h1>NORIZO DEV ROOM</h1><div class="sub">Steel Live Bridge · V3</div><div id="status" class="status">READY</div></header>
+<header><h1>NORIZO DEV ROOM</h1><div class="sub">Unified Service QA · V4</div><div id="status" class="status">READY</div></header>
 <div class="toolbar">
   <div class="rowbar">
     <select id="project">
       <option value="">CUSTOM URL</option>
+      <option value="https://oh-my-nihon-wine.jp">OMNW</option>
       <option value="https://nihonwine.jp">日本ワイン.jp</option>
-      <option value="https://craft-nihon-wine.jp">CNW</option>
-      <option value="https://nihoncheese.jp">日本チーズ.jp</option>
+      <option value="https://craft-nihon-wine.jp">クラフト日本ワイン (CNW)</option>
+      <option value="https://craftwineshop.com">Craft Wine Shop (CWS)</option>
       <option value="https://dis.nihonwine.jp">DIS</option>
+      <option value="https://nihoncheese.jp">日本チーズ.jp</option>
       <option value="https://sayaka-kitchen.com">SAYAKA KITCHEN Official</option>
       <option value="https://app.sayaka-kitchen.com">SAYAKA KITCHEN App</option>
       <option value="https://admin.sayaka-kitchen.com">SAYAKA KITCHEN Admin</option>
+      <option value="https://local-engine.jp">LOCAL ENGINE</option>
     </select>
     <input id="url" value="https://example.com" autocomplete="off" spellcheck="false"/>
     <button id="open" class="primary">PC + SP OPEN</button>
@@ -44,7 +47,8 @@ header{height:64px;border-bottom:1px solid var(--line);display:flex;align-items:
 <section class="pane"><div class="pane-title"><b>PC</b><span>1440 × 900</span><span id="pcState" style="margin-left:auto">OFFLINE</span></div><div class="viewer"><div id="pcEmpty" class="empty">PC Browser<br><small>Steel session待機中</small></div><iframe id="pc" allow="clipboard-read; clipboard-write"></iframe></div></section>
 <section class="pane"><div class="pane-title"><b>SP</b><span>mobile fingerprint</span><span id="spState" style="margin-left:auto">OFFLINE</span></div><div class="viewer"><div id="spEmpty" class="empty">SP Browser<br><small>Steel mobile session待機中</small></div><iframe id="sp" allow="clipboard-read; clipboard-write"></iframe></div></section>
 <aside class="side">
-<div class="card"><h3>CONTROL</h3><div class="kv"><span><i class="dot ok"></i>Chatty</span><span>single command origin</span></div><div class="kv"><span>GitHub</span><span>storage / history</span></div><div class="kv"><span>ConoHa</span><span>batch + Steel</span></div></div>
+<div class="card"><h3>CONTROL</h3><div class="kv"><span><i class="dot ok"></i>Chatty</span><span>single command origin</span></div><div class="kv"><span>GitHub</span><span>code / state / history</span></div><div class="kv"><span>Vercel</span><span>hosting / preview / production</span></div></div>
+<div class="card"><h3>CONTINUOUS WORKERS</h3><div class="kv"><span>OMNW Discovery</span><span class="pill">separate lifecycle</span></div><div class="kv"><span>RELIS</span><span class="pill">separate lifecycle</span></div><div class="msg">WebサービスQAとは分離。常時処理系はDEV ROOM本体のP1–P5実行とは混ぜず、個別ワーカーとして監視する。</div></div>
 <div class="card"><h3>BROWSER PROVIDER</h3><div class="kv"><span>Active</span><span id="provider">loading…</span></div><div id="providerCaps" class="msg">Checking provider…</div></div>
 <div class="card"><h3>SESSION</h3><div class="kv"><span>PC</span><span id="pcId">—</span></div><div class="kv"><span>SP</span><span id="spId">—</span></div><div class="kv"><span>残り</span><span id="timer" class="timer">—</span></div><div class="kv"><span>LINK</span><span id="linkState">OFF</span></div></div>
 <div class="card"><h3>QA</h3><div class="kv"><span>PC</span><span id="pcQa">—</span></div><div class="kv"><span>SP</span><span id="spQa">—</span></div><div id="qaDetail" class="msg">未実行</div></div>
