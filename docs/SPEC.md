@@ -15,7 +15,9 @@ GitHub Issues -------- main
 Claude Code -> PR -> Gemini Review
                     |
                     v
-               NORIZO merge
+      auto-merge if low-risk + checks PASS
+                    |
+          NORIZO only if high-risk
 ```
 
 ## Canonicality
@@ -33,12 +35,12 @@ Included now:
 - project/spec/decision/status separation
 - Issue-based task coordination
 - PR-based change review
-- manual handoff between GitHub-visible agents (no copy/paste relay)
+- GitHub-visible handoff between agents with no NORIZO copy/paste relay
 
 Explicitly deferred:
 - `state.json` as project coordination truth
 - GitHub Actions agent ping-pong
-- automatic agent invocation
+- automatic agent invocation beyond the pilot until the trigger path is verified
 - new Supabase coordination schema
 - ConoHa resident AI-team orchestration
 - new AI-HQ repository
@@ -48,7 +50,7 @@ Explicitly deferred:
 - ChatGPT owns planning and Issue quality.
 - Claude Code owns implementation.
 - Gemini owns independent research/review.
-- NORIZO owns final merge/strategic decisions.
+- NORIZO owns strategic/high-risk decisions; routine reversible merges should not require NORIZO.
 
 ## Handoff contract
 
