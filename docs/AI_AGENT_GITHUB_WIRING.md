@@ -13,3 +13,7 @@ Authentication secrets are intentionally not committed:
 - `GEMINI_API_KEY`
 
 If either secret is absent, the workflow trigger still proves the wiring path and reports the authentication gate in GitHub.
+
+## Wiring probe
+
+A low-risk documentation-only PR is used to verify that the Gemini review workflow fires on `pull_request` events.
