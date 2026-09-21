@@ -8,7 +8,7 @@ The team is established first on GitHub. ConoHa is attached later as the 24/7 ex
 
 ## People / Agents
 
-- NORIZO — product owner, final decision and merge gate
+- NORIZO — product owner and high-risk/final strategic decision gate
 - ChatGPT — PM / architect / dispatcher
 - Claude Code — primary implementation owner
 - Gemini — research / audit / review
@@ -20,5 +20,5 @@ The team is established first on GitHub. ConoHa is attached later as the 24/7 ex
 2. `main` is the single accepted project truth.
 3. Work is represented as Issues; proposed truth changes as PRs.
 4. Only one implementation owner works a given work unit by default.
-5. NORIZO only needs to provide direction and approvals, not relay AI messages.
+5. NORIZO only needs to provide direction and exceptional/high-risk approvals, not relay messages or approve routine reversible work.
 6. The same operating model can later be connected to ConoHa without redefining team semantics.
