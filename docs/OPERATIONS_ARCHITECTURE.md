@@ -176,6 +176,62 @@ Host conoha-dev
 
 ---
 
+## 5.5 ConoHa 公式 MCP（`conoha-vps-mcp`）
+
+### 登録済みの設定
+
+リポジトリ直下の `.mcp.json` に、ConoHa 公式 MCP サーバーを **プロジェクトスコープ** で登録済みです。
+
+```json
+{ "mcpServers": { "conoha-vps-mcp": { "type": "http", "url": "https://api.conoha.jp/vps/mcp" } } }
+```
+
+**プロジェクトスコープにした理由：** この設定ファイルは Git で共有されるため、
+Mac 側で `git pull` すれば **NORIZO が `claude mcp add` を打ち直す必要がありません。**
+リポジトリを開いた Claude Code が自動的にこの MCP を認識します。
+
+> `.mcp.json` には URL しか入りません。認証トークンは各マシンの `~/.claude/` 側に
+> 別途保存されるため、public リポジトリに置いても秘密情報は漏れません。
+
+### 初回だけ必要な作業（Mac 側・1回のみ）
+
+1. Mac のターミナルでこのリポジトリを開いて `claude` を起動する
+2. 「このプロジェクトのMCPサーバーを承認しますか？」と聞かれるので **承認する**
+3. `/mcp` と入力し、`conoha-vps-mcp` でログイン（ブラウザが開いてConoHaの認証画面へ）
+
+以後は認証が保持され、毎回のログインは不要です。
+
+### Web版セッションでは使えません（実測）
+
+このWeb版コンテナからは `api.conoha.jp` へ **ネットワーク的に到達できません**（HTTPS接続が拒否される）。
+また OAuth ログインにはブラウザが必要で、この環境にはブラウザがありません。
+
+| 接続先 | Web版からの到達性 |
+|---|---|
+| `api.github.com` | ✅ 到達可 |
+| `api.conoha.jp` | ❌ **遮断** |
+| `api.vercel.com`（直接） | ❌ 遮断（MCP経由のみ可） |
+
+→ **ConoHa の操作は Mac 版 Claude Code でのみ行えます。** この点は SSH と同じです。
+
+### MCP と SSH の使い分け
+
+第3章の「優先順位」に従い、**MCP を第一手段**とします。
+
+| やりたいこと | 使う手段 |
+|---|---|
+| VPSの起動/停止/再起動、プラン確認、スナップショット | **ConoHa MCP**（`conoha-vps-mcp`） |
+| VPSの状態・料金・構成の確認 | **ConoHa MCP** |
+| OS内部の作業（ログ確認、git pull、Docker操作、ビルド） | **SSH**（`ssh conoha-dev`） |
+| 緊急復旧（SSHで入れない時） | VNCコンソール |
+
+MCP で済む操作をわざわざ SSH で行わないでください。MCP のほうが操作履歴が残り、事故が起きにくくなります。
+
+> **注意：** VPSの再起動・停止・プラン変更は、第9章「事前報告が必須」の対象です。
+> MCP で実行できても、**NORIZO の承認なしに実行しないでください。**
+
+---
+
 ## 6. 認証情報の保存場所（どこに何を置くか）
 
 | 情報 | 正しい保管場所 | 絶対にやってはいけない場所 |
@@ -185,6 +241,7 @@ Host conoha-dev
 | ConoHa VPSのIPアドレス | Mac `~/.ssh/config` と ConoHa管理画面 | 公開リポジトリ |
 | Vercel / Supabase / Steel のAPIキー | **Vercel の環境変数** | リポジトリ、チャット |
 | GitHubアクセス | Mac: `gh auth` または SSH鍵 / Web版: 自動発行トークン | 手動でのトークンコピペ |
+| ConoHa MCP の認証トークン | Mac `~/.claude/`（OAuthで自動保存） | `.mcp.json`、リポジトリ |
 | Web版 Claude Code | **何も預けない**（使い捨て環境のため） | 秘密鍵の持ち込み |
 
 ### 判断の原則
@@ -301,6 +358,7 @@ NORIZO が以下のいずれかを言った時 **だけ**：
 
 このWebセッションからは実行できないため、Mac版 Claude Code で行います。
 
+- [ ] PHASE 3-0: Mac で `git pull` → `claude` 起動 → `.mcp.json` の `conoha-vps-mcp` を承認 → `/mcp` でログイン
 - [ ] PHASE 3-a: Mac の `~/.ssh/config` に `conoha-dev` を追加（`scripts/mac-setup-ssh.sh` を利用）
 - [ ] PHASE 3-b: ssh-agent / キーチェーン登録の確認
 - [ ] PHASE 4: `ssh conoha-dev` で接続テスト
