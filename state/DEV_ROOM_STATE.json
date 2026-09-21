@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-09-21T14:08:00Z",
-  "current_phase": "P3",
+  "updated_at": "2026-09-21T14:30:00Z",
+  "current_phase": "P4",
   "maintenance_mode": false,
   "retired_infrastructure": {
     "conoha": {
@@ -47,19 +47,24 @@
     },
     "P3": {
       "name": "Reusable PC/SP browser QA gate",
-      "status": "in_progress",
+      "status": "complete",
       "requirements": {
-        "responsive_pc_sp": false,
-        "navigation": false,
-        "console_runtime_errors": false,
-        "screenshots_or_visual_evidence": false,
-        "regression_verification": false
+        "responsive_pc_sp": true,
+        "navigation": true,
+        "console_runtime_errors": true,
+        "screenshots_or_visual_evidence": true,
+        "regression_verification": true
       },
-      "evidence": []
+      "evidence": [
+        "docs/evidence/2026-09-21-P3-COMPLETE.md",
+        "commit:daa4dad2353a5b24b45b95a2c25b8f80753b3400",
+        "runner:qa/browser-qa-local.mjs",
+        "selftest:qa/chromium-selftest.mjs"
+      ]
     },
     "P4": {
       "name": "Reusable project workers / observation contracts",
-      "status": "pending",
+      "status": "in_progress",
       "requirements": {
         "provider_neutral_checkpoint": false,
         "provider_neutral_heartbeat": false,
