@@ -1,0 +1,29 @@
+[Unit]
+Description=NORIZO DEV ROOM P1-P5 executor (one-shot pass)
+Documentation=https://github.com/NORIZO0201/norizo-dev-room/blob/main/docs/RESIDENT_RECOVERY.md
+After=network-online.target norizo-health.service
+Wants=network-online.target norizo-health.service
+
+[Service]
+Type=oneshot
+User=root
+Group=root
+Environment=NORIZO_ROOT=/opt/norizo
+Environment=NORIZO_LOG_DIR=/var/log/norizo
+# Both gates stay off by default. Steel self-host and deterministic builds are
+# opted into explicitly, per docs/P1_P5_EXECUTION.md.
+Environment=ENABLE_STEEL=0
+Environment=EXECUTE_BUILDS=0
+ExecStart=/bin/bash /opt/norizo/norizo-dev-room/scripts/run-p1-p5-executor.sh
+TimeoutStartSec=3600
+
+# Exit 75 means HOLD / human review. Record it as a clean stop so the timer
+# does not treat a deliberate hold as a crash to retry.
+SuccessExitStatus=75
+
+NoNewPrivileges=true
+ProtectHome=true
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=norizo-p1-p5

@@ -1,0 +1,14 @@
+[Unit]
+Description=NORIZO DEV ROOM recovery supervisor schedule
+Documentation=https://github.com/NORIZO0201/norizo-dev-room/blob/main/docs/RESIDENT_RECOVERY.md
+
+[Timer]
+# systemd itself is the outer supervisor, so the watchdog is not in the same
+# failure domain as the units it repairs.
+OnBootSec=2min
+OnUnitActiveSec=5min
+AccuracySec=30s
+Unit=norizo-supervisor.service
+
+[Install]
+WantedBy=timers.target

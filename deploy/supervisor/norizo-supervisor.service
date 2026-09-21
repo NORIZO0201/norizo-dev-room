@@ -1,0 +1,29 @@
+[Unit]
+Description=NORIZO DEV ROOM recovery supervisor (one-shot pass)
+Documentation=https://github.com/NORIZO0201/norizo-dev-room/blob/main/docs/RESIDENT_RECOVERY.md
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=root
+Group=root
+Environment=NORIZO_ROOT=/opt/norizo
+Environment=NORIZO_LOG_DIR=/var/log/norizo
+Environment=NORIZO_DESIRED_STATE=/etc/norizo/desired-state.json
+ExecStart=/usr/bin/python3 /opt/norizo/norizo-dev-room/deploy/supervisor/recovery_supervisor.py
+TimeoutStartSec=180
+
+# The supervisor must be able to enable units, so /etc/systemd/system stays
+# writable. Everything else is the usual hardening.
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+LockPersonality=true
+RestrictSUIDSGID=true
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=norizo-supervisor

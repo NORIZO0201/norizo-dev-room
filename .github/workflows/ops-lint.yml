@@ -39,3 +39,28 @@ jobs:
 
       - name: systemd unit syntax
         run: systemd-analyze verify deploy/health/norizo-health.service
+
+      - name: Resident recovery checks
+        run: |
+          python3 -m py_compile deploy/supervisor/recovery_supervisor.py
+          python3 -m json.tool deploy/supervisor/desired-state.json > /dev/null
+          bash -n deploy/supervisor/install-supervisor.sh
+          bash -n deploy/executor/install-p1-p5-timer.sh
+          bash -n scripts/run-p1-p5-executor.sh
+          shellcheck deploy/supervisor/install-supervisor.sh
+          shellcheck deploy/executor/install-p1-p5-timer.sh
+          shellcheck scripts/run-p1-p5-executor.sh
+          systemd-analyze verify deploy/supervisor/norizo-supervisor.service
+          systemd-analyze verify deploy/supervisor/norizo-supervisor.timer
+          systemd-analyze verify deploy/executor/norizo-p1-p5.service
+          systemd-analyze verify deploy/executor/norizo-p1-p5.timer
+
+      - name: Supervisor never stops or disables a unit
+        run: |
+          # The supervisor's safety contract is one-directional. Fail the build
+          # if a stop/disable/mask verb is ever introduced into it.
+          if grep -nE '"(stop|disable|mask|unmask)"' \
+              deploy/supervisor/recovery_supervisor.py; then
+            echo "Supervisor must never stop, disable, mask or unmask a unit." >&2
+            exit 1
+          fi

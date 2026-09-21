@@ -1,0 +1,15 @@
+[Unit]
+Description=NORIZO DEV ROOM P1-P5 executor schedule
+Documentation=https://github.com/NORIZO0201/norizo-dev-room/blob/main/docs/RESIDENT_RECOVERY.md
+
+[Timer]
+# The schedule lives on the VPS, not in an external automation platform.
+OnBootSec=10min
+OnUnitActiveSec=1h
+AccuracySec=1min
+# Catch up once after downtime instead of replaying every missed firing.
+Persistent=false
+Unit=norizo-p1-p5.service
+
+[Install]
+WantedBy=timers.target
