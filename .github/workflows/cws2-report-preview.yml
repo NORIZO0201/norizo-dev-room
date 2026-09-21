@@ -1,4 +1,4 @@
-name: CWS2 Report Preview
+name: CWS2 Report File
 on:
   push:
     branches:
@@ -7,31 +7,14 @@ on:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: cws2-report-preview
-  cancel-in-progress: true
 
 jobs:
-  deploy:
+  export:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
-      - name: Prepare static site
-        run: |
-          mkdir -p _site
-          cp cws2-technical-report.html _site/index.html
-      - uses: actions/configure-pages@v5
+      - uses: actions/upload-artifact@v4
         with:
-          enablement: true
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: _site
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          name: CWS_2.0_Technical_Reconstruction_Report
+          path: cws2-technical-report.html
+          if-no-files-found: error
