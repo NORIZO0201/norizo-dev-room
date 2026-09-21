@@ -90,13 +90,20 @@ export function validateMaintenance({ contract, state, handoff, observation }) {
   if (omnw?.retired_harvest_absent !== true) errors.push('retired OMNW Harvest absence not proven');
   if (omnw?.discovery_consumer_separate !== true) errors.push('OMNW Discovery/Consumer separation not proven');
 
-  const consumerSha = observation?.projects?.OMNW?.consumer_branch_sha;
+  const consumer = observation?.projects?.OMNW;
+  const consumerSha = consumer?.consumer_branch_sha;
   if (!sha40.test(consumerSha || '')) errors.push('OMNW Consumer branch requires a 40-char SHA');
   const requiredConsumerMilestone = contract?.required_observation?.omnw_consumer_milestone;
   if (!/^M[0-4]$/.test(requiredConsumerMilestone || '')) {
     errors.push('maintenance contract requires an explicit OMNW Consumer milestone M0-M4');
-  } else if (observation?.projects?.OMNW?.consumer_milestone_observed !== requiredConsumerMilestone) {
+  } else if (consumer?.consumer_milestone_observed !== requiredConsumerMilestone) {
     errors.push(`OMNW Consumer milestone observation must be ${requiredConsumerMilestone}`);
+  }
+  if (contract?.required_observation?.omnw_consumer_qa === true) {
+    if (consumer?.consumer_qa_status !== 'PASS') errors.push('OMNW Consumer QA must be PASS');
+    if (!Number.isInteger(consumer?.consumer_qa_run_id) || consumer.consumer_qa_run_id <= 0) {
+      errors.push('OMNW Consumer QA requires a positive workflow run id');
+    }
   }
 
   if (observation?.public_evidence?.nihonwine_jp_homepage_observed !== true) {
