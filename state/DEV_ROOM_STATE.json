@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-09-21T15:17:30Z",
+  "updated_at": "2026-09-21T16:10:00Z",
   "current_phase": "P5",
   "maintenance_mode": true,
   "retired_infrastructure": {
@@ -103,5 +103,15 @@
         "maintenance-handoff-commit:e039e14caf84b0eaff7e460b9b16cf03adf6310c"
       ]
     }
+  },
+  "maintenance": {
+    "status": "active",
+    "contract": "contracts/maintenance-mode.json",
+    "observation": "state/MAINTENANCE_OBSERVATION.json",
+    "validator": "scripts/validate-maintenance-state.mjs",
+    "selftest": "qa/maintenance-selftest.mjs",
+    "command": "npm run qa:maintenance",
+    "last_observed_at": "2026-09-21T16:10:00Z",
+    "last_result": "PASS"
   }
 }
