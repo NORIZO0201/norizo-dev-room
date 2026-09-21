@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "project": "RELIS",
+  "worker": "regional-state-observer",
+  "purpose": "Observe LOCAL ENGINE / RELIS regional-state inputs and preserve resumable operational state without binding execution to a VPS or hosting vendor.",
+  "execution": {
+    "provider": "unbound",
+    "mode": "condition_watch",
+    "requires_vps": false
+  },
+  "checkpoint": {
+    "version": 1,
+    "sequence": 0,
+    "cursor": null,
+    "watermark": null,
+    "last_success_at": null,
+    "input_fingerprint": null,
+    "output_fingerprint": null
+  },
+  "heartbeat": {
+    "status": "ready",
+    "observed_at": "2026-09-21T14:35:00Z",
+    "last_success_at": null,
+    "consecutive_failures": 0,
+    "run_id": null,
+    "detail": "Provider-neutral state contract is ready; a concrete runtime may bind later without changing checkpoint or heartbeat semantics."
+  },
+  "safety": {
+    "idempotent": true,
+    "conoha_dependency": false,
+    "allowed_mutations": [],
+    "max_side_effects_per_run": null
+  }
+}
