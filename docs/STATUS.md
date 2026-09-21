@@ -34,7 +34,7 @@ NORIZO LAB is **Chatty-first**.
 5. **P5 — deterministic project batch/QA gates + handoff state — COMPLETE**
 
 P5 completion evidence: `docs/evidence/2026-09-21-P5-COMPLETE.md`.  
-Latest maintenance evidence: `docs/evidence/2026-09-22-MAINTENANCE-GATE.md`.
+Latest maintenance evidence: `docs/evidence/2026-09-22-MAINTENANCE-OMNW-M4.md`.
 
 ## Infrastructure direction
 
@@ -55,15 +55,15 @@ Use managed browser/provider APIs or already-available browser tooling. No VPS i
 
 Local/tooling QA → Preview only when NORIZO asks → NORIZO confirmation → Production only with explicit NORIZO approval.
 
-DEV ROOM itself now has automatic Git deployment disabled through `git.deploymentEnabled: false`, so maintenance-state commits do not create an implicit Preview or Production deployment.
+DEV ROOM itself has automatic Git deployment disabled through `git.deploymentEnabled: false`, so maintenance-state commits do not create an implicit Preview or Production deployment.
 
 ## P5 handoff note
 
 `state/P5_HANDOFF.json` records `foundation_status: PASS`.
 
 - SAYAKA: P5 gate PASS; Supabase healthy and no runtime errors observed in the latest one-hour window.
-- CNW: P5 development gate PASS. Production remains on `24336a8fd84c5d64a1fbfb0ca47831eecb4f5eef`, while source has advanced to `1140ccf60b676c7c10acd95dd9107bbe24776f69`. No runtime errors were observed in the latest one-hour window, but source remains ahead of Production and any promotion remains blocked pending explicit NORIZO approval.
-- OMNW: P5 gate PASS; Discovery/Master and Consumer remain separate; retired Harvest remains absent. The isolated Consumer branch is still in M3 work at the latest observation and its recognition-index work remains separated from Discovery/Master source data.
+- CNW: P5 development gate PASS. Production remains on `24336a8fd84c5d64a1fbfb0ca47831eecb4f5eef`, while source has advanced to `c7a7d7289cf4c418856990349d50fb66033eaab2`. No runtime errors were observed in the latest one-hour window, but source remains ahead of Production and any promotion remains blocked pending explicit NORIZO approval.
+- OMNW: P5 gate PASS; Discovery/Master and Consumer remain separate; retired Harvest remains absent. The isolated Consumer branch has reached **M4** at `a6911de80df7f7851562b741580cc91f9a61c4b7`; the M4 deployment attempt was canceled by policy and the recognition sidecar remains separated from Discovery/Master source data.
 - NIHON WINE.JP: `PASS-NOT-REQUIRED`; no runtime errors were observed in the latest one-hour window. Historical WordPress proxy observations remain project-specific and do not block the DEV ROOM foundation.
 
 No Preview or Production deployment is implied by P5 completion or maintenance repair.
@@ -80,9 +80,10 @@ The gate checks:
 - tracked GitHub main SHAs, Supabase health and Vercel runtime evidence are present;
 - OMNW retired Harvest surfaces remain absent;
 - OMNW Consumer remains separated from Discovery/Master;
+- OMNW Consumer milestone remains at the contract-required M4 checkpoint;
 - the persisted public-evidence checkpoint remains present.
 
-The gate includes a negative self-test that proves these guards fail when the protected invariants are intentionally broken.
+The gate includes a negative self-test that intentionally downgrades OMNW from M4 to M3 and requires validation to fail, alongside the existing retirement, health, and deployment-boundary guards.
 
 ## Maintenance mode
 
