@@ -2,6 +2,8 @@ let current=null,endAt=0,tick=null,renewing=false,snapshotTick=null;
 const enabled={iphone:true,android:true,pc:false};
 const devices=['iphone','android','pc'];
 const OMNW_QA='https://oh-my-nihon-wine-git-dev-room-qa-oh-my-nihon-wine.vercel.app';
+const PREVIEW_DEFAULTS={'https://oh-my-nihon-wine.jp':OMNW_QA};
+let activeTarget='production';
 const $=s=>document.querySelector(s);
 function setLog(s,bad=false){$('#log').textContent=s;$('#status').textContent=bad?'ERROR':s}
 function viewerUrl(u){if(!u)return 'about:blank';const sep=u.includes('?')?'&':'?';return u+sep+'interactive=true&showControls=true'}
@@ -73,7 +75,7 @@ function startTimer(){
 }
 async function openDevices(){
   if(current)await stop();
-  const list=activeDevices();const url=$('#url').value.trim();
+  const list=activeDevices();const url=currentTargetUrl();
   $('#open').disabled=true;setLog('端末を起動中…');
   list.forEach(d=>{busy(d,'接続中…');$('#'+d+'State').textContent='STARTING'});
   try{
@@ -91,7 +93,7 @@ async function stop(){
 }
 async function navigateAll(){
   if(!current)return;
-  const url=$('#url').value.trim();activeDevices().forEach(d=>busy(d,'ページ反映待ち…'));setLog('NAVIGATING…');
+  const url=currentTargetUrl();activeDevices().forEach(d=>busy(d,'ページ反映待ち…'));setLog('NAVIGATING…');
   try{const j=await api('/api/navigate',{sessions:current.sessions,url});current.urls=j.urls;renderUrls(j.urls);setLog('LIVE')}
   catch(e){setLog(e.message,true)}
   finally{activeDevices().forEach(clearBusy)}
@@ -110,16 +112,8 @@ async function qa(){
 }
 async function renew(auto=false){
   if(!current||renewing)return;renewing=true;setLog(auto?'AUTO RENEW…':'RENEW…');
-  try{const j=await api('/api/renew',{sessions:current.sessions,fallbackUrl:$('#url').value.trim()});applySession(j);setLog(auto?'AUTO RENEWED':'RENEWED')}
+  try{const j=await api('/api/renew',{sessions:current.sessions,fallbackUrl:currentTargetUrl()});applySession(j);setLog(auto?'AUTO RENEWED':'RENEWED')}
   catch(e){setLog(e.message,true)}finally{renewing=false}
-}
-function resolvedTarget(){
-  const project=$('#project').value,mode=$('#environment').value;
-  if(project==='https://oh-my-nihon-wine.jp'){
-    if(mode==='qa-guest')return OMNW_QA+'/welcome';
-    if(mode==='qa-auth')return OMNW_QA+'/collection?qa=1';
-  }
-  return project||$('#url').value.trim();
 }
 function applyProjectPreset(){
   const p=$('#project').value;
@@ -128,18 +122,44 @@ function applyProjectPreset(){
   else{enabled.iphone=true;enabled.android=true;enabled.pc=true}
   updateLayout();
 }
-function refreshTarget(){
-  const next=resolvedTarget();if(next)$('#url').value=next;
-  const isOmnw=$('#project').value==='https://oh-my-nihon-wine.jp';
-  $('#environment').disabled=!isOmnw;if(!isOmnw)$('#environment').value='production';
+function previewKey(){
+  return 'devroom_preview_url:'+($('#project').value||'custom');
+}
+function currentTargetUrl(){
+  return (activeTarget==='preview'?$('#previewUrl').value:$('#productionUrl').value).trim();
+}
+function updateTargetUi(){
+  $('#useProduction').classList.toggle('active',activeTarget==='production');
+  $('#usePreview').classList.toggle('active',activeTarget==='preview');
+  $('#targetHint').textContent='選択中: '+(activeTarget==='preview'?'Preview':'Production');
+}
+function setTargetMode(mode,navigate=true){
+  if(mode==='preview'&&!$('#previewUrl').value.trim()){
+    setLog('Preview URLが未設定です',true);return;
+  }
+  activeTarget=mode;updateTargetUi();
+  if(current&&navigate)navigateAll();
+}
+function loadProjectUrls(){
+  const project=$('#project').value;
+  $('#productionUrl').value=project||'';
+  const saved=localStorage.getItem(previewKey())||PREVIEW_DEFAULTS[project]||'';
+  $('#previewUrl').value=saved;
+  activeTarget='production';
+  updateTargetUi();
+}
+function savePreviewUrl(){
+  const value=$('#previewUrl').value.trim();
+  if(value)localStorage.setItem(previewKey(),value);
+  else localStorage.removeItem(previewKey());
 }
 async function reviewWithChatty(){
   const qaState={};for(const d of devices)qaState[d]=$('#'+d+'Qa').textContent;
   const payload={
     reviewId:'review_'+Date.now(),
     project:$('#project').selectedOptions[0]?.textContent||'CUSTOM',
-    environment:$('#environment').value,
-    url:$('#url').value.trim(),
+    environment:activeTarget,
+    url:currentTargetUrl(),
     devices:activeDevices(),
     qa:qaState,
     log:$('#log').textContent,
@@ -158,7 +178,7 @@ async function reviewWithChatty(){
 }
 async function releaseIntent(kind){
   const qaState={};for(const d of devices)qaState[d]=$('#'+d+'Qa').textContent;
-  const body={kind,project:$('#project').selectedOptions[0]?.textContent||'CUSTOM',url:$('#url').value.trim(),qa:qaState,at:new Date().toISOString()};
+  const body={kind,project:$('#project').selectedOptions[0]?.textContent||'CUSTOM',url:currentTargetUrl(),qa:qaState,at:new Date().toISOString()};
   $('#releaseState').textContent='指示送信中…';
   try{const j=await api('/api/release-intent',body);$('#releaseState').textContent=j.message||'記録しました'}
   catch(e){$('#releaseState').textContent='送信失敗: '+e.message}
@@ -169,8 +189,7 @@ async function loadQaBridge(){
     try{j=raw?JSON.parse(raw):{}}catch{throw new Error('QA Bridge returned a non-JSON response')}
     const ready=Boolean(j.oidcAvailable&&j.ok);
     $('#qaBridgeState').textContent=ready?'READY':'LOCKED';$('#qaBridgeState').className=ready?'pass':'check';
-    $('#qaBridgeDetail').textContent=ready?'OMNW固定QA環境へ接続可能。':'Production確認は利用可能。QA環境は保護解除待ち。';
-    for(const o of $('#environment').options)if(o.value!=='production')o.disabled=!ready;
+    $('#qaBridgeDetail').textContent=ready?'Preview保護付きURLへの接続準備OK。':'Production確認は利用可能。保護付きPreviewは接続条件を確認。';
   }catch(e){$('#qaBridgeState').textContent='ERROR';$('#qaBridgeState').className='fail';$('#qaBridgeDetail').textContent=e.message}
 }
 $('#chattyReview').onclick=reviewWithChatty;
@@ -179,9 +198,12 @@ $('#toggleAndroid').onclick=()=>toggleDevice('android');
 $('#togglePc').onclick=()=>toggleDevice('pc');
 $('#open').onclick=openDevices;$('#stop').onclick=stop;$('#go').onclick=navigateAll;$('#qa').onclick=qa;$('#renew').onclick=()=>renew(false);
 $('#previewOk').onclick=()=>releaseIntent('preview');$('#productionOk').onclick=()=>releaseIntent('production');
-$('#project').onchange=()=>{if(current)stop();applyProjectPreset();refreshTarget()};
-$('#environment').onchange=()=>{refreshTarget();if(current)navigateAll()};
-$('#url').addEventListener('keydown',e=>{if(e.key==='Enter'){current?navigateAll():openDevices()}});
+$('#project').onchange=()=>{if(current)stop();applyProjectPreset();loadProjectUrls()};
+$('#useProduction').onclick=()=>setTargetMode('production');
+$('#usePreview').onclick=()=>setTargetMode('preview');
+$('#previewUrl').addEventListener('change',savePreviewUrl);
+$('#previewUrl').addEventListener('blur',savePreviewUrl);
+for(const id of ['productionUrl','previewUrl'])$('#'+id).addEventListener('keydown',e=>{if(e.key==='Enter'){if(id==='previewUrl')savePreviewUrl();current?navigateAll():openDevices()}});
 window.addEventListener('beforeunload',()=>{if(current)navigator.sendBeacon('/api/stop',new Blob([JSON.stringify({sessions:current.sessions})],{type:'application/json'}))});
 for(const d of ['iphone','android']){
   const img=$('#'+d);
@@ -206,4 +228,4 @@ for(const d of ['iphone','android']){
     if(Math.abs(dy)>10)deviceAction(d,'scroll',{deltaY:dy*3});
   },{passive:true});
 }
-$('#project').value='https://oh-my-nihon-wine.jp';applyProjectPreset();refreshTarget();loadQaBridge();
+$('#project').value='https://oh-my-nihon-wine.jp';applyProjectPreset();loadProjectUrls();loadQaBridge();
