@@ -1,0 +1,103 @@
+{
+  "schema_version": 1,
+  "phase": "P5",
+  "scope": "development_foundation",
+  "policy": {
+    "conoha_dependency": false,
+    "vercel_preview_requires_explicit_norizo_request": true,
+    "production_deploy_requires_explicit_norizo_approval": true,
+    "gate_statuses": ["PASS", "FAIL", "BLOCKED", "PASS-NOT-REQUIRED"],
+    "rule": "P5 proves deterministic development and QA gates plus handoff state. Production promotion is a separate approval boundary and is never implied by a PASS development gate."
+  },
+  "projects": [
+    {
+      "id": "SAYAKA",
+      "required": true,
+      "repository": "NORIZO0201/sayaka-kitchen",
+      "gate_status": "PASS",
+      "deterministic_commands": [
+        "node scripts/verify-three-surface-contract.mjs",
+        "node scripts/verify-sayaka-archive-contract.mjs",
+        "npm run build"
+      ],
+      "browser_qa": {
+        "contract": "P3",
+        "profiles": ["pc", "sp"],
+        "required": true
+      },
+      "data_boundary": "sayaka-kitchen Supabase only",
+      "proof": [
+        "GitHub package.json prebuild defines both SAYAKA contract verifiers",
+        "Vercel latest observed non-production deployment dpl_2iA125LK2EnLibkQ6gufWwFcWiTk was READY",
+        "Supabase sayaka-kitchen project was ACTIVE_HEALTHY",
+        "Vercel runtime error query for the previous 24 hours returned no runtime errors"
+      ]
+    },
+    {
+      "id": "CNW",
+      "required": true,
+      "repository": "NORIZO0201/craft-nihon-wine",
+      "gate_status": "PASS",
+      "deterministic_commands": [
+        "npm run lint",
+        "npm test",
+        "npm run build"
+      ],
+      "browser_qa": {
+        "contract": "P3",
+        "profiles": ["pc", "sp"],
+        "required": true
+      },
+      "data_boundary": "craft-nihon-wine Supabase only",
+      "proof": [
+        "GitHub package.json defines TypeScript lint, node:test suite, and Next build",
+        "Vercel observed READY non-production deployments for the NextThree slug fix branch",
+        "GitHub main components/product/NextThree.tsx uses the Unicode slug directly instead of pre-encoding it",
+        "Supabase craft-nihon-wine project was ACTIVE_HEALTHY"
+      ],
+      "production_note": "Current production is intentionally outside the PASS gate. It remains on an older deployment and recent production logs include failed-to-decode-param errors. Promotion of the current fix requires explicit NORIZO approval."
+    },
+    {
+      "id": "OMNW",
+      "required": true,
+      "repository": "NORIZO0201/oh-my-nihon-wine",
+      "gate_status": "PASS",
+      "deterministic_commands": [
+        "npm run lint",
+        "npm run typecheck",
+        "npm run qa",
+        "npm run build"
+      ],
+      "browser_qa": {
+        "contract": "P3",
+        "profiles": ["pc", "sp"],
+        "required": true
+      },
+      "data_boundary": "contracts/omnw-boundary.json; Discovery/Master is isolated from Consumer and retired Harvest is forbidden",
+      "proof": [
+        "GitHub package.json defines lint, typecheck, bounded Recognition QA, and build commands",
+        "P2 canonical OMNW boundary audit is complete",
+        "Supabase omnw-production project was ACTIVE_HEALTHY",
+        "Vercel runtime error query for the previous 24 hours returned no runtime errors"
+      ]
+    },
+    {
+      "id": "OTHER_NIHON_WINE_JP",
+      "required": false,
+      "repository": "NORIZO0201/nihonwine-rebuild",
+      "gate_status": "PASS-NOT-REQUIRED",
+      "deterministic_commands": [],
+      "browser_qa": {
+        "contract": "P3",
+        "profiles": ["pc", "sp"],
+        "required": false
+      },
+      "data_boundary": "nihon-wine-jp-2 Supabase plus preserved legacy WordPress interfaces",
+      "proof": [
+        "PASS-NOT-REQUIRED is explicit because P5 completion requires the reusable foundation to be proven on SAYAKA, CNW, and OMNW; NIHON WINE.JP already carries its own extensive repository test/build suite and is retained as an observed handoff project rather than a fourth required gate.",
+        "Supabase nihon-wine-jp-2 project was ACTIVE_HEALTHY",
+        "Vercel production observation showed an external WordPress admin proxy socket-hang-up group; this remains a project-specific runtime concern, not a DEV ROOM foundation requirement"
+      ]
+    }
+  ]
+}
