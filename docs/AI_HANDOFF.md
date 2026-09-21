@@ -88,3 +88,31 @@ P1 Dashboard
 No arbitrary remote shell command queue. Commands remain allowlisted.
 No new public monitoring ports.
 No secret material in GitHub.
+
+
+## Autonomous ignition — required before P1
+The remaining automation gap is the Mac-local executor. GitHub/Supabase coordination alone does not start a local Claude Code process.
+
+Target flow:
+
+ChatGPT / DEV ROOM
+→ GitHub Issue + AI_HANDOFF / Supabase command queue
+→ Mac-local runner (launchd, always-on while Mac is available)
+→ invokes/assigns Claude Code local work for tasks that require ConoHa SSH
+→ writes evidence/result back to GitHub Issue and shared branch
+
+Rules:
+- NORIZO is never the relay.
+- Cloud Claude handles code-only tasks.
+- Mac-local Claude handles ConoHa OS tasks.
+- The runner must first verify local execution (Darwin + /Users present) before any ConoHa action.
+- Never copy SSH keys into cloud environments.
+- When the Mac is offline, ConoHa resident services continue independently; queued Mac-only tasks wait safely.
+- P1→P5 may proceed automatically only after this ignition path is installed and proven once.
+
+### Local executor completion gate
+- [ ] launchd job installed on Mac
+- [ ] environment check passes as Mac-local
+- [ ] runner sees shared task/queue without NORIZO intervention
+- [ ] runner can invoke the approved local Claude Code workflow
+- [ ] one no-op/health task completes and writes result back
