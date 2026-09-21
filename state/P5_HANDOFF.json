@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "phase": "P5",
-  "observed_at": "2026-09-21T16:10:00Z",
+  "observed_at": "2026-09-21T17:06:30Z",
   "foundation_status": "PASS",
   "deployment_policy": {
     "preview_without_explicit_norizo_request": false,
@@ -40,7 +40,7 @@
       "gate_status": "PASS",
       "source": {
         "repository": "NORIZO0201/craft-nihon-wine",
-        "main_sha": "1140ccf60b676c7c10acd95dd9107bbe24776f69",
+        "main_sha": "c7a7d7289cf4c418856990349d50fb66033eaab2",
         "verified_fix_files": [
           "components/product/NextThree.tsx",
           "app/favorites/FavoritesClient.tsx",
@@ -64,13 +64,13 @@
         "latest_production_deployment": "dpl_DDYosa76kNfAaKXJSKR7aoqjBzrc",
         "latest_production_sha": "24336a8fd84c5d64a1fbfb0ca47831eecb4f5eef",
         "latest_production_state": "READY",
-        "latest_observed_nonproduction_ready": "dpl_7CTcUbF8ZRduskmN4St487QZ4nT4",
+        "latest_observed_nonproduction_ready": "dpl_3k9Ac9Sg8PcxaJAEuFgkSrxLuEoJ",
         "runtime_errors_1h": 0
       },
       "handoff": {
         "source_ahead_of_production": true,
         "production_action": "AWAITING_EXPLICIT_NORIZO_APPROVAL",
-        "reason": "The current Production is healthy in the latest one-hour observation, but it remains on 24336a8 while slug remediation and later CNW work are ahead on main. Zero recent errors does not prove the source remediation has shipped. Production promotion remains forbidden without explicit NORIZO approval."
+        "reason": "Production is healthy in the latest one-hour observation, but it remains on 24336a8 while slug remediation and later CNW SEO/catalog changes are ahead on main. Zero recent errors does not prove those source changes have shipped. Production promotion remains forbidden without explicit NORIZO approval."
       }
     },
     "OMNW": {
@@ -79,8 +79,8 @@
         "repository": "NORIZO0201/oh-my-nihon-wine",
         "main_sha": "1a926caace6fe12621966a52e9593f6f721c68ba",
         "consumer_work_branch": "agent/recognition-core-m0-m4",
-        "consumer_work_sha": "fef80993180dbb7e48e44fe5d009b9d9a740dfa4",
-        "consumer_milestone_observed": "M3"
+        "consumer_work_sha": "a6911de80df7f7851562b741580cc91f9a61c4b7",
+        "consumer_milestone_observed": "M4"
       },
       "supabase": {
         "project": "omnw-production",
@@ -105,7 +105,7 @@
       "handoff": {
         "source_ahead_of_production": false,
         "production_action": "NONE",
-        "reason": "Canonical main Production remains aligned. Consumer Recognition Core work is isolated on its branch; observed M3 work continues on the recognition_image_index sidecar while CWS/Master/Discovery source tables remain separated, and branch Vercel deploy attempts are canceled by policy."
+        "reason": "Canonical main Production remains aligned. The isolated Consumer Recognition Core branch has now reached M4 at a6911de8; its enrichment work reads canonical sources and retains Consumer-side learning in recognition_image_index. Discovery/Master separation is still proven, retired Harvest surfaces remain absent, and the M4 branch deployment attempt was canceled by policy."
       }
     },
     "OTHER_NIHON_WINE_JP": {
