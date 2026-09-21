@@ -24,6 +24,7 @@
     "public_evidence": true,
     "omnw_boundary_audit": true,
     "omnw_consumer_branch_sha": true,
-    "omnw_consumer_milestone": "M4"
+    "omnw_consumer_milestone": "M4",
+    "omnw_consumer_qa": true
   }
 }
