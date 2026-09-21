@@ -1,8 +1,9 @@
 {
   "schema_version": 1,
   "phase": "P5",
-  "observed_at": "2026-09-21T18:10:00Z",
+  "observed_at": "2026-09-21T19:08:53Z",
   "foundation_status": "PASS",
+  "maintenance_status": "BLOCKED_HUMAN_CONFIRMATION",
   "deployment_policy": {
     "preview_without_explicit_norizo_request": false,
     "production_without_explicit_norizo_approval": false
@@ -33,26 +34,30 @@
       "handoff": {
         "source_ahead_of_production": true,
         "production_action": "NO_AUTOMATIC_ACTION",
-        "reason": "Source contains newer admin cleanup. Production is healthy; any promotion remains an explicit NORIZO approval decision."
+        "reason": "Source contains newer admin cleanup. Production runtime remains clean in the latest one-hour window; any promotion remains an explicit NORIZO approval decision."
       }
     },
     "CNW": {
       "gate_status": "PASS",
       "source": {
         "repository": "NORIZO0201/craft-nihon-wine",
-        "main_sha": "c7a7d7289cf4c418856990349d50fb66033eaab2",
+        "main_sha": "98d40a13f1a3beab1fd2e8e49979650a9d11b562",
+        "ahead_of_production_by_commits": 18,
         "verified_fix_files": [
           "components/product/NextThree.tsx",
           "app/favorites/FavoritesClient.tsx",
           "components/product/ProductHero.tsx",
-          "proxy.ts"
+          "proxy.ts",
+          "app/wines/[slug]/page.tsx"
         ],
         "maintenance_commits": [
           "9c5eb56d330e422be60bac53e793fa3787a257c0",
           "0180a8c2cf82f60b6bb511a5c40ce2a118126f48",
-          "a428d294ac44783d2673aac9eede4b0e3e413caa"
+          "a428d294ac44783d2673aac9eede4b0e3e413caa",
+          "f7bd9d0854a80c134530bb1ce080d8f12565aedb",
+          "347fa1954278e0d8cbcd313974207509ceb2d956"
         ],
-        "verified_fix": "Internal wine navigation keeps Unicode slugs raw and malformed percent wine paths are rejected before Next dynamic-route decoding."
+        "verified_fix": "Later source guards malformed percent wine paths before Next dynamic-route decoding and keeps internal wine slugs Unicode/raw."
       },
       "supabase": {
         "project": "craft-nihon-wine",
@@ -64,30 +69,31 @@
         "latest_production_deployment": "dpl_DDYosa76kNfAaKXJSKR7aoqjBzrc",
         "latest_production_sha": "24336a8fd84c5d64a1fbfb0ca47831eecb4f5eef",
         "latest_production_state": "READY",
-        "latest_observed_nonproduction_ready": "dpl_FJLCDKQkZPVL8h6GxixZKwNKeDjC",
-        "runtime_errors_1h": 5,
+        "latest_observed_nonproduction_ready": "dpl_A17z4ARnRPiFm4dELPVefN9HEmnW",
+        "runtime_errors_1h": 4,
         "runtime_warning": {
           "route": "/wines/[slug]",
-          "http_status_observed": 200,
-          "message": "fetch failed",
-          "cause": "write ETIMEDOUT",
-          "last_seen": "2026-09-21T17:17:05Z"
+          "http_status_observed": 500,
+          "message": "failed to decode param",
+          "count_1h": 4,
+          "last_seen": "2026-09-21T18:55:30Z"
         }
       },
       "handoff": {
         "source_ahead_of_production": true,
         "production_action": "AWAITING_EXPLICIT_NORIZO_APPROVAL",
-        "reason": "Production still serves from 24336a8. The latest one-hour telemetry contains five repeated caught upstream fetch timeouts on one /wines/[slug] request, but that request returned HTTP 200. Slug remediation and later source changes remain ahead on main. No Production promotion is allowed without explicit NORIZO approval."
+        "reason": "Current Production still serves 24336a8 and emitted four HTTP 500 malformed-slug errors in the latest one-hour window. Later malformed-path guards and additional source work are ahead on main. No Production promotion or new DEV ROOM Preview is allowed without the explicit NORIZO workflow."
       }
     },
     "OMNW": {
       "gate_status": "PASS",
       "source": {
         "repository": "NORIZO0201/oh-my-nihon-wine",
-        "main_sha": "1a926caace6fe12621966a52e9593f6f721c68ba",
+        "main_sha": "72e0582c4a9c9894af10f471ffc1f173d24a3601",
         "consumer_work_branch": "agent/recognition-core-m0-m4",
         "consumer_work_sha": "6d9cfa6466e817e5d0c8c2eaa26e0ec6b8cf4cfd",
         "consumer_milestone_observed": "M4",
+        "consumer_milestone_merged_to_main": true,
         "consumer_qa_status": "PASS",
         "consumer_qa_workflow": "Recognition Core QA",
         "consumer_qa_run_id": 35630485168
@@ -99,12 +105,13 @@
       },
       "vercel": {
         "project_id": "prj_9snNz2zJOdB3a8M2bED1ObBsAOx1",
-        "latest_production_deployment": "dpl_3udPCN6dyM4HFEJVTNo1xxdrmZup",
-        "latest_production_sha": "1a926caace6fe12621966a52e9593f6f721c68ba",
+        "latest_production_deployment": "dpl_77tfhLbeCkDs2MoXx4yTXkxWP3cV",
+        "latest_production_sha": "72e0582c4a9c9894af10f471ffc1f173d24a3601",
         "latest_production_state": "READY",
         "runtime_errors_1h": 0,
         "consumer_branch_auto_deploys": "CANCELED_BY_POLICY",
-        "latest_consumer_branch_attempt": "dpl_8awgcVYesUmfRUQbBrEzxboBMnGJ"
+        "latest_consumer_branch_attempt": "dpl_8awgcVYesUmfRUQbBrEzxboBMnGJ",
+        "production_authorization_status": "UNVERIFIED_EXTERNAL_CHANGE"
       },
       "boundary": {
         "discovery_consumer_separate": true,
@@ -115,8 +122,8 @@
       },
       "handoff": {
         "source_ahead_of_production": false,
-        "production_action": "NONE",
-        "reason": "Canonical main Production remains aligned. The isolated Consumer Recognition Core branch is at M4 on 6d9cfa64 and GitHub Actions Recognition Core QA run 35630485168 passed typecheck, QA, Python compile, scoped ESLint, and build. Discovery/Master separation is still proven, retired Harvest tables/views and edge functions remain absent, and the Consumer branch deployment attempt was canceled by policy."
+        "production_action": "HUMAN_CONFIRMATION_REQUIRED",
+        "reason": "Recognition Core M0-M4 has been squashed onto main and Vercel Production now matches 72e0582. Runtime is clean and the OMNW data boundary still passes, but DEV ROOM has no explicit NORIZO approval provenance for this Production change. It is not silently accepted as an approved baseline."
       }
     },
     "OTHER_NIHON_WINE_JP": {
@@ -139,15 +146,22 @@
       },
       "handoff": {
         "production_action": "PROJECT_SPECIFIC_FOLLOW_UP",
-        "reason": "NIHON WINE.JP remains an observed non-required P5 project. No runtime errors were observed in the latest one-hour maintenance window; historical external WordPress proxy concerns remain project-specific and do not gate the DEV ROOM foundation."
+        "reason": "NIHON WINE.JP remains an observed non-required P5 project. No runtime errors were observed in the latest one-hour maintenance window; public homepage observation succeeded with 2026-09-21 NEWS."
       }
     }
+  },
+  "deployment_provenance": {
+    "guard": "ACTIVE",
+    "unverified_external_change_count": 4,
+    "blocking_projects": ["OMNW", "CNW"],
+    "evidence": "docs/evidence/2026-09-22-MAINTENANCE-DEPLOYMENT-PROVENANCE-GUARD.md"
   },
   "next_mode": "maintenance",
   "maintenance_rules": [
     "Keep P1-P5 contracts intact and validate state drift on future runs.",
     "Use contracts/maintenance-mode.json and state/MAINTENANCE_OBSERVATION.json as the deterministic maintenance gate.",
-    "Require current OMNW Consumer M4 branch evidence to include a passing Recognition Core QA workflow run.",
+    "Record authorization provenance for external Preview/Production changes so another actor cannot create a false maintenance PASS.",
+    "Require current OMNW Consumer M4 evidence to include a passing Recognition Core QA workflow run.",
     "Do not revive or inspect ConoHa.",
     "Never revive the retired OMNW Harvest pipeline.",
     "Do not create Vercel Preview unless NORIZO explicitly asks to see one.",
