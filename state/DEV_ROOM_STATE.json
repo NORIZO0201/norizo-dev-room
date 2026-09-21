@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-09-21T14:43:25Z",
+  "updated_at": "2026-09-21T15:17:30Z",
   "current_phase": "P5",
   "maintenance_mode": true,
   "retired_infrastructure": {
@@ -95,10 +95,12 @@
       },
       "evidence": [
         "docs/evidence/2026-09-21-P5-COMPLETE.md",
+        "docs/evidence/2026-09-22-MAINTENANCE-CNW-ROUTE-DRIFT.md",
         "state:P5_HANDOFF.json",
         "contract:contracts/p5-project-gates.json",
         "validator:scripts/validate-p5-gates.mjs",
-        "selftest:qa/p5-gates-selftest.mjs"
+        "selftest:qa/p5-gates-selftest.mjs",
+        "maintenance-handoff-commit:e039e14caf84b0eaff7e460b9b16cf03adf6310c"
       ]
     }
   }
