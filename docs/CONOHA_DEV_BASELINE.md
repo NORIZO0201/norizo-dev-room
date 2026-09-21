@@ -1,92 +1,21 @@
-# ConoHa DEV Baseline
+# ConoHa DEV Baseline — RETIRED TOMBSTONE
 
-Updated: 2026-09-21 JST
+Retired: 2026-09-21 JST
 
-## Purpose
+ConoHa is no longer part of NORIZO DEV ROOM.
 
-ConoHa is NORIZO LAB's persistent execution host for **ordinary deterministic resident jobs** and self-hosted Steel Browser.
+This file is retained only as an audit/tombstone marker so historical references resolve safely. It is **not** an operating guide.
 
-It is not an autonomous AI-agent host and does not receive instructions from GitHub Issues, PR comments, labels, or Actions.
+## Mandatory rule
 
-## Current VPS
+Do not:
+- inspect ConoHa
+- start or stop ConoHa resources
+- recreate/rebuild a VPS
+- migrate a DEV ROOM phase to a VPS
+- restore the former resident-worker/control-plane setup
+- use historical scripts in `deploy/` as a live deployment path
 
-- Provider: ConoHa VPS 3.0
-- OS: Ubuntu 24.04 LTS
-- Plan: 6 vCPU / 12 GB RAM
-- Boot storage: 100 GB
-- Daily backup: enabled, 14-day retention
-- Security baseline: do not add public browser-control/admin ports
-- Existing host is preserved; do not rebuild it for routine changes
+The canonical operating state is `state/DEV_ROOM_STATE.json` and the current architecture is `docs/DEV_ROOM_ARCHITECTURE.md`.
 
-## Operating model
-
-NORIZO → ChatGPT / Chatty → direct infrastructure/service operations.
-
-Long-running work is migrated to this VPS one job at a time.
-
-Every resident job must have:
-- one-shot entrypoint proven first
-- explicit read/write targets
-- checkpoint/idempotency strategy
-- bounded retry/backoff
-- health/log evidence
-- restart policy
-- stop/removal procedure
-
-No resident AI orchestrator is permitted.
-
-## Core stack
-
-Required:
-- Linux / systemd
-- Python
-- Node.js when a workload requires it
-- Docker Engine + Docker Compose
-- Git for code checkout and version history
-- jq / ripgrep / standard build tools
-- health monitoring
-- Steel Browser self-host for PC/SP browser QA
-
-Optional tools such as Claude Code, Codex CLI, or Gemini CLI are not infrastructure dependencies and are not required on the VPS.
-
-## GitHub boundary
-
-GitHub is code/document/history/audit storage.
-
-Forbidden:
-- GitHub Issue → shell
-- GitHub PR comment → AI runner
-- GitHub Action → AI dispatcher
-- GitHub polling as a general command queue
-
-A resident workload may pull versioned code from GitHub, but its runtime instructions and schedules are local deterministic configuration.
-
-## Steel Browser
-
-Steel self-host is the standard browser-development/QA substrate for DEV ROOM.
-
-Official Steel self-host requirements are at least 4 GB RAM and 10 GB free disk. This VPS exceeds those requirements.
-
-Security:
-- bind Steel API to loopback/private access
-- never expose Chrome debugging port 9223 publicly
-- do not expose Steel API publicly without an authenticated gateway
-- browser sessions are development/QA infrastructure, not a public product endpoint
-
-## Vercel
-
-Deployment flow remains:
-
-Local/ConoHa QA → Preview only when NORIZO asks → NORIZO confirmation → Production.
-
-## Security
-
-Never commit:
-- passwords
-- API tokens
-- private SSH keys
-- Vercel/Supabase/Shopify secrets
-- OAuth secrets
-- recovery codes
-
-Production/destructive/paid/security-sensitive operations require NORIZO approval.
+Browser QA uses managed/available browser provider tooling. Project checkpoints and deterministic gates are repository/service based and provider-neutral.
