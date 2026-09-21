@@ -23,7 +23,7 @@ iframe{width:100%;height:100%;border:0;background:#fff}.deviceShot{width:100%;he
 </style>
 </head>
 <body>
-<header><h1>NORIZO DEV ROOM</h1><div class="sub">Device Lab · V8.2 · Appetize Standalone</div><div id="status" class="status">READY</div></header>
+<header><h1>NORIZO DEV ROOM</h1><div class="sub">Device Lab · V8.3 · Streamed Mobile</div><div id="status" class="status">READY</div></header>
 <div class="toolbar">
   <div class="row">
     <select id="project">
@@ -37,14 +37,13 @@ iframe{width:100%;height:100%;border:0;background:#fff}.deviceShot{width:100%;he
 </div>
 <div class="layout">
   <main id="deviceArea" class="deviceArea cols2">
-    <section id="iphonePane" class="pane"><div class="paneTitle"><b>iPhone</b><small>iPhone 16 Pro / Mobile Safari</small><span id="iphoneState" class="state">OFFLINE</span></div><div class="viewer"><div class="deviceShell iphoneShell"><div class="island"></div><div class="screen"><div id="iphoneEmpty" class="empty">iPhone Simulator<small>Appetize / Mobile Safari</small></div><div id="iphoneBusy" class="busy">接続中…</div><iframe id="iphone" allow="clipboard-read; clipboard-write; autoplay"></iframe></div><div class="homebar"></div></div></div></section>
-    <section id="androidPane" class="pane"><div class="paneTitle"><b>Android</b><small>Pixel 9 Pro / Mobile Chrome</small><span id="androidState" class="state">OFFLINE</span></div><div class="viewer"><div class="deviceShell androidShell"><div class="punch"></div><div class="screen"><div id="androidEmpty" class="empty">Android Emulator<small>Appetize / Mobile Chrome</small></div><div id="androidBusy" class="busy">接続中…</div><iframe id="android" allow="clipboard-read; clipboard-write; autoplay"></iframe></div></div></div></section>
+    <section id="iphonePane" class="pane"><div class="paneTitle"><b>iPhone</b><small>393 × 852 / iPhone class</small><span id="iphoneState" class="state">OFFLINE</span></div><div class="viewer"><div class="deviceShell iphoneShell"><div class="island"></div><div class="screen"><div id="iphoneEmpty" class="empty">iPhone QA Device<small>SP確認の主画面</small></div><div id="iphoneBusy" class="busy">接続中…</div><img id="iphone" class="deviceShot" alt="iPhone viewport" draggable="false"/></div><div class="homebar"></div></div></div></section>
+    <section id="androidPane" class="pane"><div class="paneTitle"><b>Android</b><small>412 × 915 / Android class</small><span id="androidState" class="state">OFFLINE</span></div><div class="viewer"><div class="deviceShell androidShell"><div class="punch"></div><div class="screen"><div id="androidEmpty" class="empty">Android QA Device<small>Android分岐確認</small></div><div id="androidBusy" class="busy">接続中…</div><img id="android" class="deviceShot" alt="Android viewport" draggable="false"/></div></div></div></section>
     <section id="pcPane" class="pane hidden"><div class="paneTitle"><b>PC</b><small>1440 × 900</small><span id="pcState" class="state">OFFLINE</span></div><div class="viewer" style="padding:0"><div class="deviceShell pcShell"><div class="screen"><div id="pcEmpty" class="empty">PC Browser<small>必要なサービスだけ表示</small></div><div id="pcBusy" class="busy">接続中…</div><iframe id="pc"></iframe></div></div></div></section>
   </main>
   <aside class="side">
     <div class="card"><h3>DEVICE CONTROL</h3><div class="kv"><span>iPhone</span><span id="iphoneQa">—</span></div><div class="kv"><span>Android</span><span id="androidQa">—</span></div><div class="kv"><span>PC</span><span id="pcQa">非表示</span></div><div id="qaDetail" class="msg">未実行</div></div>
-    <div class="card"><h3>CHATTTY REVIEW</h3><button id="chattyReview" style="width:100%;height:36px" class="primary">Chattyと一緒に確認</button><div id="reviewState" class="msg" style="margin-top:7px">未送信</div></div>
-    <div class="card"><h3>APPETIZE</h3><div class="msg">Mobile Safari / Chrome をStandalone Deviceで直接起動します。追加設定は不要です。</div><div id="appetizeState" class="msg pass" style="margin-top:7px">Standalone Device · 設定不要</div></div>
+    <div class="card"><h3>CHATTY REVIEW</h3><button id="chattyReview" style="width:100%;height:36px" class="primary">Chattyと一緒に確認</button><div id="reviewState" class="msg" style="margin-top:7px">未送信</div></div>
     <div class="card"><h3>APP STATE</h3><div class="kv"><span>QA BRIDGE</span><span id="qaBridgeState" class="check">CHECKING</span></div><div id="qaBridgeDetail" class="msg">OMNW固定QA環境への接続状態を確認中。</div></div>
     <div class="card"><h3>SESSION</h3><div class="kv"><span>残り</span><span id="timer">—</span></div><div class="msg">表示ONの端末だけ起動します。</div></div>
     <div class="card"><h3>RELEASE CONTROL</h3><div class="msg">QA後、必要時のみPreview。最終確認後にProduction OK。</div><div class="release"><button id="previewOk">Preview依頼</button><button id="productionOk" class="prod">Production OK</button></div><div id="releaseState" class="msg" style="margin-top:7px">承認指示なし</div></div>
