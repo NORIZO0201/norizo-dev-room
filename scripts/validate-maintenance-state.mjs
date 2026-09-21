@@ -7,6 +7,10 @@ const here = dirname(fileURLToPath(import.meta.url));
 const root = resolve(here, '..');
 
 const sha40 = /^[0-9a-f]{40}$/;
+const deploymentId = /^dpl_[A-Za-z0-9]+$/;
+const allowedDeploymentEnvironments = new Set(['preview', 'production']);
+const allowedAuthorization = new Set(['EXPLICITLY_APPROVED', 'UNVERIFIED_EXTERNAL_CHANGE']);
+const allowedMaintenanceGateStatus = new Set(['PASS', 'BLOCKED_HUMAN_CONFIRMATION']);
 
 export function validateMaintenance({ contract, state, handoff, observation }) {
   const errors = [];
@@ -21,6 +25,9 @@ export function validateMaintenance({ contract, state, handoff, observation }) {
   }
   if (contract?.policy?.production_deploy_requires_explicit_norizo_approval !== true) {
     errors.push('maintenance contract must require explicit NORIZO approval for Production');
+  }
+  if (contract?.policy?.external_deployments_must_record_authorization_provenance !== true) {
+    errors.push('maintenance contract must track authorization provenance for external deployments');
   }
   if (contract?.policy?.retired_omnw_harvest_must_remain_absent !== true) {
     errors.push('maintenance contract must keep retired OMNW Harvest absent');
@@ -59,6 +66,9 @@ export function validateMaintenance({ contract, state, handoff, observation }) {
     errors.push('invalid maintenance observation identity');
   }
   if (observation?.foundation_status !== 'PASS') errors.push('maintenance observation foundation_status must be PASS');
+  if (!allowedMaintenanceGateStatus.has(observation?.maintenance_gate_status)) {
+    errors.push('maintenance observation requires PASS or BLOCKED_HUMAN_CONFIRMATION gate status');
+  }
   if (observation?.operations?.conoha_touched !== false) errors.push('maintenance observation must prove ConoHa untouched');
   if (observation?.operations?.preview_deploy_created_by_this_run !== false) {
     errors.push('maintenance observation must prove no Preview created by this run');
@@ -81,6 +91,41 @@ export function validateMaintenance({ contract, state, handoff, observation }) {
       errors.push(`${id} requires a non-negative integer Vercel runtime error count`);
     }
     if (!project.deployment_boundary) errors.push(`${id} requires an explicit deployment boundary`);
+  }
+
+  if (contract?.required_observation?.deployment_provenance === true) {
+    const events = observation?.deployment_provenance?.events;
+    if (!Array.isArray(events)) {
+      errors.push('maintenance observation requires deployment provenance events');
+    } else {
+      let unverifiedExternalChange = false;
+      for (const event of events) {
+        if (!tracked.includes(event?.project)) errors.push('deployment provenance event references untracked project');
+        if (!allowedDeploymentEnvironments.has(event?.environment)) {
+          errors.push('deployment provenance event requires preview or production environment');
+        }
+        if (!deploymentId.test(event?.deployment_id || '')) {
+          errors.push('deployment provenance event requires a Vercel deployment id');
+        }
+        if (!sha40.test(event?.sha || '')) errors.push('deployment provenance event requires a 40-char SHA');
+        if (event?.created_by_this_run !== false) {
+          errors.push('deployment provenance external event must prove it was not created by this run');
+        }
+        if (!allowedAuthorization.has(event?.authorization_status)) {
+          errors.push('deployment provenance event requires explicit authorization status');
+        }
+        if (event?.authorization_status === 'UNVERIFIED_EXTERNAL_CHANGE') unverifiedExternalChange = true;
+      }
+      if (unverifiedExternalChange && observation?.maintenance_gate_status !== 'BLOCKED_HUMAN_CONFIRMATION') {
+        errors.push('unverified external deployments require BLOCKED_HUMAN_CONFIRMATION');
+      }
+    }
+  }
+
+  if (observation?.maintenance_gate_status === 'BLOCKED_HUMAN_CONFIRMATION') {
+    if (!Array.isArray(observation?.blockers) || observation.blockers.length === 0) {
+      errors.push('blocked maintenance gate requires at least one blocker');
+    }
   }
 
   const omnw = observation?.omnw_boundary_audit;
@@ -127,6 +172,8 @@ async function main() {
     mode: 'maintenance',
     observed_at: observation.observed_at,
     foundation_status: observation.foundation_status,
+    maintenance_gate_status: observation.maintenance_gate_status,
+    blockers: observation.blockers || [],
     errors
   }, null, 2));
   if (errors.length) process.exit(1);
