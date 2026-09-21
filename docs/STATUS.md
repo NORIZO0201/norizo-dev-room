@@ -10,6 +10,8 @@ The P1→P5 development foundation is complete and DEV ROOM is now in **maintena
 
 Canonical machine-readable state: `state/DEV_ROOM_STATE.json`  
 P5 handoff: `state/P5_HANDOFF.json`  
+Maintenance checkpoint: `state/MAINTENANCE_OBSERVATION.json`  
+Maintenance contract: `contracts/maintenance-mode.json`  
 Completion and maintenance evidence: `docs/evidence/`
 
 ## Current operating model
@@ -32,7 +34,7 @@ NORIZO LAB is **Chatty-first**.
 5. **P5 — deterministic project batch/QA gates + handoff state — COMPLETE**
 
 P5 completion evidence: `docs/evidence/2026-09-21-P5-COMPLETE.md`.  
-Latest maintenance evidence: `docs/evidence/2026-09-22-MAINTENANCE-CNW-ROUTE-DRIFT.md`.
+Latest maintenance evidence: `docs/evidence/2026-09-22-MAINTENANCE-GATE.md`.
 
 ## Infrastructure direction
 
@@ -53,16 +55,34 @@ Use managed browser/provider APIs or already-available browser tooling. No VPS i
 
 Local/tooling QA → Preview only when NORIZO asks → NORIZO confirmation → Production only with explicit NORIZO approval.
 
+DEV ROOM itself now has automatic Git deployment disabled through `git.deploymentEnabled: false`, so maintenance-state commits do not create an implicit Preview or Production deployment.
+
 ## P5 handoff note
 
 `state/P5_HANDOFF.json` records `foundation_status: PASS`.
 
 - SAYAKA: P5 gate PASS; Supabase healthy and no runtime errors observed in the latest one-hour window.
-- CNW: P5 development gate PASS. A one-shot Production release was made after the original P5 handoff, but that Production still logged `/wines/[slug]` decode failures. Additional main-branch remediation now removes remaining pre-encoded internal wine routes and rejects malformed percent wine paths before dynamic-route decoding. Automatic `main` deployment is disabled; further Production promotion remains blocked pending explicit NORIZO approval.
-- OMNW: P5 gate PASS; Discovery/Master and Consumer remain separate; retired Harvest remains absent. The isolated Consumer branch has advanced through observed M3 work while its writes remain on the Consumer recognition-index sidecar rather than Discovery/Master source tables.
+- CNW: P5 development gate PASS. Production remains on `24336a8fd84c5d64a1fbfb0ca47831eecb4f5eef`, while source has advanced to `1140ccf60b676c7c10acd95dd9107bbe24776f69`. No runtime errors were observed in the latest one-hour window, but source remains ahead of Production and any promotion remains blocked pending explicit NORIZO approval.
+- OMNW: P5 gate PASS; Discovery/Master and Consumer remain separate; retired Harvest remains absent. The isolated Consumer branch is still in M3 work at the latest observation and its recognition-index work remains separated from Discovery/Master source data.
 - NIHON WINE.JP: `PASS-NOT-REQUIRED`; no runtime errors were observed in the latest one-hour window. Historical WordPress proxy observations remain project-specific and do not block the DEV ROOM foundation.
 
 No Preview or Production deployment is implied by P5 completion or maintenance repair.
+
+## Deterministic maintenance gate
+
+Run `npm run qa:maintenance` to validate the persisted maintenance checkpoint.
+
+The gate checks:
+
+- P1–P5 remain complete and maintenance mode remains active;
+- ConoHa remains retired and untouched;
+- Preview and Production approval boundaries remain intact;
+- tracked GitHub main SHAs, Supabase health and Vercel runtime evidence are present;
+- OMNW retired Harvest surfaces remain absent;
+- OMNW Consumer remains separated from Discovery/Master;
+- the persisted public-evidence checkpoint remains present.
+
+The gate includes a negative self-test that proves these guards fail when the protected invariants are intentionally broken.
 
 ## Maintenance mode
 
@@ -70,6 +90,8 @@ DEV ROOM remains enabled after P5 and must continue to:
 
 - preserve the P1–P5 contracts and canonical phase state;
 - detect foundation drift and make safe deterministic repairs when possible;
+- refresh `state/MAINTENANCE_OBSERVATION.json` with exact evidence;
+- run the deterministic maintenance gate after state changes;
 - preserve the OMNW Discovery/Master ↔ Consumer boundary;
 - never revive the old OMNW Harvest pipeline;
 - keep P3 browser QA reusable for PC/SP verification;
@@ -80,6 +102,10 @@ DEV ROOM remains enabled after P5 and must continue to:
 - never deploy Production without explicit NORIZO approval.
 
 Maintenance continues until NORIZO explicitly stops it.
+
+## Known approval boundary
+
+OMNW main currently uses a Vercel `ignoreCommand` that allows `main` builds while ignoring non-main branches. A change to that file on OMNW main could itself enter the Production deployment path, so maintenance must not alter it without explicit NORIZO Production approval. Consumer branch deployment attempts remain canceled under the current branch policy.
 
 ## Retired on 2026-09-21
 
