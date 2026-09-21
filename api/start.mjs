@@ -13,12 +13,17 @@ export default async function handler(req, res) {
     pc = await p.createSession({ dimensions: { width: 1440, height: 900 }, persistProfile: true });
     sp = await p.createSession({ deviceConfig: { device: 'mobile' }, persistProfile: true });
 
-    await Promise.all([p.goto(pc.id, url), p.goto(sp.id, url)]);
+    const [pcUrl, spUrl] = await Promise.all([
+      p.goto(pc.id, url),
+      p.goto(sp.id, url, { mobile: true })
+    ]);
 
     return res.status(200).json({
       provider: p.info().provider,
       pc,
       sp,
+      pcUrl,
+      spUrl,
       expiresInMs: p.SESSION_MS,
       url
     });
