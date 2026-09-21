@@ -8,7 +8,8 @@ ENDPOINT=os.environ.get("NORIZO_CONTROL_ENDPOINT","https://vlelayhbebvwlvzfehgt.
 TOKEN_FILE=Path(os.environ.get("NORIZO_NODE_TOKEN_FILE","/etc/norizo/node-token"))
 HEALTH_URL=os.environ.get("NORIZO_HEALTH_URL","http://127.0.0.1:8787/status")
 INTERVAL=max(15,int(os.environ.get("NORIZO_AGENT_INTERVAL","30")))
-ALLOWED_UNITS={"norizo-health.service","omnw-discovery.service","omnw-recognition.service","omnw-master.service","omnw-m0-m5.service"}
+ALLOWED_START_RESTART_UNITS={"norizo-health.service","norizo-p1-p5.timer","norizo-supervisor.timer","norizo-relis-observer.service","omnw-discovery.service","omnw-recognition.service","omnw-master.service","omnw-m0-m5.service"}
+ALLOWED_STOP_UNITS={"omnw-discovery.service","omnw-recognition.service","omnw-master.service","omnw-m0-m5.service"}
 ALLOWED_REPOS={"norizo-dev-room","oh-my-nihon-wine","local-engine","sayaka-kitchen"}
 ROOT=Path("/opt/norizo")
 
@@ -45,11 +46,15 @@ def run(cmd,timeout=120):
 
 def command(c):
     name=c.get("command"); args=c.get("args") or {}
-    if name in {"start_unit","restart_unit","stop_unit"}:
+    if name in {"start_unit","restart_unit"}:
         unit=str(args.get("unit",""))
-        if unit not in ALLOWED_UNITS: raise ValueError("unit_not_allowed")
-        verb={"start_unit":"start","restart_unit":"restart","stop_unit":"stop"}[name]
+        if unit not in ALLOWED_START_RESTART_UNITS: raise ValueError("unit_not_allowed")
+        verb={"start_unit":"start","restart_unit":"restart"}[name]
         return run(["systemctl",verb,unit])
+    if name=="stop_unit":
+        unit=str(args.get("unit",""))
+        if unit not in ALLOWED_STOP_UNITS: raise ValueError("stop_not_allowed")
+        return run(["systemctl","stop",unit])
     if name=="git_ff_pull":
         repo=str(args.get("repo",""))
         if repo not in ALLOWED_REPOS: raise ValueError("repo_not_allowed")
