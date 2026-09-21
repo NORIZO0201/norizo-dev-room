@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "comment": "Resident desired state. Supervisor may enable/start/restart only; never stop/disable/mask/unmask.",
+  "units": [
+    {"name":"norizo-health.service","mode":"daemon","required":true},
+    {"name":"norizo-control-agent.service","mode":"daemon","required":true},
+    {"name":"norizo-p1-p5.timer","mode":"timer","required":true}
+  ],
+  "freshness": [
+    {"label":"health_snapshot","path":"/opt/norizo/system/health/status.json","max_age_seconds":900},
+    {"label":"p1_phase_state","path":"/opt/norizo/system/phases/P1.json","max_age_seconds":7200},
+    {"label":"p1_p5_executor_run","path":"/opt/norizo/system/phases/executor-run.json","max_age_seconds":7200}
+  ]
+}

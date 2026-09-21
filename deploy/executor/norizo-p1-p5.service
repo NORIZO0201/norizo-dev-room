@@ -1,0 +1,21 @@
+[Unit]
+Description=NORIZO DEV ROOM P1-P5 executor
+After=network-online.target norizo-health.service norizo-control-agent.service
+Wants=network-online.target norizo-health.service norizo-control-agent.service
+
+[Service]
+Type=oneshot
+User=root
+Group=root
+Environment=NORIZO_ROOT=/opt/norizo
+Environment=NORIZO_LOG_DIR=/var/log/norizo
+Environment=ENABLE_STEEL=0
+Environment=EXECUTE_BUILDS=1
+ExecStart=/bin/bash /opt/norizo/norizo-dev-room/scripts/run-p1-p5-executor.sh
+TimeoutStartSec=3600
+SuccessExitStatus=75
+NoNewPrivileges=true
+ProtectHome=true
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=norizo-p1-p5

@@ -1,0 +1,12 @@
+[Unit]
+Description=NORIZO DEV ROOM recovery supervisor schedule
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=5min
+AccuracySec=30s
+Persistent=true
+Unit=norizo-supervisor.service
+
+[Install]
+WantedBy=timers.target

@@ -89,6 +89,68 @@ Priority order:
 
 Do not use the VNC console for routine provisioning when API/MCP/SSH can perform the operation.
 
+This priority order assumes a Mac-local session. None of it is reachable from a cloud
+session -- see **Execution Environment** below before attempting any of it.
+
+## Execution Environment (read before attempting ConoHa access)
+
+Claude Code, Codex CLI, and any other agent can run in one of two places. The window
+being typed into is not the same thing as the machine that executes the work. Confusing
+the two leads to the false conclusion that ConoHa access is broken or misconfigured.
+
+### The two environments
+
+| | Mac-local session | Cloud session |
+| --- | --- | --- |
+| Where the work actually runs | this Mac | ephemeral Linux container, Anthropic-hosted |
+| How it is started | `claude` in Terminal; desktop app opened on a local folder | claude.ai/code; desktop app opened on a cloud environment |
+| `ssh conoha` | works | impossible: outbound port 22 blocked, and no private key exists there |
+| ConoHa REST API | works | blocked: egress proxy answers 403 for `*.conoha.io` and `api.conoha.jp` |
+| ConoHa MCP server | usable once authorized | unreachable: the same 403 applies before authorization is even relevant |
+
+The desktop app is a client, not an environment. Opening Claude Code from the desktop app
+does **not** by itself mean the session runs on the Mac. A desktop-app session pointed at a
+cloud environment carries every cloud restriction in the table above.
+
+### How to identify the current environment
+
+Run both commands:
+
+```
+hostname
+ls /Users
+```
+
+- macOS hostname, and `/Users` lists -> Mac-local session. ConoHa work is possible.
+- hostname `vm`, and `ls /Users` reports `No such file or directory` -> cloud session.
+  ConoHa work is impossible. Stop and reopen the task in a Mac-local session.
+
+Additional cloud markers: working directory under `/home/user/`, `HTTPS_PROXY` pointing at
+a local port, `~/.ccr/` present, `~/.ssh/` empty.
+
+### Rule
+
+ConoHa operations -- MCP, REST API, SSH, provisioning, and any deployment onto the VPS --
+are performed only from a Mac-local session. In a cloud session, restrict work to editing
+code and pushing to GitHub, and leave VPS steps to a Mac-local session.
+
+### A cloud session's failure to reach ConoHa is not a defect
+
+It is the expected result of this baseline's own security design. Do not "repair" it:
+
+- The empty `~/.ssh/` is correct. The private key is deliberately held on the Mac only
+  (see the SSH section). Never generate a replacement key, copy a key into the container,
+  or commit a key in order to unblock a cloud session.
+- The 403 is a network policy decision, not an outage and not a ConoHa-side fault. Do not
+  retry it as though it were transient, and never disable TLS verification or unset the
+  proxy to get around it.
+- Authorizing the ConoHa MCP server does not help in a cloud session, because the 403
+  applies at the network layer first.
+
+Verified 2026-09-21 JST from a cloud session: `identity.c3j1.conoha.io:443` and
+`api.conoha.jp:443` were both rejected at CONNECT with 403, and outbound TCP port 22 was
+blocked.
+
 ## Target DEV Stack
 
 Provision toward:
@@ -125,7 +187,7 @@ Verified 2026-09-21 JST. The current VPS is kept as-is; it is not rebuilt.
 
 | Item | Status |
 | --- | --- |
-| Mac -> ConoHa SSH (`ssh conoha`) | verified |
+| Mac -> ConoHa SSH (`ssh conoha`) | verified, from a Mac-local session |
 | OS | Ubuntu 24.04.5 LTS |
 | VPS -> GitHub SSH (`norizo_conoha_github_ed25519`) | verified |
 | DEV root `/opt/norizo` | created |

@@ -1,0 +1,19 @@
+[Unit]
+Description=NORIZO DEV ROOM Control Agent
+After=network-online.target norizo-health.service
+Wants=network-online.target norizo-health.service
+
+[Service]
+Type=simple
+Environment=NORIZO_NODE_ID=conoha-01
+Environment=NORIZO_AGENT_INTERVAL=30
+ExecStart=/usr/bin/python3 /opt/norizo/norizo-dev-room/deploy/control-plane/telemetry_agent.py
+Restart=always
+RestartSec=5
+StartLimitIntervalSec=0
+User=root
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
