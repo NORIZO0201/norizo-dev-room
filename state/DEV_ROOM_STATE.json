@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-09-21T13:57:00Z",
-  "current_phase": "P1",
+  "updated_at": "2026-09-21T14:02:00Z",
+  "current_phase": "P2",
   "maintenance_mode": false,
   "retired_infrastructure": {
     "conoha": {
@@ -18,18 +18,21 @@
   "phases": {
     "P1": {
       "name": "Control Room / health / canonical project state",
-      "status": "in_progress",
+      "status": "complete",
       "requirements": {
         "canonical_state": true,
         "no_vps_dependency": true,
-        "deterministic_health_validator": false,
-        "completion_evidence_persisted": false
+        "deterministic_health_validator": true,
+        "completion_evidence_persisted": true
       },
-      "evidence": []
+      "evidence": [
+        "docs/evidence/2026-09-21-P1-COMPLETE.md",
+        "commit:99aa9afe2ec0e2362f21b1ed1d6624b338397046"
+      ]
     },
     "P2": {
       "name": "OMNW Discovery/Master + Consumer development support",
-      "status": "pending",
+      "status": "in_progress",
       "requirements": {
         "discovery_master_separate_from_consumer": false,
         "retired_harvest_absent": false,
