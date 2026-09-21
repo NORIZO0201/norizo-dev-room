@@ -1,4 +1,5 @@
-import { getVercelOidcToken } from '@vercel/functions';
+import vercelFunctions from '@vercel/functions';
+const { getVercelOidcToken } = vercelFunctions;
 
 export default async function handler(_req, res) {
   const token = getVercelOidcToken() || '';
