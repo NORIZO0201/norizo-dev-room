@@ -1,53 +1,63 @@
-name: Ops lint
+name: DEV ROOM foundation QA
 
 on:
   pull_request:
     paths:
-      - 'deploy/**'
-      - 'scripts/**'
+      - 'contracts/**'
+      - 'state/**'
+      - 'qa/**'
+      - 'scripts/validate-*.mjs'
+      - 'package.json'
       - '.github/workflows/ops-lint.yml'
   push:
     branches:
-      - 'ops/**'
-      - 'integrate/**'
+      - main
     paths:
-      - 'deploy/**'
-      - 'scripts/**'
+      - 'contracts/**'
+      - 'state/**'
+      - 'qa/**'
+      - 'scripts/validate-*.mjs'
+      - 'package.json'
       - '.github/workflows/ops-lint.yml'
+  workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
-  validate:
+  foundation:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Python syntax
-        run: |
-          python3 -m py_compile deploy/health/health_server.py
-          python3 -m py_compile scripts/write-baseline.py
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
 
-      - name: Bash syntax
-        run: |
-          bash -n deploy/health/install-health-monitor.sh
-          bash -n scripts/setup-conoha-batch-host.sh
+      - name: P1-P5 canonical state
+        run: node scripts/validate-phase-state.mjs
 
-      - name: ShellCheck
-        run: |
-          shellcheck deploy/health/install-health-monitor.sh
-          shellcheck scripts/setup-conoha-batch-host.sh
+      - name: P3 browser QA contract
+        run: node qa/selftest.mjs
 
-      - name: systemd unit syntax
-        run: |
-          systemd-analyze verify deploy/health/norizo-health.service
+      - name: P4 worker contract
+        run: node qa/worker-state-selftest.mjs
 
-      - name: Policy guard
+      - name: P5 project gates
         run: |
-          if grep -RInE '@claude|@codex|claude-code-action|gemini-cli|norizo-claude-orchestrator|norizo-control-agent|norizo-p1-p5|norizo-supervisor' \
-            --exclude-dir=.git .github deploy scripts; then
-            echo "Retired AI dispatch/control-plane artifact detected." >&2
-            exit 1
-          fi
+          node scripts/validate-p5-gates.mjs
+          node qa/p5-gates-selftest.mjs
+
+      - name: Maintenance gate
+        run: |
+          node scripts/validate-maintenance-state.mjs
+          node qa/maintenance-selftest.mjs
+
+      - name: Retired infrastructure policy
+        run: |
+          test ! -e .mcp.json || ! grep -qi 'conoha' .mcp.json
+          grep -q '"status": "retired"' state/DEV_ROOM_STATE.json
+          grep -q '"conoha_touched": false' state/MAINTENANCE_OBSERVATION.json
