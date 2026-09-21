@@ -1,93 +1,12 @@
-name: Gemini CLI
+name: Gemini CLI (retired)
 
+# Automation retired by NORIZO on 2026-09-21. Previous implementation is in Git history.
 on:
-  pull_request:
-    types: [opened, synchronize, reopened]
-  issue_comment:
-    types: [created]
-
+  workflow_dispatch:
+permissions: {}
 jobs:
-  gemini:
-    if: |
-      (github.event_name == 'pull_request') ||
-      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@gemini-cli'))
+  retired:
+    if: ${{ false }}
     runs-on: ubuntu-latest
-    timeout-minutes: 10
-    permissions:
-      contents: read
-      pull-requests: write
-      issues: write
     steps:
-      - name: Resolve target
-        id: context
-        shell: bash
-        run: |
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            echo "number=${{ github.event.pull_request.number }}" >> "$GITHUB_OUTPUT"
-            echo "kind=pr" >> "$GITHUB_OUTPUT"
-          else
-            echo "number=${{ github.event.issue.number }}" >> "$GITHUB_OUTPUT"
-            if [ -n "${{ github.event.issue.pull_request.url }}" ]; then
-              echo "kind=pr" >> "$GITHUB_OUTPUT"
-            else
-              echo "kind=issue" >> "$GITHUB_OUTPUT"
-            fi
-          fi
-
-      - name: Acknowledge trigger
-        env:
-          GH_TOKEN: ${{ github.token }}
-          NUMBER: ${{ steps.context.outputs.number }}
-          KIND: ${{ steps.context.outputs.kind }}
-        run: |
-          if [ "$KIND" = "pr" ]; then
-            gh pr comment "$NUMBER" --repo "${{ github.repository }}" --body "GEMINI_WIRING_TRIGGERED — GitHub event reached Gemini workflow."
-          else
-            gh issue comment "$NUMBER" --repo "${{ github.repository }}" --body "GEMINI_WIRING_TRIGGERED — GitHub event reached Gemini workflow."
-          fi
-
-      - name: Checkout repository
-        uses: actions/checkout@v6
-
-      - name: Run Gemini
-        id: gemini_run
-        continue-on-error: true
-        uses: google-github-actions/run-gemini-cli@v0
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        with:
-          gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
-          github_pr_number: ${{ steps.context.outputs.kind == 'pr' && steps.context.outputs.number || '' }}
-          github_issue_number: ${{ steps.context.outputs.number }}
-          prompt: |
-            Read AGENTS.md and GEMINI.md first.
-            If this target is a pull request, review it as NORIZO DEV ROOM's independent auditor.
-            If it is an issue, respond to the explicit request in the @gemini-cli comment.
-            Do not modify Production, ConoHa, Supabase, DNS, secrets, or paid services.
-            End with:
-            VERDICT: PASS | CHANGES_REQUESTED | NEEDS_HUMAN
-            BLOCKERS:
-            NON_BLOCKING:
-            NEXT:
-
-      - name: Publish result
-        if: always()
-        env:
-          GH_TOKEN: ${{ github.token }}
-          NUMBER: ${{ steps.context.outputs.number }}
-          KIND: ${{ steps.context.outputs.kind }}
-          SUMMARY: ${{ steps.gemini_run.outputs.summary }}
-          OUTCOME: ${{ steps.gemini_run.outcome }}
-        run: |
-          if [ "$OUTCOME" = "success" ] && [ -n "$SUMMARY" ]; then
-            body="## Gemini result
-
-$SUMMARY"
-          else
-            body="GEMINI_WIRING_AUTH_OR_RUNTIME_FAILED — GitHub trigger succeeded, Gemini model execution did not. Check Actions logs; authentication/runtime setup is the remaining gate."
-          fi
-          if [ "$KIND" = "pr" ]; then
-            gh pr comment "$NUMBER" --repo "${{ github.repository }}" --body "$body"
-          else
-            gh issue comment "$NUMBER" --repo "${{ github.repository }}" --body "$body"
-          fi
+      - run: echo "Gemini is excluded from automated collaboration."
