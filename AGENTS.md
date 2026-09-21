@@ -11,6 +11,7 @@ GitHub stores:
 - documentation
 - diffs
 - release/history evidence
+- phase/checkpoint state
 - audit trail
 
 Do not use Issues, PR comments, mentions, labels, or GitHub Actions to dispatch work to Claude Code, Codex, Gemini, or any other AI.
@@ -19,29 +20,31 @@ Do not use Issues, PR comments, mentions, labels, or GitHub Actions to dispatch 
 Claude Code, Codex, and Gemini may be used only for bounded, explicitly requested work.
 They are not standing owners and must not create self-sustaining handoff loops.
 
-## ConoHa
-ConoHa is a deterministic resident-workload host.
+## Retired infrastructure
+ConoHa is retired as of 2026-09-21.
 
-- No GitHub-origin free-form task execution.
-- No resident AI orchestrator.
-- Move long-running jobs one at a time.
-- Verify one-shot behavior before residency.
-- Every resident job needs checkpoint/idempotency, bounded retry, logs, restart behavior, and a stop/removal procedure.
+- Do not inspect, start, rebuild, recreate, or depend on ConoHa.
+- Do not add new VPS dependencies to DEV ROOM phases P1–P5.
+- Historical ConoHa files may remain only as explicitly marked tombstones/audit evidence and must not be executable setup paths.
 
-## Steel
-Self-hosted Steel may be used as the browser-development and QA substrate for PC/SP work.
-Keep its API/debugging surfaces private and never expose browser-control ports directly to the public internet.
+## Browser QA
+Use managed browser/provider APIs or other already-available browser tooling for PC/SP QA.
+The reusable QA path must cover responsive layouts, navigation, console/runtime errors, screenshots/evidence, and regression verification without requiring a VPS.
+
+## Phase state
+`state/DEV_ROOM_STATE.json` is the canonical P1–P5 checkpoint.
+Every phase completion must include exact evidence paths/identifiers so the next run can resume idempotently.
 
 ## Deployment safety
 Vercel flow:
-Local/ConoHa QA → Preview only when NORIZO asks → NORIZO confirmation → Production.
+Local/tooling QA → Preview only when NORIZO asks → NORIZO confirmation → Production.
 
 Explicit NORIZO approval is required for:
 - Production deployment
+- Vercel Preview creation when NORIZO has not asked to see it
 - destructive data deletion
 - DNS changes
 - secret/key rotation
-- VPS rebuild/recreate
 - new paid services or material paid API usage
 
 Never commit secrets, tokens, passwords, or private keys.
