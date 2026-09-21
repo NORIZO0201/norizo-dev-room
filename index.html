@@ -32,6 +32,7 @@ header{height:64px;border-bottom:1px solid var(--line);display:flex;align-items:
       <option value="https://admin.sayaka-kitchen.com">SAYAKA KITCHEN Admin</option>
       <option value="https://local-engine.jp">LOCAL ENGINE</option>
     </select>
+    <select id="environment" title="本番またはQA状態を選びます"><option value="production">Production</option><option value="qa-guest">QA 未ログイン</option><option value="qa-auth">QA ログイン後</option></select>
     <select id="deviceProfile" title="SP側の実機クラスを選びます"><option value="iphone" selected>iPhone class</option><option value="android">Android class</option><option value="compact">Compact iPhone</option></select>
     <input id="url" value="https://example.com" autocomplete="off" spellcheck="false"/>
     <button id="open" class="primary" title="SPとPCの2つのブラウザを同時に起動します">SP + PC 起動</button>
@@ -54,7 +55,7 @@ header{height:64px;border-bottom:1px solid var(--line);display:flex;align-items:
 <div class="card"><h3>CONTINUOUS WORKERS</h3><div class="kv"><span>OMNW Discovery</span><span class="pill">separate lifecycle</span></div><div class="kv"><span>RELIS</span><span class="pill">separate lifecycle</span></div><div class="msg">WebサービスQAとは分離。常時処理系はDEV ROOM本体のP1–P5実行とは混ぜず、個別ワーカーとして監視する。</div></div>
 <div class="card"><h3>RELEASE CONTROL</h3><div class="msg">QA後、ここからNORIZOの承認指示を記録できます。Previewは必要な時だけ、Productionは最終承認時だけ使います。</div><div class="release"><button id="previewOk">Preview依頼</button><button id="productionOk" class="prod">Production OK</button></div><div id="releaseState" class="releaseState">承認指示なし</div></div>
 <div class="card"><h3>操作の意味</h3><div class="kv"><span>SP + PC 起動</span><span>2画面を新規開始</span></div><div class="kv"><span>両方をこのURLへ</span><span>URL欄へ同時移動</span></div><div class="kv"><span>URL同期</span><span>片側の遷移を追従</span></div><div class="kv"><span>QA確認</span><span>表示/画像/SP分岐検証</span></div><div class="kv"><span>セッション延長</span><span>ブラウザ時間を更新</span></div></div>
-<div class="card"><h3>DEVICE LAB</h3><div class="kv"><span>SP priority</span><span class="pass">PRIMARY</span></div><div class="kv"><span>Viewport</span><span>393 × 852</span></div><div class="kv"><span>Touch</span><span>enabled</span></div><div class="kv"><span>Fingerprint</span><span>Steel mobile</span></div><div class="msg">SPは単なる縮小表示ではなく、モバイルfingerprint / touch / device viewportを使ってサーバー・クライアント両方のSP分岐を確認します。</div></div><div class="card"><h3>BROWSER PROVIDER</h3><div class="kv"><span>Active</span><span id="provider">loading…</span></div><div id="providerCaps" class="msg">Checking provider…</div></div>
+<div class="card"><h3>APP STATE</h3><div class="kv"><span>Production</span><span>現在公開中</span></div><div class="kv"><span>QA 未ログイン</span><span>Welcome / Sign in</span></div><div class="kv"><span>QA ログイン後</span><span>合成QA Session</span></div><div class="msg">OMNWは固定QAブランチを使い、Production前のSP分岐後画面を確認します。</div></div><div class="card"><h3>DEVICE LAB</h3><div class="kv"><span>SP priority</span><span class="pass">PRIMARY</span></div><div class="kv"><span>Viewport</span><span>393 × 852</span></div><div class="kv"><span>Touch</span><span>enabled</span></div><div class="kv"><span>Fingerprint</span><span>Steel mobile</span></div><div class="msg">SPは単なる縮小表示ではなく、モバイルfingerprint / touch / device viewportを使ってサーバー・クライアント両方のSP分岐を確認します。</div></div><div class="card"><h3>BROWSER PROVIDER</h3><div class="kv"><span>Active</span><span id="provider">loading…</span></div><div id="providerCaps" class="msg">Checking provider…</div></div>
 <div class="card"><h3>SESSION</h3><div class="kv"><span>SP</span><span id="spId">—</span></div><div class="kv"><span>PC</span><span id="pcId">—</span></div><div class="kv"><span>残り</span><span id="timer" class="timer">—</span></div><div class="kv"><span>LINK</span><span id="linkState">OFF</span></div></div>
 <div class="card"><h3>QA</h3><div class="kv"><span>PC</span><span id="pcQa">—</span></div><div class="kv"><span>SP</span><span id="spQa">—</span></div><div id="qaDetail" class="msg">未実行</div></div>
 <div class="card"><h3>CURRENT URL</h3><div class="msg">PC: <span id="pcUrl">—</span></div><div class="msg" style="margin-top:5px">SP: <span id="spUrl">—</span></div></div>
@@ -79,12 +80,31 @@ async function api(path,body){const r=await fetch(path,{method:'POST',headers:{'
 async function stop(){if(!current)return;const old=current;clearView();setLog('STOPPING…');try{await api('/api/stop',{pcId:old.pc.id,spId:old.sp.id})}catch{}setLog('STOPPED')}
 function startTimer(){if(tick)clearInterval(tick);tick=setInterval(async()=>{const n=Math.max(0,endAt-Date.now());const m=Math.floor(n/60000),s=Math.floor((n%60000)/1000);$('#timer').textContent=`${m}:${String(s).padStart(2,'0')}`;if(n<=75000&&!renewing&&current){await renew(true)}if(n<=0&&!renewing){clearView();setLog('SESSION EXPIRED',true)}},1000)}
 async function openPair(){if(current)await stop();const url=$('#url').value.trim();$('#open').disabled=true;setLog('SP/PC 接続中…');state('#spState','接続中');state('#pcState','接続中');busyBoth('ブラウザ接続中…');try{const j=await api('/api/start',{url,deviceProfile:$('#deviceProfile').value});applySession(j);$('#spUrl').textContent=j.spUrl||url;$('#pcUrl').textContent=j.pcUrl||url;busyBoth('サイト反映待ち…');await new Promise(r=>setTimeout(r,900));clearBusyBoth()}catch(e){clearBusyBoth();clearView();setLog(e.message,true)}finally{$('#open').disabled=false}}
-async function goBoth(){if(!current)return;const url=$('#url').value.trim();setLog('ページ反映待ち…');busyBoth('ページ反映待ち…');try{const j=await api('/api/navigate',{pcId:current.pc.id,spId:current.sp.id,url});$('#spUrl').textContent=j.spUrl||url;$('#pcUrl').textContent=j.pcUrl||url;busyBoth('サイト反映待ち…');await new Promise(r=>setTimeout(r,900));setLog('LIVE')}catch(e){setLog(e.message,true)}finally{clearBusyBoth()}}
+async function goBoth(){if(!current)return;const url=$('#url').value.trim();setLog('ページ反映待ち…');busyBoth('ページ反映待ち…');try{const j=await api('/api/navigate',{pcId:current.pc.id,spId:current.sp.id,url,deviceProfile:$('#deviceProfile').value});$('#spUrl').textContent=j.spUrl||url;$('#pcUrl').textContent=j.pcUrl||url;busyBoth('サイト反映待ち…');await new Promise(r=>setTimeout(r,900));setLog('LIVE')}catch(e){setLog(e.message,true)}finally{clearBusyBoth()}}
 async function syncOnce(){if(!current||!linkOn||renewing)return;try{const j=await api('/api/sync',{pcId:current.pc.id,spId:current.sp.id,master:$('#master').value});$('#pcUrl').textContent=j.pcUrl||'—';$('#spUrl').textContent=j.spUrl||'—';if(j.changed)$('#url').value=$('#master').value==='pc'?j.pcUrl:j.spUrl}catch(e){setLog(`SYNC: ${e.message}`,true)}}
 function toggleLink(){linkOn=!linkOn;$('#link').classList.toggle('active',linkOn);$('#link').textContent=`URL同期: ${linkOn?'ON':'OFF'}`;$('#linkState').textContent=linkOn?`${$('#master').value.toUpperCase()} MASTER`:'OFF';if(syncTick)clearInterval(syncTick);if(linkOn){syncOnce();syncTick=setInterval(syncOnce,5000)}}
 async function qa(){if(!current)return;setLog('QA確認中…');busyBoth('QA確認中…');try{const j=await api('/api/inspect',{pcId:current.pc.id,spId:current.sp.id,deviceProfile:$('#deviceProfile').value});for(const side of ['sp','pc']){const v=j.qa[side];const el=$(`#${side}Qa`);el.textContent=v;el.className=v==='PASS'?'pass':'check'}$('#spUrl').textContent=j.sp.url;$('#pcUrl').textContent=j.pc.url;const mobile=j.sp.mobileSignals?'SP分岐 OK':'SP分岐 要確認';const pwa=j.sp.pwaStandalone?'PWA standalone':'browser mode';$('#qaDetail').textContent=`SP ${j.sp.viewport.width}×${j.sp.viewport.height} / touch ${j.sp.touchPoints} / ${mobile} / ${pwa} ｜ PC ${j.pc.viewport.width}×${j.pc.viewport.height} ｜ broken img SP ${j.sp.brokenImages} / PC ${j.pc.brokenImages}`;state('#spState',j.sp.mobileSignals?'LIVE · MOBILE':'LIVE · CHECK');setLog(`QA: SP ${j.qa.sp} / PC ${j.qa.pc}`)}catch(e){setLog(e.message,true)}finally{clearBusyBoth()}}
 async function renew(auto=false){if(!current||renewing)return;renewing=true;setLog(auto?'AUTO RENEW…':'RENEW…');const old=current;try{const j=await api('/api/renew',{pc:old.pc,sp:old.sp,fallbackUrl:$('#url').value.trim()});applySession(j);$('#pcUrl').textContent=j.pcUrl;$('#spUrl').textContent=j.spUrl;setLog(auto?'AUTO RENEWED':'RENEWED')}catch(e){setLog(`RENEW: ${e.message}`,true)}finally{renewing=false}}
-$('#project').onchange=e=>{if(e.target.value){$('#url').value=e.target.value;if(current)goBoth()}};
+const OMNW_QA='https://oh-my-nihon-wine-git-dev-room-qa-oh-my-nihon-wine.vercel.app';
+function resolvedTarget(){
+  const project=$('#project').value;
+  const mode=$('#environment').value;
+  if(project==='https://oh-my-nihon-wine.jp'){
+    if(mode==='qa-guest') return OMNW_QA+'/welcome';
+    if(mode==='qa-auth') return OMNW_QA+'/collection?qa=1';
+  }
+  return project || $('#url').value.trim();
+}
+function refreshTarget(autoNavigate=false){
+  const next=resolvedTarget();
+  if(next) $('#url').value=next;
+  const isOmnw=$('#project').value==='https://oh-my-nihon-wine.jp';
+  $('#environment').disabled=!isOmnw;
+  if(!isOmnw) $('#environment').value='production';
+  if(autoNavigate&&current) goBoth();
+}
+$('#project').onchange=()=>refreshTarget(true);
+$('#environment').onchange=()=>refreshTarget(true);
 async function releaseIntent(kind){const selected=$('#project').selectedOptions[0]?.textContent||'CUSTOM';const body={kind,project:selected,url:$('#url').value.trim(),qa:{sp:$('#spQa').textContent,pc:$('#pcQa').textContent},at:new Date().toISOString()};$('#releaseState').textContent='指示送信中…';try{const j=await api('/api/release-intent',body);$('#releaseState').textContent=j.message||'承認指示を記録しました';setLog(j.message||'RELEASE INTENT RECORDED')}catch(e){$('#releaseState').textContent=`送信失敗: ${e.message}`;setLog(e.message,true)}}
 $('#open').onclick=openPair;$('#go').onclick=goBoth;$('#stop').onclick=stop;$('#link').onclick=toggleLink;$('#qa').onclick=qa;$('#renew').onclick=()=>renew(false);$('#previewOk').onclick=()=>releaseIntent('preview');$('#productionOk').onclick=()=>releaseIntent('production');$('#master').onchange=()=>{$('#linkState').textContent=linkOn?`${$('#master').value.toUpperCase()} MASTER`:'OFF'};
 $('#url').addEventListener('keydown',e=>{if(e.key==='Enter'){current?goBoth():openPair()}});
