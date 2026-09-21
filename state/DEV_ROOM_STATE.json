@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "updated_at": "2026-09-21T13:57:00Z",
+  "current_phase": "P1",
+  "maintenance_mode": false,
+  "retired_infrastructure": {
+    "conoha": {
+      "status": "retired",
+      "checked_in_current_model": false,
+      "rule": "do_not_check_start_rebuild_or_recreate"
+    }
+  },
+  "deployment_policy": {
+    "vercel_preview_without_explicit_norizo_request": false,
+    "production_without_explicit_norizo_approval": false
+  },
+  "phase_order": ["P1", "P2", "P3", "P4", "P5"],
+  "phases": {
+    "P1": {
+      "name": "Control Room / health / canonical project state",
+      "status": "in_progress",
+      "requirements": {
+        "canonical_state": true,
+        "no_vps_dependency": true,
+        "deterministic_health_validator": false,
+        "completion_evidence_persisted": false
+      },
+      "evidence": []
+    },
+    "P2": {
+      "name": "OMNW Discovery/Master + Consumer development support",
+      "status": "pending",
+      "requirements": {
+        "discovery_master_separate_from_consumer": false,
+        "retired_harvest_absent": false,
+        "consumer_m0_m4_safe_from_discovery_mutation": false
+      },
+      "evidence": []
+    },
+    "P3": {
+      "name": "Reusable PC/SP browser QA gate",
+      "status": "pending",
+      "requirements": {
+        "responsive_pc_sp": false,
+        "navigation": false,
+        "console_runtime_errors": false,
+        "screenshots_or_visual_evidence": false,
+        "regression_verification": false
+      },
+      "evidence": []
+    },
+    "P4": {
+      "name": "Reusable project workers / observation contracts",
+      "status": "pending",
+      "requirements": {
+        "provider_neutral_checkpoint": false,
+        "provider_neutral_heartbeat": false,
+        "relis_reuse_proven": false
+      },
+      "evidence": []
+    },
+    "P5": {
+      "name": "Deterministic project batch/QA gates + handoff state",
+      "status": "pending",
+      "requirements": {
+        "sayaka_gate": false,
+        "cnw_gate": false,
+        "omnw_gate": false,
+        "other_project_gate_or_pass_not_required": false,
+        "handoff_state": false
+      },
+      "evidence": []
+    }
+  }
+}
