@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-09-21T17:06:30Z",
+  "updated_at": "2026-09-21T18:10:00Z",
   "current_phase": "P5",
   "maintenance_mode": true,
   "retired_infrastructure": {
@@ -47,8 +47,10 @@
       "evidence": [
         "docs/evidence/2026-09-21-P2-COMPLETE.md",
         "docs/evidence/2026-09-22-MAINTENANCE-OMNW-M4.md",
+        "docs/evidence/2026-09-22-MAINTENANCE-OMNW-M4-QA.md",
         "commit:179c6111a5273e6638919ed346418b41c514a444",
-        "consumer-m4:a6911de80df7f7851562b741580cc91f9a61c4b7",
+        "consumer-m4:6d9cfa6466e817e5d0c8c2eaa26e0ec6b8cf4cfd",
+        "consumer-qa-run:35630485168",
         "contract:contracts/omnw-boundary.json",
         "audit:contracts/omnw-p2-audit.sql"
       ]
@@ -100,6 +102,7 @@
         "docs/evidence/2026-09-22-MAINTENANCE-CNW-ROUTE-DRIFT.md",
         "docs/evidence/2026-09-22-MAINTENANCE-GATE.md",
         "docs/evidence/2026-09-22-MAINTENANCE-OMNW-M4.md",
+        "docs/evidence/2026-09-22-MAINTENANCE-OMNW-M4-QA.md",
         "state:P5_HANDOFF.json",
         "contract:contracts/p5-project-gates.json",
         "validator:scripts/validate-p5-gates.mjs",
@@ -115,8 +118,9 @@
     "validator": "scripts/validate-maintenance-state.mjs",
     "selftest": "qa/maintenance-selftest.mjs",
     "command": "npm run qa:maintenance",
-    "evidence": "docs/evidence/2026-09-22-MAINTENANCE-OMNW-M4.md",
-    "last_observed_at": "2026-09-21T17:06:30Z",
-    "last_result": "PASS"
+    "evidence": "docs/evidence/2026-09-22-MAINTENANCE-OMNW-M4-QA.md",
+    "last_observed_at": "2026-09-21T18:10:00Z",
+    "last_result": "PASS",
+    "omnw_consumer_qa_required": true
   }
 }
