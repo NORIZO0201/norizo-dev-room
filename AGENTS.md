@@ -21,11 +21,19 @@ Claude Code, Codex, and Gemini may be used only for bounded, explicitly requeste
 They are not standing owners and must not create self-sustaining handoff loops.
 
 ## Retired infrastructure
-ConoHa is retired as of 2026-09-21.
+ConoHa/VPS is permanently retired from DEV ROOM.
 
 - Do not inspect, start, rebuild, recreate, or depend on ConoHa.
-- Do not add new VPS dependencies to DEV ROOM phases P1–P5.
-- Historical ConoHa files may remain only as explicitly marked tombstones/audit evidence and must not be executable setup paths.
+- Do not add VPS dependencies to DEV ROOM.
+- Do not keep executable tombstones, systemd units, installers, or resident-worker launchers for retired infrastructure in the live tree.
+- Git history is the audit record for removed infrastructure.
+
+## DEV ROOM lifecycle
+P1–P5 are complete. DEV ROOM is a reusable development foundation, not a standing hourly workload.
+
+- No DEV ROOM Watchdog or P1–P5 Executor should be scheduled.
+- Maintenance is on-demand: run deterministic validators when DEV ROOM state or contracts change, or when a project explicitly uses the foundation.
+- Project-specific ongoing workers (for example OMNW Discovery or RELIS) remain separate from DEV ROOM lifecycle automation.
 
 ## Browser QA
 Use managed browser/provider APIs or other already-available browser tooling for PC/SP QA.

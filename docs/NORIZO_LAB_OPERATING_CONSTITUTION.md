@@ -1,128 +1,103 @@
 # NORIZO LAB Operating Constitution
 
-Updated: 2026-09-21 JST
+Updated: 2026-09-22 JST
 
 ## 1. Single point of command
 
-All work starts from ChatGPT ("Chatty").
-
-Chatty is the only orchestration origin for NORIZO LAB.
-No other AI, automation, GitHub workflow, or external agent may become an independent command source.
+All work starts from ChatGPT ("Chatty"). NORIZO → Chatty is the normal command path.
+No other AI, automation, GitHub workflow, or external agent becomes an independent command source.
 
 ## 2. GitHub role
 
-GitHub is a repository, history store, diff/audit surface, and backup of code and documents.
+GitHub is code/document/history/checkpoint/audit storage.
+It is not an instruction bus between AIs.
 
-GitHub is **not** an instruction bus between AIs.
+- Do not dispatch work to Claude Code, Codex, Gemini, or another AI through Issues, PR comments, mentions, labels, or Actions.
+- GitHub Actions are permitted only as ordinary deterministic CI/checks.
+- Historical implementation details belong in Git history rather than executable tombstones in the live tree.
 
-Rules:
-- Do not use GitHub Issues, PR comments, mentions, labels, or GitHub Actions to dispatch work from Chatty to Claude Code, Codex, Gemini, or any other AI.
-- Do not design autonomous AI-to-AI handoff around GitHub.
-- GitHub Actions may be used only where a normal CI/check is independently justified; they are not the NORIZO LAB orchestration layer.
-- All GitHub changes originate from a task explicitly initiated by Chatty/NORIZO.
+## 3. External AI tools
 
-## 3. Claude Code
+Claude Code, Codex, and Gemini are optional bounded specialists.
+They are not standing runtime owners and must not create self-sustaining handoff loops.
 
-Claude Code is not a standing member of the execution chain.
+## 4. Retired infrastructure
 
-Default:
-- Do not depend on Claude Code for normal operation.
-- Use only occasionally for a clearly bounded task when specifically needed.
-- Do not create any permanent Claude Code bridge, watchdog, dispatcher, or autonomous GitHub handoff.
+ConoHa/VPS is retired and must not be checked, started, rebuilt, recreated, or replaced merely to preserve an old architecture.
 
-Commercial posture:
-- Downgrade to the low-cost plan from next billing period unless another independent use justifies more.
+The live DEV ROOM tree must not contain:
+- ConoHa setup/provisioning scripts;
+- VPS/systemd health services;
+- resident worker installers or systemd units tied to the retired host model;
+- DEV ROOM Watchdog/Executor machinery whose only purpose was to drive P1–P5 continuously.
 
-## 4. Codex
+Git history remains the audit record.
 
-Codex is not part of the mandatory NORIZO LAB runtime chain.
+## 5. DEV ROOM lifecycle
 
-Rules:
-- Do not depend on Codex Cloud/GitHub mention workflows.
-- Do not build a GitHub-to-Codex autonomous loop.
-- Use Codex only when Chatty explicitly decides it adds value to a bounded task.
+P1–P5 are a completed reusable development foundation.
 
-## 5. Gemini
+Normal mode after completion is **on-demand maintenance**, not permanent hourly DEV ROOM execution:
+- deterministic state/contract QA runs when the foundation changes;
+- browser QA runs when a project needs PC/SP verification;
+- project-specific workers run under their own project contracts;
+- DEV ROOM itself does not need a Watchdog watching an Executor.
 
-Gemini is treated primarily as an external research/search/review tool.
+This prevents duplicated monitoring, unnecessary Actions/automation runs, and stale state accumulation.
 
-Rules:
-- Do not make Gemini a standing execution owner.
-- Do not depend on Gemini Actions or GitHub workflows for continuity.
-- Any Gemini output returns to Chatty/NORIZO for judgment.
+## 6. Reusable long-running work
 
-## 6. ConoHa VPS
+If a project genuinely needs continuous or scheduled work, keep it project-owned and provider-neutral.
 
-ConoHa is managed by Chatty for NORIZO LAB infrastructure.
+Each such worker must have:
+- explicit purpose and owner;
+- checkpoint/idempotency semantics;
+- heartbeat/observation contract where useful;
+- safe restart behavior;
+- bounded cost and allowlist;
+- explicit stop/removal rule.
 
-Rules:
-- Unnecessary AIs, agents, runners, bridges, and autonomous dispatchers must not be introduced.
-- No GitHub-origin instruction system is allowed.
-- Long-running work is moved to ConoHa **one job at a time** by Chatty.
-- Each resident job must be independently understandable, observable, restartable, and removable.
-- A resident batch must have an explicit purpose, entrypoint, state/checkpoint strategy, restart policy, log location, and stop procedure before it is considered established.
-- Do not bundle unrelated jobs merely to create an "agentic" platform.
+Do not bundle unrelated workloads into a generic resident "AI factory".
 
-## 7. Resident batch operating rule
+## 7. External services
 
-For each long-running task:
+Vercel, Supabase, Shopify, Google services, and other systems are operated directly through authorized connectors/APIs where available.
 
-1. Chatty defines the job.
-2. Chatty verifies the one-shot task first.
-3. Only then move that single task to ConoHa.
-4. Add systemd/timer/cron only as required for that job.
-5. Verify health, logs, restart, checkpoint/idempotency, and failure behavior.
-6. Keep GitHub only as code/document/history storage.
-7. Move to the next resident task only after the current one is proven stable.
-
-## 8. External services
-
-Vercel, Supabase, Shopify, Google services, and other systems are operated directly from Chatty where an authorized connector/API is available.
-
-Do not route instructions through GitHub merely to reach another service.
-
-Vercel operating sequence remains:
+Vercel sequence:
 
 Local QA → Preview only when NORIZO asks to see it → NORIZO confirmation → Production.
 
-Production/destructive/paid/security-sensitive operations require NORIZO approval.
+Production/destructive/paid/security-sensitive operations require explicit NORIZO approval.
 
-## 9. Human relay rule
+## 8. Human relay rule
 
-NORIZO must not be used as a routine copy-and-paste relay between AIs.
+NORIZO must not be used as routine copy-and-paste relay between AIs.
+If two AI systems cannot communicate reliably without manual relaying, treat them as separate tools.
 
-If two AI systems cannot communicate reliably without NORIZO manually relaying prompts/results, treat them as separate tools rather than pretending they form one autonomous agentic workflow.
-
-## 10. Architectural summary
+## 9. Architectural summary
 
 ```text
 NORIZO
    ↓
-ChatGPT / Chatty  ← single command origin
-   ├─ GitHub      ← code / docs / history / audit only
-   ├─ ConoHa      ← proven resident jobs, one by one
-   ├─ Vercel      ← deployment / preview when required
-   ├─ Supabase    ← data/backend operations when required
-   ├─ Shopify     ← commerce operations when required
-   ├─ Claude Code ← occasional bounded specialist
-   ├─ Codex       ← optional bounded specialist
-   └─ Gemini      ← research/search/review
+ChatGPT / Chatty
+   ├─ GitHub       code / docs / history / checkpoint
+   ├─ Supabase     project data / deterministic backend
+   ├─ Browser QA   local or approved managed provider
+   ├─ Vercel       hosting under approval rules
+   ├─ Shopify      commerce integrations where authorized
+   ├─ Claude Code  occasional bounded specialist
+   ├─ Codex        optional bounded specialist
+   └─ Gemini       research/search/review
 
-Forbidden:
+Not part of the architecture:
+ConoHa/VPS
+DEV ROOM hourly Watchdog/Executor
 GitHub → AI dispatch
-AI → AI autonomous relay assumed as infrastructure
-GitHub Actions as the NORIZO LAB orchestration backbone
+AI → AI autonomous relay
 ```
 
-## 11. Core principle
+## 10. Core principle
 
-Do not build NORIZO LAB around an abstract "agentic workflow".
-
-Build each workflow around:
-- one explicit owner: Chatty
-- one explicit source of records: GitHub where appropriate
-- direct authorized service access
-- ordinary deterministic software for repeatable work
-- one-by-one resident batch migration to ConoHa when persistence is actually required
-
-Reliability takes priority over architectural novelty.
+Keep the live system smaller than its history.
+Completed scaffolding is removed from the active tree; reusable contracts and deterministic QA remain.
+Reliability, low cost, and clear ownership take priority over architectural novelty.

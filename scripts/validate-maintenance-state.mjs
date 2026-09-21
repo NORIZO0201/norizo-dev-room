@@ -19,6 +19,8 @@ export function validateMaintenance({ contract, state, handoff, observation }) {
     errors.push('invalid maintenance contract identity');
   }
   if (contract?.foundation_phase !== 'P5') errors.push('maintenance foundation must be P5');
+  if (contract?.execution_mode !== 'on_demand') errors.push('DEV ROOM maintenance must be on-demand');
+  if (contract?.policy?.scheduled_dev_room_watch_executor !== false) errors.push('DEV ROOM Watch/Executor must remain retired');
   if (contract?.policy?.conoha_retired !== true) errors.push('maintenance contract must retire ConoHa');
   if (contract?.policy?.vercel_preview_requires_explicit_norizo_request !== true) {
     errors.push('maintenance contract must require explicit NORIZO request for Preview');
@@ -36,6 +38,8 @@ export function validateMaintenance({ contract, state, handoff, observation }) {
   if (state?.current_phase !== 'P5' || state?.maintenance_mode !== true) {
     errors.push('canonical state must remain P5 maintenance');
   }
+  if (state?.scheduled_dev_room_watch_executor !== false) errors.push('canonical state must keep DEV ROOM Watch/Executor retired');
+  if (state?.maintenance_execution !== 'on_demand') errors.push('canonical maintenance execution must be on-demand');
   if (state?.retired_infrastructure?.conoha?.status !== 'retired') errors.push('ConoHa must remain retired');
   if (state?.retired_infrastructure?.conoha?.rule !== 'do_not_check_start_rebuild_or_recreate') {
     errors.push('ConoHa retirement rule drifted');

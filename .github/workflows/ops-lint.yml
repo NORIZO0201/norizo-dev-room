@@ -7,10 +7,11 @@ on:
       - 'state/**'
       - 'qa/**'
       - 'scripts/validate-*.mjs'
-      - 'scripts/write-baseline.py'
-      - 'deploy/**'
       - 'package.json'
       - '.github/workflows/ops-lint.yml'
+      - 'AGENTS.md'
+      - 'docs/STATUS.md'
+      - 'docs/NORIZO_LAB_OPERATING_CONSTITUTION.md'
   push:
     branches:
       - main
@@ -19,10 +20,11 @@ on:
       - 'state/**'
       - 'qa/**'
       - 'scripts/validate-*.mjs'
-      - 'scripts/write-baseline.py'
-      - 'deploy/**'
       - 'package.json'
       - '.github/workflows/ops-lint.yml'
+      - 'AGENTS.md'
+      - 'docs/STATUS.md'
+      - 'docs/NORIZO_LAB_OPERATING_CONSTITUTION.md'
   workflow_dispatch:
 
 permissions:
@@ -60,14 +62,14 @@ jobs:
           node scripts/validate-maintenance-state.mjs
           node qa/maintenance-selftest.mjs
 
-      - name: Retired infrastructure policy
+      - name: Retired infrastructure absence
         run: |
           test ! -e .mcp.json || ! grep -qi 'conoha' .mcp.json
+          test ! -e scripts/setup-conoha-batch-host.sh
+          test ! -e scripts/write-baseline.py
+          test ! -e deploy/health
+          test ! -e deploy/workers
+          test ! -e docs/CONOHA_DEV_BASELINE.md
+          test ! -e docs/INCIDENT_2026-09-21_EXECUTOR_STOP.md
           grep -q '"status": "retired"' state/DEV_ROOM_STATE.json
-          grep -q '"conoha_touched": false' state/MAINTENANCE_OBSERVATION.json
-          grep -q '^RETIRED:' deploy/health/install-health-monitor.sh
-          grep -q '^RETIRED:' deploy/workers/install-omnw-resident-workers.sh
-          grep -q 'Retired tombstone' scripts/write-baseline.py
-          ! grep -q 'systemctl' deploy/health/install-health-monitor.sh
-          ! grep -q 'systemctl' deploy/workers/install-omnw-resident-workers.sh
-          ! grep -q 'subprocess' scripts/write-baseline.py
+          grep -q '"scheduled_dev_room_watch_executor": false' state/DEV_ROOM_STATE.json
