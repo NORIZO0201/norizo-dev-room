@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-09-21T18:10:00Z",
+  "updated_at": "2026-09-21T19:08:53Z",
   "current_phase": "P5",
   "maintenance_mode": true,
   "retired_infrastructure": {
@@ -48,8 +48,10 @@
         "docs/evidence/2026-09-21-P2-COMPLETE.md",
         "docs/evidence/2026-09-22-MAINTENANCE-OMNW-M4.md",
         "docs/evidence/2026-09-22-MAINTENANCE-OMNW-M4-QA.md",
+        "docs/evidence/2026-09-22-MAINTENANCE-DEPLOYMENT-PROVENANCE-GUARD.md",
         "commit:179c6111a5273e6638919ed346418b41c514a444",
         "consumer-m4:6d9cfa6466e817e5d0c8c2eaa26e0ec6b8cf4cfd",
+        "consumer-m4-main:72e0582c4a9c9894af10f471ffc1f173d24a3601",
         "consumer-qa-run:35630485168",
         "contract:contracts/omnw-boundary.json",
         "audit:contracts/omnw-p2-audit.sql"
@@ -103,6 +105,7 @@
         "docs/evidence/2026-09-22-MAINTENANCE-GATE.md",
         "docs/evidence/2026-09-22-MAINTENANCE-OMNW-M4.md",
         "docs/evidence/2026-09-22-MAINTENANCE-OMNW-M4-QA.md",
+        "docs/evidence/2026-09-22-MAINTENANCE-DEPLOYMENT-PROVENANCE-GUARD.md",
         "state:P5_HANDOFF.json",
         "contract:contracts/p5-project-gates.json",
         "validator:scripts/validate-p5-gates.mjs",
@@ -118,9 +121,15 @@
     "validator": "scripts/validate-maintenance-state.mjs",
     "selftest": "qa/maintenance-selftest.mjs",
     "command": "npm run qa:maintenance",
-    "evidence": "docs/evidence/2026-09-22-MAINTENANCE-OMNW-M4-QA.md",
-    "last_observed_at": "2026-09-21T18:10:00Z",
-    "last_result": "PASS",
-    "omnw_consumer_qa_required": true
+    "evidence": "docs/evidence/2026-09-22-MAINTENANCE-DEPLOYMENT-PROVENANCE-GUARD.md",
+    "last_observed_at": "2026-09-21T19:08:53Z",
+    "last_result": "BLOCKED_HUMAN_CONFIRMATION",
+    "omnw_consumer_qa_required": true,
+    "deployment_provenance_guard": true,
+    "blockers": [
+      "OMNW_PRODUCTION_PROVENANCE_UNVERIFIED",
+      "CNW_PRODUCTION_MALFORMED_SLUG_500",
+      "CNW_PREVIEW_PROVENANCE_UNVERIFIED"
+    ]
   }
 }
