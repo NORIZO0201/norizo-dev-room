@@ -1,1 +1,105 @@
-ewogICJzY2hlbWFfdmVyc2lvbiI6IDEsCiAgInVwZGF0ZWRfYXQiOiAiMjAyNi0wOS0yMVQxNDo0MzoyNVoiLAogICJjdXJyZW50X3BoYXNlIjogIlA1IiwKICAibWFpbnRlbmFuY2VfbW9kZSI6IHRydWUsCiAgInJldGlyZWRfaW5mcmFzdHJ1Y3R1cmUiOiB7CiAgICAiY29ub2hhIjogewogICAgICAic3RhdHVzIjogInJldGlyZWQiLAogICAgICAiY2hlY2tlZF9pbl9jdXJyZW50X21vZGVsIjogZmFsc2UsCiAgICAgICJydWxlIjogImRvX25vdF9jaGVja19zdGFydF9yZWJ1aWxkX29yX3JlY3JlYXRlIgogICAgfQogIH0sCiAgImRlcGxveW1lbnRfcG9saWN5IjogewogICAgInZlcmNlbF9wcmV2aWV3X3dpdGhvdXRfZXhwbGljaXRfbm9yaXpvX3JlcXVlc3QiOiBmYWxzZSwKICAgICJwcm9kdWN0aW9uX3dpdGhvdXRfZXhwbGljaXRfbm9yaXpvX2FwcHJvdmFsIjogZmFsc2UKICB9LAogICJwaGFzZV9vcmRlciI6IFsKICAgICJQMSIsCiAgICAiUDIiLAogICAgIlAzIiwKICAgICJQNCIsCiAgICAiUDUiCiAgXSwKICAicGhhc2VzIjogewogICAgIlAxIjogewogICAgICAibmFtZSI6ICJDb250cm9sIFJvb20gLyBoZWFsdGggLyBjYW5vbmljYWwgcHJvamVjdCBzdGF0ZSIsCiAgICAgICJzdGF0dXMiOiAiY29tcGxldGUiLAogICAgICAicmVxdWlyZW1lbnRzIjogewogICAgICAgICJjYW5vbmljYWxfc3RhdGUiOiB0cnVlLAogICAgICAgICJub192cHNfZGVwZW5kZW5jeSI6IHRydWUsCiAgICAgICAgImRldGVybWluaXN0aWNfaGVhbHRoX3ZhbGlkYXRvciI6IHRydWUsCiAgICAgICAgImNvbXBsZXRpb25fZXZpZGVuY2VfcGVyc2lzdGVkIjogdHJ1ZQogICAgICB9LAogICAgICAiZXZpZGVuY2UiOiBbCiAgICAgICAgImRvY3MvZXZpZGVuY2UvMjAyNi0wOS0yMS1QMS1DT01QTEVURS5tZCIsCiAgICAgICAgImNvbW1pdDo5OWFhOWFmZTJlYzBlMjM2MmYyMWIxZWQxZDY2MjRiMzM4Mzk3MDQ2IgogICAgICBdCiAgICB9LAogICAgIlAyIjogewogICAgICAibmFtZSI6ICJPTU5XIERpc2NvdmVyeS9NYXN0ZXIgKyBDb25zdW1lciBkZXZlbG9wbWVudCBzdXBwb3J0IiwKICAgICAgInN0YXR1cyI6ICJjb21wbGV0ZSIsCiAgICAgICJyZXF1aXJlbWVudHMiOiB7CiAgICAgICAgImRpc2NvdmVyeV9tYXN0ZXJfc2VwYXJhdGVfZnJvbV9jb25zdW1lciI6IHRydWUsCiAgICAgICAgInJldGlyZWRfaGFydmVzdF9hYnNlbnQiOiB0cnVlLAogICAgICAgICJjb25zdW1lcl9tMF9tNF9zYWZlX2Zyb21fZGlzY292ZXJ5X211dGF0aW9uIjogdHJ1ZQogICAgICB9LAogICAgICAiZXZpZGVuY2UiOiBbCiAgICAgICAgImRvY3MvZXZpZGVuY2UvMjAyNi0wOS0yMS1QMi1DT01QTEVURS5tZCIsCiAgICAgICAgImNvbW1pdDoxNzljNjExMWE1MjczZTY2Mzg5MTllZDM0NjQxOGI0MWM1MTRhNDQ0IiwKICAgICAgICAiY29udHJhY3Q6Y29udHJhY3RzL29tbnctYm91bmRhcnkuanNvbiIsCiAgICAgICAgImF1ZGl0OmNvbnRyYWN0cy9vbW53LXAyLWF1ZGl0LnNxbCIKICAgICAgXQogICAgfSwKICAgICJQMyI6IHsKICAgICAgIm5hbWUiOiAiUmV1c2FibGUgUEMvU1AgYnJvd3NlciBRQSBnYXRlIiwKICAgICAgInN0YXR1cyI6ICJjb21wbGV0ZSIsCiAgICAgICJyZXF1aXJlbWVudHMiOiB7CiAgICAgICAgInJlc3BvbnNpdmVfcGNfc3AiOiB0cnVlLAogICAgICAgICJuYXZpZ2F0aW9uIjogdHJ1ZSwKICAgICAgICAiY29uc29sZV9ydW50aW1lX2Vycm9ycyI6IHRydWUsCiAgICAgICAgInNjcmVlbnNob3RzX29yX3Zpc3VhbF9ldmlkZW5jZSI6IHRydWUsCiAgICAgICAgInJlZ3Jlc3Npb25fdmVyaWZpY2F0aW9uIjogdHJ1ZQogICAgICB9LAogICAgICAiZXZpZGVuY2UiOiBbCiAgICAgICAgImRvY3MvZXZpZGVuY2UvMjAyNi0wOS0yMS1QMy1DT01QTEVURS5tZCIsCiAgICAgICAgImNvbW1pdDpkYWE0ZGFkMjM1M2E1YjI0YjQ1Yjk1YTJjMjViOGY4MDc1M2IzNDAwIiwKICAgICAgICAicnVubmVyOnFhL2Jyb3dzZXItcWEtbG9jYWwubWpzIiwKICAgICAgICAic2VsZnRlc3Q6cWEvY2hyb21pdW0tc2VsZnRlc3QubWpzIgogICAgICBdCiAgICB9LAogICAgIlA0IjogewogICAgICAibmFtZSI6ICJSZXVzYWJsZSBwcm9qZWN0IHdvcmtlcnMgLyBvYnNlcnZhdGlvbiBjb250cmFjdHMiLAogICAgICAic3RhdHVzIjogImNvbXBsZXRlIiwKICAgICAgInJlcXVpcmVtZW50cyI6IHsKICAgICAgICAicHJvdmlkZXJfbmV1dHJhbF9jaGVja3BvaW50IjogdHJ1ZSwKICAgICAgICAicHJvdmlkZXJfbmV1dHJhbF9oZWFydGJlYXQiOiB0cnVlLAogICAgICAgICJyZWxpc19yZXVzZV9wcm92ZW4iOiB0cnVlCiAgICAgIH0sCiAgICAgICJldmlkZW5jZSI6IFsKICAgICAgICAiZG9jcy9ldmlkZW5jZS8yMDI2LTA5LTIxLVA0LUNPTVBMRVRFLm1kIiwKICAgICAgICAiY29tbWl0OmZjMjQwMzhiNjY5OWM4YjI1MDBlYWZiY2E5YWFmMWY4NDRiYTQ1YzIiLAogICAgICAgICJjb250cmFjdDpjb250cmFjdHMvd29ya2VyLXN0YXRlLWNvbnRyYWN0Lmpzb24iLAogICAgICAgICJzZWxmdGVzdDpxYS93b3JrZXItc3RhdGUtc2VsZnRlc3QubWpzIgogICAgICBdCiAgICB9LAogICAgIlA1IjogewogICAgICAibmFtZSI6ICJEZXRlcm1pbmlzdGljIHByb2plY3QgYmF0Y2gvUUEgZ2F0ZXMgKyBoYW5kb2ZmIHN0YXRlIiwKICAgICAgInN0YXR1cyI6ICJjb21wbGV0ZSIsCiAgICAgICJyZXF1aXJlbWVudHMiOiB7CiAgICAgICAgInNheWFrYV9nYXRlIjogdHJ1ZSwKICAgICAgICAiY253X2dhdGUiOiB0cnVlLAogICAgICAgICJvbW53X2dhdGUiOiB0cnVlLAogICAgICAgICJvdGhlcl9wcm9qZWN0X2dhdGVfb3JfcGFzc19ub3RfcmVxdWlyZWQiOiB0cnVlLAogICAgICAgICJoYW5kb2ZmX3N0YXRlIjogdHJ1ZQogICAgICB9LAogICAgICAiZXZpZGVuY2UiOiBbCiAgICAgICAgImRvY3MvZXZpZGVuY2UvMjAyNi0wOS0yMS1QNS1DT01QTEVURS5tZCIsCiAgICAgICAgInN0YXRlOlA1X0hBTkRPRkYuanNvbiIsCiAgICAgICAgImNvbnRyYWN0OmNvbnRyYWN0cy9wNS1wcm9qZWN0LWdhdGVzLmpzb24iLAogICAgICAgICJ2YWxpZGF0b3I6c2NyaXB0cy92YWxpZGF0ZS1wNS1nYXRlcy5tanMiLAogICAgICAgICJzZWxmdGVzdDpxYS9wNS1nYXRlcy1zZWxmdGVzdC5tanMiCiAgICAgIF0KICAgIH0KICB9Cn0K
+{
+  "schema_version": 1,
+  "updated_at": "2026-09-21T14:43:25Z",
+  "current_phase": "P5",
+  "maintenance_mode": true,
+  "retired_infrastructure": {
+    "conoha": {
+      "status": "retired",
+      "checked_in_current_model": false,
+      "rule": "do_not_check_start_rebuild_or_recreate"
+    }
+  },
+  "deployment_policy": {
+    "vercel_preview_without_explicit_norizo_request": false,
+    "production_without_explicit_norizo_approval": false
+  },
+  "phase_order": [
+    "P1",
+    "P2",
+    "P3",
+    "P4",
+    "P5"
+  ],
+  "phases": {
+    "P1": {
+      "name": "Control Room / health / canonical project state",
+      "status": "complete",
+      "requirements": {
+        "canonical_state": true,
+        "no_vps_dependency": true,
+        "deterministic_health_validator": true,
+        "completion_evidence_persisted": true
+      },
+      "evidence": [
+        "docs/evidence/2026-09-21-P1-COMPLETE.md",
+        "commit:99aa9afe2ec0e2362f21b1ed1d6624b338397046"
+      ]
+    },
+    "P2": {
+      "name": "OMNW Discovery/Master + Consumer development support",
+      "status": "complete",
+      "requirements": {
+        "discovery_master_separate_from_consumer": true,
+        "retired_harvest_absent": true,
+        "consumer_m0_m4_safe_from_discovery_mutation": true
+      },
+      "evidence": [
+        "docs/evidence/2026-09-21-P2-COMPLETE.md",
+        "commit:179c6111a5273e6638919ed346418b41c514a444",
+        "contract:contracts/omnw-boundary.json",
+        "audit:contracts/omnw-p2-audit.sql"
+      ]
+    },
+    "P3": {
+      "name": "Reusable PC/SP browser QA gate",
+      "status": "complete",
+      "requirements": {
+        "responsive_pc_sp": true,
+        "navigation": true,
+        "console_runtime_errors": true,
+        "screenshots_or_visual_evidence": true,
+        "regression_verification": true
+      },
+      "evidence": [
+        "docs/evidence/2026-09-21-P3-COMPLETE.md",
+        "commit:daa4dad2353a5b24b45b95a2c25b8f80753b3400",
+        "runner:qa/browser-qa-local.mjs",
+        "selftest:qa/chromium-selftest.mjs"
+      ]
+    },
+    "P4": {
+      "name": "Reusable project workers / observation contracts",
+      "status": "complete",
+      "requirements": {
+        "provider_neutral_checkpoint": true,
+        "provider_neutral_heartbeat": true,
+        "relis_reuse_proven": true
+      },
+      "evidence": [
+        "docs/evidence/2026-09-21-P4-COMPLETE.md",
+        "commit:fc24038b6699c8b2500eafbca9aaf1f844ba45c2",
+        "contract:contracts/worker-state-contract.json",
+        "selftest:qa/worker-state-selftest.mjs"
+      ]
+    },
+    "P5": {
+      "name": "Deterministic project batch/QA gates + handoff state",
+      "status": "complete",
+      "requirements": {
+        "sayaka_gate": true,
+        "cnw_gate": true,
+        "omnw_gate": true,
+        "other_project_gate_or_pass_not_required": true,
+        "handoff_state": true
+      },
+      "evidence": [
+        "docs/evidence/2026-09-21-P5-COMPLETE.md",
+        "state:P5_HANDOFF.json",
+        "contract:contracts/p5-project-gates.json",
+        "validator:scripts/validate-p5-gates.mjs",
+        "selftest:qa/p5-gates-selftest.mjs"
+      ]
+    }
+  }
+}
