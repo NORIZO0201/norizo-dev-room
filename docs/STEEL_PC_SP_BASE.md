@@ -1,60 +1,55 @@
-# Steel PC/SP Development Base
+# PC/SP Browser QA Base
 
 Updated: 2026-09-21 JST
 
 ## Decision
 
-Use **self-hosted Steel Browser** on the existing ConoHa VPS as the default PC/SP browser-development and QA substrate.
+DEV ROOM browser QA is **provider-neutral and VPS-free**.
 
-This uses the open-source Steel Browser software and adds no Steel Cloud usage charge. The existing VPS remains the infrastructure cost.
+Use an already-available managed browser/provider path (Steel Cloud when configured, or another reachable Playwright-compatible provider already approved for the project). Do not create or self-host Steel on ConoHa or any replacement VPS merely to satisfy P3.
 
-## Official constraints checked
-
-Current Steel self-host documentation requires:
-- Docker 20.10+
-- at least 4 GB RAM
-- at least 10 GB free disk
-
-Current ConoHa class (6 vCPU / 12 GB RAM / 100 GB) is sufficient.
-
-Steel Local/self-host currently documents concurrency of 1. Therefore PC and SP QA run sequentially by default.
-
-## Security
-
-- Steel API: bind to 127.0.0.1:3000
-- Chrome debugging/CDP: bind to 127.0.0.1:9223
-- Never publish 9223 directly
-- Do not expose Steel API publicly without an authenticated gateway
-- Keep browser cache under /opt/norizo/steel/cache
-- Do not store site passwords in GitHub
-
-## QA profiles
+## Required QA profiles
 
 ### PC
-- default viewport target: 1440 × 900
-- desktop user agent/profile
-- screenshots and interaction QA
+- default target viewport: 1440 × 900 unless the project specifies another canonical desktop size
+- desktop navigation and interaction checks
+- runtime/console error capture
+- screenshot/evidence capture
 
 ### SP
-- mobile viewport/fingerprint
-- touch/mobile interaction QA
-- screenshots and interaction QA
+- canonical project mobile viewport (393 × 852 when no project-specific size is defined)
+- touch/mobile interaction checks
+- responsive overflow/layout checks
+- runtime/console error capture
+- screenshot/evidence capture
 
-Because self-host concurrency is 1, DEV ROOM should treat PC/SP as two QA modes over one browser capacity rather than two simultaneous always-on sessions.
+## Required evidence per run
+
+A reusable QA run records:
+- project / route
+- tested URL
+- viewport/profile
+- navigation result
+- key DOM/assertion result
+- console/runtime errors
+- screenshot/evidence reference
+- regression PASS/FAIL outcome
 
 ## Operating flow
 
-1. Chatty defines the page and QA objective.
-2. Deterministic browser QA script starts a Steel session.
-3. Run PC or SP profile.
-4. Capture evidence: URL, screenshot, console errors, key DOM checks.
-5. Stop session.
-6. Run the other profile if needed.
-7. Preview is created only when NORIZO explicitly asks to see it.
-8. Production only after approval and required checks.
+1. Chatty selects the project, route set, and QA objective.
+2. Use the configured managed/reachable browser provider only for the required test window.
+3. Run PC and/or SP checks.
+4. Capture deterministic evidence.
+5. Stop/release the browser session.
+6. Persist regression outcome into the P1–P5 evidence/handoff state.
+7. Create a Vercel Preview only when NORIZO explicitly asks to see it.
+8. Deploy Production only after the required checks and explicit approval.
 
-## Cloud fallback
+## Cost and security
 
-Steel Cloud is not the default. Current Steel Launch pricing is $0/month plus usage with one-time credits, so it is not a permanent unlimited-free replacement for self-hosting.
-
-Use Steel Cloud only when a managed capability is specifically needed and approved.
+- Prefer structured APIs over browser automation for data collection.
+- Keep sessions on-demand; do not leave paid browser sessions idling.
+- Keep viewer/debug URLs private.
+- Never commit browser provider tokens.
+- Do not add a new paid browser service without explicit approval.
