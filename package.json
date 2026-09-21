@@ -3,7 +3,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vercel dev"
+    "dev": "vercel dev",
+    "qa:state": "node scripts/validate-phase-state.mjs"
   },
   "dependencies": {
     "playwright-core": "^1.63.0"
