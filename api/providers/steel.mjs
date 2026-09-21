@@ -154,7 +154,7 @@ export async function inspectPage(id) {
       userAgent: navigator.userAgent,
       touchPoints: navigator.maxTouchPoints || 0,
       coarsePointer: matchMedia('(pointer: coarse)').matches,
-      mobileSignals: innerWidth <= 430 && (navigator.maxTouchPoints || 0) > 0,
+      mobileSignals: innerWidth <= 430 && (navigator.maxTouchPoints || 0) > 0 && /(Mobile|Android|iPhone|iPad)/i.test(navigator.userAgent),
       scroll: { x: scrollX, y: scrollY }
     };
   }));
