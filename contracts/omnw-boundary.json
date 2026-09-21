@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "project": "OMNW",
+  "supabase_project": "omnw-production",
+  "principle": "consumer_and_discovery_master_are_separate",
+  "legacy_pipeline": {
+    "harvest": "forbidden"
+  },
+  "lanes": {
+    "discovery": {
+      "tables": ["discovery_sources", "discovery_runs", "discovery_candidates"],
+      "consumer_direct_write": false
+    },
+    "master": {
+      "tables": ["wineries", "wines", "vintages", "winery_aliases", "wine_aliases"],
+      "consumer_direct_write": false
+    },
+    "consumer": {
+      "tables": ["user_profiles", "wine_experiences", "unknown_wine_submissions"],
+      "development_mode": "local_adapters_first",
+      "discovery_table_write": false
+    }
+  },
+  "consumer_m0_m4_rule": "Consumer development may use local adapters, fixtures, or consumer-owned tables, but must not mutate discovery_sources, discovery_runs, or discovery_candidates as part of UI development.",
+  "completion_checks": [
+    "no_harvest_named_table",
+    "no_harvest_named_edge_function",
+    "no_consumer_foreign_key_to_discovery_tables",
+    "consumer_local_adapter_path_exists",
+    "discovery_master_lane_allowlist_excludes_consumer"
+  ]
+}
