@@ -5,27 +5,24 @@ import { getProvider } from './providers/index.mjs';
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
   const url = req.body?.url;
-  if (typeof url !== 'string' || !/^https?:\/\//i.test(url)) {
-    return res.status(400).json({ error: 'Invalid URL' });
-  }
+  if (typeof url !== 'string' || !/^https?:\/\//i.test(url)) return res.status(400).json({ error: 'Invalid URL' });
 
   try {
     const p = await getProvider();
-    const pcId = req.body?.pcId;
-    const spId = req.body?.spId;
+    const sessions = req.body?.sessions || {};
     const protectedQa = /\.vercel\.app/i.test(url) && /git-dev-room-qa/i.test(url);
     const oidc = protectedQa ? getVercelOidcToken() : undefined;
-    const extraHTTPHeaders = oidc
-      ? { 'x-vercel-trusted-oidc-idp-token': oidc }
-      : undefined;
-    const deviceProfile = ['iphone','android','compact'].includes(req.body?.deviceProfile) ? req.body.deviceProfile : 'iphone';
+    const extraHTTPHeaders = oidc ? { 'x-vercel-trusted-oidc-idp-token': oidc } : undefined;
+    const urls = {};
 
-    const [pcUrl, spUrl] = await Promise.all([
-      pcId ? p.goto(pcId, url, { extraHTTPHeaders }) : Promise.resolve(null),
-      spId ? p.goto(spId, url, { mobile: true, deviceProfile, extraHTTPHeaders }) : Promise.resolve(null)
-    ]);
+    await Promise.all(Object.entries(sessions).map(async ([device, session]) => {
+      if (!session?.id) return;
+      urls[device] = await p.goto(session.id, url, device === 'pc'
+        ? { extraHTTPHeaders }
+        : { mobile: true, deviceProfile: device, extraHTTPHeaders });
+    }));
 
-    return res.status(200).json({ ok: true, provider: p.info().provider, pcUrl, spUrl, oidcAvailable: Boolean(oidc) });
+    return res.status(200).json({ ok: true, provider: p.info().provider, urls, oidcAvailable: Boolean(oidc) });
   } catch (e) {
     return res.status(500).json({ error: e?.message || String(e) });
   }
