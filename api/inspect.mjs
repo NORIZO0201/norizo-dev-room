@@ -2,26 +2,21 @@ import { getProvider } from './providers/index.mjs';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
-
-  const pcId = req.body?.pcId;
-  const spId = req.body?.spId;
-  if (!pcId || !spId) return res.status(400).json({ error: 'Missing sessions' });
-
   try {
     const p = await getProvider();
-    const deviceProfile = ['iphone','android','compact'].includes(req.body?.deviceProfile) ? req.body.deviceProfile : 'iphone';
-    if (p.configureMobile) await p.configureMobile(spId, deviceProfile);
-    const [pc, sp] = await Promise.all([p.inspectPage(pcId), p.inspectPage(spId)]);
-    const gradePc = x => x.hasVisibleContent && x.brokenImages === 0 ? 'PASS' : 'CHECK';
-    const gradeSp = x => x.hasVisibleContent && x.brokenImages === 0 && x.mobileSignals ? 'PASS' : 'CHECK';
+    const sessions = req.body?.sessions || {};
+    const result = {};
+    const qa = {};
 
-    return res.status(200).json({
-      provider: p.info().provider,
-      pc,
-      sp,
-      deviceProfile,
-      qa: { pc: gradePc(pc), sp: gradeSp(sp) }
-    });
+    for (const [device, session] of Object.entries(sessions)) {
+      if (!session?.id) continue;
+      if (device !== 'pc' && p.configureMobile) await p.configureMobile(session.id, device);
+      const info = await p.inspectPage(session.id);
+      result[device] = info;
+      qa[device] = info.hasVisibleContent && info.brokenImages === 0 && (device === 'pc' || info.mobileSignals) ? 'PASS' : 'CHECK';
+    }
+
+    return res.status(200).json({ provider: p.info().provider, result, qa });
   } catch (e) {
     return res.status(500).json({ error: e?.message || String(e) });
   }
