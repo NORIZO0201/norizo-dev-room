@@ -36,7 +36,8 @@ def claude_available():
     return subprocess.run(["bash","-lc","command -v claude >/dev/null 2>&1"]).returncode==0
 
 def load_tasks():
-    return gh_json(["issue","list","--repo",REPO,"--state","open","--label","ai:claude","--json","number,title,body,updatedAt"])
+    items = gh_json(["issue","list","--repo",REPO,"--state","open","--limit","100","--json","number,title,body,updatedAt"])
+    return [x for x in items if str(x.get("title","")).startswith("CLAUDE:")]
 
 def already_done(issue):
     if not LAST_FILE.exists(): return False
