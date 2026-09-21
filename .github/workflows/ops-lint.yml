@@ -36,3 +36,6 @@ jobs:
         run: |
           shellcheck deploy/health/install-health-monitor.sh
           shellcheck scripts/bootstrap-conoha.sh
+
+      - name: systemd unit syntax
+        run: systemd-analyze verify deploy/health/norizo-health.service
