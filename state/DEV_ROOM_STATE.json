@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-09-21T14:02:00Z",
-  "current_phase": "P2",
+  "updated_at": "2026-09-21T14:08:00Z",
+  "current_phase": "P3",
   "maintenance_mode": false,
   "retired_infrastructure": {
     "conoha": {
@@ -32,17 +32,22 @@
     },
     "P2": {
       "name": "OMNW Discovery/Master + Consumer development support",
-      "status": "in_progress",
+      "status": "complete",
       "requirements": {
-        "discovery_master_separate_from_consumer": false,
-        "retired_harvest_absent": false,
-        "consumer_m0_m4_safe_from_discovery_mutation": false
+        "discovery_master_separate_from_consumer": true,
+        "retired_harvest_absent": true,
+        "consumer_m0_m4_safe_from_discovery_mutation": true
       },
-      "evidence": []
+      "evidence": [
+        "docs/evidence/2026-09-21-P2-COMPLETE.md",
+        "commit:179c6111a5273e6638919ed346418b41c514a444",
+        "contract:contracts/omnw-boundary.json",
+        "audit:contracts/omnw-p2-audit.sql"
+      ]
     },
     "P3": {
       "name": "Reusable PC/SP browser QA gate",
-      "status": "pending",
+      "status": "in_progress",
       "requirements": {
         "responsive_pc_sp": false,
         "navigation": false,
