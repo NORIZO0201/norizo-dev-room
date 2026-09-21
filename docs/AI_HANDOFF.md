@@ -1,3 +1,7 @@
+> **Historical document — not active coordination state.**  
+> Current team truth is `main` via `AGENTS.md`, `docs/PROJECT.md`, `docs/SPEC.md`, `docs/DECISIONS.md`, and `docs/STATUS.md`.  
+> Current work belongs in GitHub Issues. This file is retained only as P0 historical evidence.
+
 # AI HANDOFF — DEV ROOM P0
 
 Updated: 2026-09-21 JST
