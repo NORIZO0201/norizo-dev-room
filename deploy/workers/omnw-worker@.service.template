@@ -11,8 +11,7 @@
 [Unit]
 Description=OMNW resident worker (%i)
 After=network-online.target norizo-health.service
-Wants=network-online.target
-Requires=norizo-health.service
+Wants=network-online.target norizo-health.service
 
 StartLimitIntervalSec=600
 StartLimitBurst=3
