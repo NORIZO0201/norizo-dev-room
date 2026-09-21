@@ -1,15 +1,15 @@
-import vercelFunctions from '@vercel/functions';
-const { getVercelOidcToken } = vercelFunctions;
+import { getVercelOidcToken } from '@vercel/oidc';
 
 export default async function handler(_req, res) {
-  const token = getVercelOidcToken() || '';
   const target = 'https://oh-my-nihon-wine-git-dev-room-qa-oh-my-nihon-wine.vercel.app/welcome';
+  let token = '';
   let status = null;
   let location = null;
   let ok = false;
   let error = null;
 
   try {
+    token = (await getVercelOidcToken()) || '';
     const response = await fetch(target, {
       redirect: 'manual',
       headers: token ? { 'x-vercel-trusted-oidc-idp-token': token } : {}
