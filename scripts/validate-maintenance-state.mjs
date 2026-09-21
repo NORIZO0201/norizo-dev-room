@@ -92,8 +92,11 @@ export function validateMaintenance({ contract, state, handoff, observation }) {
 
   const consumerSha = observation?.projects?.OMNW?.consumer_branch_sha;
   if (!sha40.test(consumerSha || '')) errors.push('OMNW Consumer branch requires a 40-char SHA');
-  if (observation?.projects?.OMNW?.consumer_milestone_observed !== 'M3') {
-    errors.push('OMNW Consumer milestone observation must remain explicit');
+  const requiredConsumerMilestone = contract?.required_observation?.omnw_consumer_milestone;
+  if (!/^M[0-4]$/.test(requiredConsumerMilestone || '')) {
+    errors.push('maintenance contract requires an explicit OMNW Consumer milestone M0-M4');
+  } else if (observation?.projects?.OMNW?.consumer_milestone_observed !== requiredConsumerMilestone) {
+    errors.push(`OMNW Consumer milestone observation must be ${requiredConsumerMilestone}`);
   }
 
   if (observation?.public_evidence?.nihonwine_jp_homepage_observed !== true) {
