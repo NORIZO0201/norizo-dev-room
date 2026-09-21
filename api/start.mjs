@@ -1,3 +1,4 @@
+import { getVercelOidcToken } from '@vercel/functions';
 import { getProvider } from './providers/index.mjs';
 
 export default async function handler(req, res) {
@@ -16,7 +17,7 @@ export default async function handler(req, res) {
     sp = await p.createSession({ deviceConfig: { device: 'mobile' }, persistProfile: true });
 
     const protectedQa = /\.vercel\.app/i.test(url) && /git-dev-room-qa/i.test(url);
-    const oidc = protectedQa ? process.env.VERCEL_OIDC_TOKEN : null;
+    const oidc = protectedQa ? getVercelOidcToken() : undefined;
     const extraHTTPHeaders = oidc
       ? { 'x-vercel-trusted-oidc-idp-token': oidc }
       : undefined;
