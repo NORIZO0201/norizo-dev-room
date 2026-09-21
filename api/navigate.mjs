@@ -11,9 +11,15 @@ export default async function handler(req, res) {
     const p = await getProvider();
     const pcId = req.body?.pcId;
     const spId = req.body?.spId;
+    const protectedQa = /\.vercel\.app/i.test(url) && /git-dev-room-qa/i.test(url);
+    const oidc = protectedQa ? process.env.VERCEL_OIDC_TOKEN : null;
+    const extraHTTPHeaders = oidc
+      ? { 'x-vercel-trusted-oidc-idp-token': oidc }
+      : undefined;
+    const deviceProfile = ['iphone','android','compact'].includes(req.body?.deviceProfile) ? req.body.deviceProfile : 'iphone';
     const [pcUrl, spUrl] = await Promise.all([
-      pcId ? p.goto(pcId, url) : Promise.resolve(null),
-      spId ? p.goto(spId, url, { mobile: true }) : Promise.resolve(null)
+      pcId ? p.goto(pcId, url, { extraHTTPHeaders }) : Promise.resolve(null),
+      spId ? p.goto(spId, url, { mobile: true, deviceProfile, extraHTTPHeaders }) : Promise.resolve(null)
     ]);
     return res.status(200).json({ ok: true, provider: p.info().provider, pcUrl, spUrl });
   } catch (e) {
