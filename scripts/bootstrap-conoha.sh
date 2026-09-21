@@ -24,7 +24,7 @@ STEEL_DIR="$ROOT_DIR/steel"
 echo "== NORIZO AI WORK FACTORY bootstrap =="
 
 apt-get update -y
-apt-get install -y ca-certificates curl git jq unzip openssh-client
+apt-get install -y ca-certificates curl git jq unzip openssh-client gh
 
 # Docker
 if ! command -v docker >/dev/null 2>&1; then
@@ -80,7 +80,13 @@ echo "== Claude Code =="
 if command -v claude >/dev/null 2>&1; then
   claude --version || true
 else
-  echo "Claude Code was not found. The ConoHa startup template may still be finishing or was not selected."
+  echo "Claude Code was not found."
+  if command -v npm >/dev/null 2>&1; then
+    npm install -g @anthropic-ai/claude-code || true
+    command -v claude >/dev/null 2>&1 && claude --version || true
+  else
+    echo "npm is also missing; verify the ConoHa Claude Code startup template."
+  fi
 fi
 
 echo
@@ -88,7 +94,7 @@ echo "== GitHub =="
 if command -v gh >/dev/null 2>&1; then
   gh --version | head -1
 else
-  echo "GitHub CLI is not installed yet. Git itself is installed and DEV ROOM is cloned."
+  echo "GitHub CLI installation failed; git itself is available."
 fi
 
 echo
