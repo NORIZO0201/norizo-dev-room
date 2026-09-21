@@ -1,12 +1,15 @@
 {
   "schema_version": 1,
   "phase": "P5",
-  "observed_at": "2026-09-21T15:17:30Z",
+  "observed_at": "2026-09-21T16:10:00Z",
   "foundation_status": "PASS",
   "deployment_policy": {
     "preview_without_explicit_norizo_request": false,
     "production_without_explicit_norizo_approval": false
   },
+  "maintenance_contract": "contracts/maintenance-mode.json",
+  "latest_maintenance_observation": "state/MAINTENANCE_OBSERVATION.json",
+  "maintenance_validator": "scripts/validate-maintenance-state.mjs",
   "projects": {
     "SAYAKA": {
       "gate_status": "PASS",
@@ -37,7 +40,7 @@
       "gate_status": "PASS",
       "source": {
         "repository": "NORIZO0201/craft-nihon-wine",
-        "main_sha": "a428d294ac44783d2673aac9eede4b0e3e413caa",
+        "main_sha": "1140ccf60b676c7c10acd95dd9107bbe24776f69",
         "verified_fix_files": [
           "components/product/NextThree.tsx",
           "app/favorites/FavoritesClient.tsx",
@@ -61,20 +64,13 @@
         "latest_production_deployment": "dpl_DDYosa76kNfAaKXJSKR7aoqjBzrc",
         "latest_production_sha": "24336a8fd84c5d64a1fbfb0ca47831eecb4f5eef",
         "latest_production_state": "READY",
-        "latest_observed_nonproduction_ready": "dpl_BDigNpTjf4Y3DMFStxQUzBzRe4xU",
-        "runtime_errors_1h": {
-          "groups": 2,
-          "primary": "failed to decode param",
-          "primary_count": 4,
-          "primary_route": "/wines/[slug]",
-          "last_seen": "2026-09-21T15:01:34Z",
-          "malformed_percent_path_observed": true
-        }
+        "latest_observed_nonproduction_ready": "dpl_7CTcUbF8ZRduskmN4St487QZ4nT4",
+        "runtime_errors_1h": 0
       },
       "handoff": {
         "source_ahead_of_production": true,
         "production_action": "AWAITING_EXPLICIT_NORIZO_APPROVAL",
-        "reason": "The one-shot Production promotion is READY but still logged malformed long Japanese wine-slug decode failures. Additional source remediation is now on main with automatic main deployment disabled. No further Production promotion is permitted without explicit NORIZO approval."
+        "reason": "The current Production is healthy in the latest one-hour observation, but it remains on 24336a8 while slug remediation and later CNW work are ahead on main. Zero recent errors does not prove the source remediation has shipped. Production promotion remains forbidden without explicit NORIZO approval."
       }
     },
     "OMNW": {
@@ -83,7 +79,7 @@
         "repository": "NORIZO0201/oh-my-nihon-wine",
         "main_sha": "1a926caace6fe12621966a52e9593f6f721c68ba",
         "consumer_work_branch": "agent/recognition-core-m0-m4",
-        "consumer_work_sha": "41c96fa26b94fdaf7b270106ccb5ae7be27ba5c4",
+        "consumer_work_sha": "fef80993180dbb7e48e44fe5d009b9d9a740dfa4",
         "consumer_milestone_observed": "M3"
       },
       "supabase": {
@@ -109,7 +105,7 @@
       "handoff": {
         "source_ahead_of_production": false,
         "production_action": "NONE",
-        "reason": "Canonical main Production remains aligned. Consumer Recognition Core work is isolated on its branch; observed M3 learning writes only the recognition_image_index sidecar while CWS/Master/Discovery source tables remain read-only."
+        "reason": "Canonical main Production remains aligned. Consumer Recognition Core work is isolated on its branch; observed M3 work continues on the recognition_image_index sidecar while CWS/Master/Discovery source tables remain separated, and branch Vercel deploy attempts are canceled by policy."
       }
     },
     "OTHER_NIHON_WINE_JP": {
@@ -139,6 +135,7 @@
   "next_mode": "maintenance",
   "maintenance_rules": [
     "Keep P1-P5 contracts intact and validate state drift on future runs.",
+    "Use contracts/maintenance-mode.json and state/MAINTENANCE_OBSERVATION.json as the deterministic maintenance gate.",
     "Do not revive or inspect ConoHa.",
     "Never revive the retired OMNW Harvest pipeline.",
     "Do not create Vercel Preview unless NORIZO explicitly asks to see one.",
