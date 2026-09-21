@@ -102,3 +102,27 @@ Once the snapshot and host convergence occur, ChatGPT can complete the remaining
 - No public monitoring port.
 - No secrets in GitHub.
 - No P1–P5 work before P0 completion.
+
+
+## P0 COMPLETION EVIDENCE — 2026-09-21 JST
+
+P0 is COMPLETE.
+
+Verified on the actual ConoHa VPS and control plane:
+- [x] snapshot-before-bootstrap rule followed by NORIZO before the mutating bootstrap
+- [x] bootstrap completed on the VPS
+- [x] `/opt/norizo/system/baseline.json` generated and displayed on the VPS
+- [x] `norizo-health.service` active
+- [x] `norizo-control-agent.service` active
+- [x] `conoha-01` node token exists in Supabase
+- [x] fresh telemetry received; node status became `online`
+- [x] safe allowlisted command round-trip succeeded:
+      `health_snapshot` leased by `conoha-01`, executed with code 0, and returned `done`
+      with live health showing both health/control-agent units active
+
+P0 completion is based on live execution evidence, not code presence alone.
+
+Operational consequence:
+- Routine operation no longer depends on NORIZO manually running `ssh conoha`.
+- The ConoHa resident control agent and systemd services are now the 24/7 execution substrate.
+- Any future manual Mac-local SSH is break-glass/recovery only, not normal operation.
