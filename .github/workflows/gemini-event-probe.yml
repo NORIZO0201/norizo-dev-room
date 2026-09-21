@@ -1,19 +1,12 @@
-name: Gemini Event Probe
+name: Gemini Event Probe (retired)
 
+# Automation retired by NORIZO on 2026-09-21. Previous implementation is in Git history.
 on:
-  issue_comment:
-    types: [created]
-
+  workflow_dispatch:
+permissions: {}
 jobs:
-  probe:
-    if: contains(github.event.comment.body, '@gemini-cli')
+  retired:
+    if: ${{ false }}
     runs-on: ubuntu-latest
-    permissions:
-      issues: write
-      pull-requests: write
     steps:
-      - name: Prove GitHub event routing
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          gh issue comment "${{ github.event.issue.number }}" --repo "${{ github.repository }}" --body "GEMINI_EVENT_PROBE_OK — GitHub received @gemini-cli and started an Actions job."
+      - run: echo "Gemini is excluded from automated collaboration."
