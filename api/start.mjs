@@ -2,50 +2,47 @@ import vercelFunctions from '@vercel/functions';
 const { getVercelOidcToken } = vercelFunctions;
 import { getProvider } from './providers/index.mjs';
 
-const valid = d => ['iphone','android','pc'].includes(d);
+function appetizeUrl(device, url) {
+  const p = new URLSearchParams({
+    autoplay: 'true',
+    scale: 'auto',
+    orientation: 'portrait',
+    screenOnly: 'false',
+    deviceColor: 'black',
+    codec: 'jpeg',
+    launchUrl: url
+  });
+  if (device === 'iphone') {
+    p.set('device','iphone16pro');
+    p.set('osVersion','18.2');
+  } else {
+    p.set('device','pixel9pro');
+    p.set('osVersion','15.0');
+  }
+  return 'https://appetize.io/standalone?' + p.toString();
+}
 
-export default async function handler(req, res) {
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
-  const url = typeof req.body?.url === 'string' && /^https?:\/\//i.test(req.body.url) ? req.body.url : 'https://example.com';
-  const devices = Array.isArray(req.body?.devices) ? req.body.devices.filter(valid) : ['iphone','android'];
-  if (!devices.length) return res.status(400).json({ error: 'Select at least one device' });
-
+export default async function handler(req,res){
+  if(req.method!=='POST')return res.status(405).json({error:'Method not allowed'});
+  const url=typeof req.body?.url==='string'&&/^https?:\/\//i.test(req.body.url)?req.body.url:'https://example.com';
+  const devices=Array.isArray(req.body?.devices)?req.body.devices.filter(d=>['iphone','android','pc'].includes(d)):['iphone','android'];
+  if(!devices.length)return res.status(400).json({error:'Select at least one device'});
+  const sessions={}, urls={}, embedUrls={};
   let p;
-  const sessions = {};
-  try {
-    p = await getProvider();
-    const protectedQa = /\.vercel\.app/i.test(url) && /git-dev-room-qa/i.test(url);
-    const oidc = protectedQa ? getVercelOidcToken() : undefined;
-    const extraHTTPHeaders = oidc ? { 'x-vercel-trusted-oidc-idp-token': oidc } : undefined;
-
-    for (const device of devices) {
-      if (device === 'pc') {
-        sessions.pc = await p.createSession({ dimensions: { width: 1440, height: 900 }, persistProfile: true });
-      } else {
-        sessions[device] = await p.createSession({ deviceConfig: { device: 'mobile' }, persistProfile: true });
-      }
+  try{
+    if(devices.includes('iphone')){urls.iphone=url;embedUrls.iphone=appetizeUrl('iphone',url)}
+    if(devices.includes('android')){urls.android=url;embedUrls.android=appetizeUrl('android',url)}
+    if(devices.includes('pc')){
+      p=await getProvider();
+      const protectedQa=/\.vercel\.app/i.test(url)&&/git-dev-room-qa/i.test(url);
+      const oidc=protectedQa?getVercelOidcToken():undefined;
+      const extraHTTPHeaders=oidc?{'x-vercel-trusted-oidc-idp-token':oidc}:undefined;
+      sessions.pc=await p.createSession({dimensions:{width:1440,height:900},persistProfile:true});
+      urls.pc=await p.goto(sessions.pc.id,url,{extraHTTPHeaders});
     }
-
-    const urls = {};
-    await Promise.all(devices.map(async device => {
-      const session = sessions[device];
-      urls[device] = await p.goto(session.id, url, device === 'pc'
-        ? { extraHTTPHeaders }
-        : { mobile: true, deviceProfile: device, extraHTTPHeaders });
-    }));
-
-    return res.status(200).json({
-      provider: p.info().provider,
-      sessions,
-      urls,
-      devices,
-      protectedQa,
-      oidcAvailable: Boolean(oidc),
-      expiresInMs: p.SESSION_MS,
-      url
-    });
-  } catch (e) {
-    if (p) await Promise.allSettled(Object.values(sessions).map(s => p.release(s?.id)));
-    return res.status(500).json({ error: e?.message || String(e) });
+    return res.status(200).json({sessions,urls,embedUrls,devices,expiresInMs:p?.SESSION_MS||840000,url});
+  }catch(e){
+    if(p&&sessions.pc?.id)await p.release(sessions.pc.id).catch(()=>{});
+    return res.status(500).json({error:e?.message||String(e)});
   }
 }
