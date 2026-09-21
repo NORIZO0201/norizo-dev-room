@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-09-21T16:10:00Z",
+  "updated_at": "2026-09-21T16:16:00Z",
   "current_phase": "P5",
   "maintenance_mode": true,
   "retired_infrastructure": {
@@ -96,6 +96,7 @@
       "evidence": [
         "docs/evidence/2026-09-21-P5-COMPLETE.md",
         "docs/evidence/2026-09-22-MAINTENANCE-CNW-ROUTE-DRIFT.md",
+        "docs/evidence/2026-09-22-MAINTENANCE-GATE.md",
         "state:P5_HANDOFF.json",
         "contract:contracts/p5-project-gates.json",
         "validator:scripts/validate-p5-gates.mjs",
@@ -111,6 +112,7 @@
     "validator": "scripts/validate-maintenance-state.mjs",
     "selftest": "qa/maintenance-selftest.mjs",
     "command": "npm run qa:maintenance",
+    "evidence": "docs/evidence/2026-09-22-MAINTENANCE-GATE.md",
     "last_observed_at": "2026-09-21T16:10:00Z",
     "last_result": "PASS"
   }
