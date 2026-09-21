@@ -15,7 +15,8 @@
     "qa:maintenance": "node scripts/validate-maintenance-state.mjs && node qa/maintenance-selftest.mjs"
   },
   "dependencies": {
-    "playwright-core": "^1.63.0",
-    "@vercel/functions": "latest"
+    "@vercel/functions": "latest",
+    "@vercel/oidc": "latest",
+    "playwright-core": "^1.63.0"
   }
 }
