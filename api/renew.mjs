@@ -1,42 +1,89 @@
 import { getProvider } from './providers/index.mjs';
+import { isHttpUrl, methodNotAllowed, readBody, sendError, sendJson } from './_http.mjs';
+import { oidcContextFor } from './_oidc.mjs';
 
+// Sessions are time-boxed by the provider, so extending means replacing them.
+// The current URL is read first, then the old sessions are released and fresh
+// ones are created for the same devices and pointed back at the same page.
 export default async function handler(req, res) {
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
-  const oldSessions = req.body?.sessions || {};
-  const fallbackUrl = req.body?.fallbackUrl || 'https://example.com';
+  if (req.method !== 'POST') return methodNotAllowed(res, ['POST']);
+
+  const body = readBody(req);
+  const oldSessions = body.sessions || {};
+  const fallbackUrl = isHttpUrl(body.fallbackUrl) ? body.fallbackUrl : 'https://example.com';
+  const entries = Object.entries(oldSessions).filter(([, s]) => s?.id);
+  if (!entries.length) return sendError(res, 400, 'No active device session to renew.');
+
+  let p;
   try {
-    const p = await getProvider();
-    const urls = {};
-    for (const [device, session] of Object.entries(oldSessions)) {
-      if (!session?.id) continue;
-      urls[device] = await p.getUrl(session.id).catch(() => fallbackUrl);
-    }
-    await Promise.allSettled(Object.values(oldSessions).map(s => p.release(s?.id)));
+    p = await getProvider();
+  } catch (e) {
+    return sendError(res, 500, e);
+  }
+
+  try {
+    const previousUrls = {};
+    await Promise.all(entries.map(async ([device, session]) => {
+      previousUrls[device] = await Promise.resolve(p.getUrl(session.id, device)).catch(() => null);
+    }));
+
+    await Promise.allSettled(entries.map(([, s]) => p.release(s.id)));
 
     const sessions = {};
-    for (const [device, old] of Object.entries(oldSessions)) {
-      if (!old?.id) continue;
-      if (device === 'pc') {
-        sessions.pc = await p.createSession({
-          dimensions: { width: 1440, height: 900 },
+    const urls = {};
+    const ready = {};
+    const failures = {};
+
+    await Promise.all(entries.map(async ([device, old]) => {
+      const previous = previousUrls[device];
+      const target = isHttpUrl(previous) ? previous : fallbackUrl;
+      const oidc = await oidcContextFor(target);
+      let session;
+      try {
+        session = await p.createSession({
+          device,
           ...(old.profileId ? { profileId: old.profileId } : {}),
           persistProfile: true
         });
-      } else {
-        sessions[device] = await p.createSession({
-          deviceConfig: { device: 'mobile' },
-          ...(old.profileId ? { profileId: old.profileId } : {}),
-          persistProfile: true
+        sessions[device] = session;
+
+        const nav = await p.goto(session.id, target, {
+          device,
+          mobile: device !== 'pc',
+          deviceProfile: device,
+          extraHTTPHeaders: oidc.extraHTTPHeaders
         });
+        urls[device] = nav.url;
+        ready[device] = {
+          device,
+          viewport: nav.viewport,
+          httpStatus: nav.status,
+          navError: nav.navError,
+          pageErrors: nav.errors,
+          renews: true
+        };
+      } catch (e) {
+        failures[device] = String(e?.message || e);
+        if (session?.id) await Promise.resolve(p.release(session.id)).catch(() => {});
+        delete sessions[device];
       }
+    }));
+
+    if (!Object.keys(sessions).length) {
+      return sendError(res, 502, `Renew failed: ${Object.values(failures).join(' | ') || 'unknown error'}`, { failures });
     }
 
-    await Promise.all(Object.entries(sessions).map(([device, session]) =>
-      p.goto(session.id, urls[device] || fallbackUrl, device === 'pc' ? {} : { mobile: true, deviceProfile: device })
-    ));
-
-    return res.status(200).json({ provider: p.info().provider, sessions, urls, expiresInMs: p.SESSION_MS });
+    return sendJson(res, 200, {
+      ok: true,
+      provider: p.info().provider,
+      sessions,
+      urls,
+      ready,
+      failures,
+      devices: Object.keys(sessions),
+      expiresInMs: p.SESSION_MS
+    });
   } catch (e) {
-    return res.status(500).json({ error: e?.message || String(e) });
+    return sendError(res, 502, e);
   }
 }

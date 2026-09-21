@@ -1,16 +1,19 @@
-import { getVercelOidcToken } from '@vercel/oidc';
+import { sendJson } from './_http.mjs';
+import { QA_PREVIEW_TARGET, getOidcToken } from './_oidc.mjs';
 
+// Non-secret readiness probe for the protected OMNW QA Preview.
+// Always answers 200 + JSON: the DEV ROOM header card must never be the reason
+// a device pane fails to load.
 export default async function handler(_req, res) {
-  const target = 'https://oh-my-nihon-wine-git-dev-room-qa-oh-my-nihon-wine.vercel.app/welcome';
-  let token = '';
+  const { token, error: tokenError } = await getOidcToken();
+
   let status = null;
   let location = null;
   let ok = false;
-  let error = null;
+  let error = tokenError;
 
   try {
-    token = (await getVercelOidcToken()) || '';
-    const response = await fetch(target, {
+    const response = await fetch(QA_PREVIEW_TARGET, {
       redirect: 'manual',
       headers: token ? { 'x-vercel-trusted-oidc-idp-token': token } : {}
     });
@@ -18,14 +21,14 @@ export default async function handler(_req, res) {
     location = response.headers.get('location');
     ok = response.ok;
   } catch (cause) {
-    error = cause?.message || String(cause);
+    error = error || String(cause?.message || cause);
   }
 
-  return res.status(200).json({
-    oidcAvailable: Boolean(token),
-    target,
-    status,
+  return sendJson(res, 200, {
     ok,
+    oidcAvailable: Boolean(token),
+    target: QA_PREVIEW_TARGET,
+    status,
     redirectedToAuth: Boolean(location && /vercel\.com\/sso-api/i.test(location)),
     error
   });

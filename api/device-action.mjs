@@ -1,16 +1,35 @@
 import { getProvider } from './providers/index.mjs';
+import { methodNotAllowed, readBody, sendError, sendJson } from './_http.mjs';
 
+// Forwards a DEV ROOM gesture to the remote session.
+// `x`/`y` arrive already converted to device CSS pixels by the client, which
+// corrects for the `object-fit: contain` letterbox inside the device shell.
 export default async function handler(req, res) {
-  if (req.method !== 'POST') return res.status(405).json({error:'Method not allowed'});
-  const { id, type, x, y, deltaY } = req.body || {};
-  if (!id) return res.status(400).json({error:'Missing session id'});
+  if (req.method !== 'POST') return methodNotAllowed(res, ['POST']);
+
+  const { id, device, type, x, y, deltaX, deltaY } = readBody(req);
+  if (!id) return sendError(res, 400, 'Missing session id.');
+
   try {
     const p = await getProvider();
-    if (type === 'tap') await p.tapPage(id, x, y);
-    else if (type === 'scroll') await p.scrollPage(id, deltaY);
-    else return res.status(400).json({error:'Invalid action'});
-    return res.status(200).json({ok:true});
+    let result;
+
+    if (type === 'tap') {
+      if (!Number.isFinite(Number(x)) || !Number.isFinite(Number(y))) {
+        return sendError(res, 400, 'tap requires numeric x and y.');
+      }
+      result = await p.tapPage(String(id), Number(x), Number(y), device);
+    } else if (type === 'scroll') {
+      if (!Number.isFinite(Number(deltaY)) && !Number.isFinite(Number(deltaX))) {
+        return sendError(res, 400, 'scroll requires a numeric deltaY or deltaX.');
+      }
+      result = await p.scrollPage(String(id), Number(deltaY) || 0, device, Number(deltaX) || 0);
+    } else {
+      return sendError(res, 400, `Invalid action: ${String(type)}`);
+    }
+
+    return sendJson(res, 200, { ok: true, type, result });
   } catch (e) {
-    return res.status(500).json({error:e?.message || String(e)});
+    return sendError(res, 502, e);
   }
 }

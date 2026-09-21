@@ -1,50 +1,105 @@
-import { getVercelOidcToken } from '@vercel/oidc';
 import { getProvider } from './providers/index.mjs';
+import { isHttpUrl, methodNotAllowed, readBody, sendError, sendJson } from './_http.mjs';
+import { oidcContextFor } from './_oidc.mjs';
 
-const valid = d => ['iphone','android','pc'].includes(d);
+const VALID = new Set(['iphone', 'android', 'pc']);
 
 export default async function handler(req, res) {
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
-  const url = typeof req.body?.url === 'string' && /^https?:\/\//i.test(req.body.url) ? req.body.url : 'https://example.com';
-  const devices = Array.isArray(req.body?.devices) ? req.body.devices.filter(valid) : ['iphone','android'];
-  if (!devices.length) return res.status(400).json({ error: 'Select at least one device' });
+  if (req.method !== 'POST') return methodNotAllowed(res, ['POST']);
+
+  const body = readBody(req);
+  const url = isHttpUrl(body.url) ? body.url : 'https://example.com';
+  const devices = Array.isArray(body.devices) ? body.devices.filter(d => VALID.has(d)) : ['iphone', 'android'];
+  if (!devices.length) return sendError(res, 400, 'Select at least one device.');
 
   let p;
-  const sessions = {};
   try {
     p = await getProvider();
-    const protectedQa = /\.vercel\.app/i.test(url) && /git-dev-room-qa/i.test(url);
-    const oidc = protectedQa ? await getVercelOidcToken() : undefined;
-    const extraHTTPHeaders = oidc ? { 'x-vercel-trusted-oidc-idp-token': oidc } : undefined;
-
-    for (const device of devices) {
-      if (device === 'pc') {
-        sessions.pc = await p.createSession({ dimensions: { width: 1440, height: 900 }, persistProfile: true });
-      } else {
-        sessions[device] = await p.createSession({ deviceConfig: { device: 'mobile' }, persistProfile: true });
-      }
-    }
-
-    const urls = {};
-    await Promise.all(devices.map(async device => {
-      const session = sessions[device];
-      urls[device] = await p.goto(session.id, url, device === 'pc'
-        ? { extraHTTPHeaders }
-        : { mobile: true, deviceProfile: device, extraHTTPHeaders });
-    }));
-
-    return res.status(200).json({
-      provider: p.info().provider,
-      sessions,
-      urls,
-      devices,
-      protectedQa,
-      oidcAvailable: Boolean(oidc),
-      expiresInMs: p.SESSION_MS,
-      url
-    });
   } catch (e) {
-    if (p) await Promise.allSettled(Object.values(sessions).map(s => p.release(s?.id)));
-    return res.status(500).json({ error: e?.message || String(e) });
+    return sendError(res, 500, e);
+  }
+
+  const oidc = await oidcContextFor(url);
+  const sessions = {};
+  const urls = {};
+  const ready = {};
+  const failures = {};
+
+  // Each device is started independently: a failing iPhone must not blank out
+  // a working Android pane.
+  await Promise.all(devices.map(async device => {
+    let session;
+    try {
+      session = await p.createSession({ device, persistProfile: true });
+      sessions[device] = session;
+
+      const nav = await p.goto(session.id, url, {
+        device,
+        mobile: device !== 'pc',
+        deviceProfile: device,
+        extraHTTPHeaders: oidc.extraHTTPHeaders
+      });
+      urls[device] = nav.url;
+
+      // A session id alone proves nothing. Take one real screenshot so the
+      // response reports whether this device can actually render.
+      let snapshotBytes = 0;
+      let snapshotError = null;
+      if (device === 'pc') {
+        snapshotBytes = -1; // PC uses the provider's live viewer, not snapshots
+      } else {
+        try {
+          const shot = await p.screenshotPage(session.id, device);
+          snapshotBytes = shot?.length || 0;
+        } catch (e) {
+          snapshotError = String(e?.message || e);
+        }
+      }
+
+      ready[device] = {
+        device,
+        viewport: nav.viewport,
+        httpStatus: nav.status,
+        navError: nav.navError,
+        pageErrors: nav.errors,
+        snapshotBytes,
+        snapshotError,
+        renders: device === 'pc' ? Boolean(session.debugUrl) : snapshotBytes > 1000
+      };
+    } catch (e) {
+      failures[device] = String(e?.message || e);
+      if (session?.id) await Promise.resolve(p.release(session.id)).catch(() => {});
+      delete sessions[device];
+    }
+  }));
+
+  if (!Object.keys(sessions).length) {
+    return sendError(res, 502, `No device session could be started: ${Object.values(failures).join(' | ') || 'unknown error'}`, {
+      failures,
+      provider: safeProvider(p)
+    });
+  }
+
+  return sendJson(res, 200, {
+    ok: true,
+    provider: safeProvider(p),
+    sessions,
+    urls,
+    ready,
+    failures,
+    devices: Object.keys(sessions),
+    protectedQa: oidc.protectedQa,
+    oidcAvailable: oidc.oidcAvailable,
+    oidcError: oidc.oidcError,
+    expiresInMs: p.SESSION_MS,
+    url
+  });
+}
+
+function safeProvider(p) {
+  try {
+    return p.info().provider;
+  } catch {
+    return 'unknown';
   }
 }

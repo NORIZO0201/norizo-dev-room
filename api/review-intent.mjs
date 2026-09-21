@@ -11,7 +11,6 @@ export default async function handler(req,res){
     qa:body.qa||{},
     log:String(body.log||''),
     status:String(body.status||''),
-    appetizeConfigured:Boolean(body.appetizeConfigured),
     at:String(body.at||new Date().toISOString())
   };
   console.log(JSON.stringify(event));

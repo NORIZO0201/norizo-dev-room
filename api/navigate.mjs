@@ -1,28 +1,64 @@
-import { getVercelOidcToken } from '@vercel/oidc';
 import { getProvider } from './providers/index.mjs';
+import { isHttpUrl, methodNotAllowed, readBody, sendError, sendJson } from './_http.mjs';
+import { oidcContextFor } from './_oidc.mjs';
 
 export default async function handler(req, res) {
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
-  const url = req.body?.url;
-  if (typeof url !== 'string' || !/^https?:\/\//i.test(url)) return res.status(400).json({ error: 'Invalid URL' });
+  if (req.method !== 'POST') return methodNotAllowed(res, ['POST']);
 
+  const body = readBody(req);
+  const url = body.url;
+  if (!isHttpUrl(url)) return sendError(res, 400, 'Invalid URL. An http(s) URL is required.');
+
+  let p;
   try {
-    const p = await getProvider();
-    const sessions = req.body?.sessions || {};
-    const protectedQa = /\.vercel\.app/i.test(url) && /git-dev-room-qa/i.test(url);
-    const oidc = protectedQa ? await getVercelOidcToken() : undefined;
-    const extraHTTPHeaders = oidc ? { 'x-vercel-trusted-oidc-idp-token': oidc } : undefined;
-    const urls = {};
-
-    await Promise.all(Object.entries(sessions).map(async ([device, session]) => {
-      if (!session?.id) return;
-      urls[device] = await p.goto(session.id, url, device === 'pc'
-        ? { extraHTTPHeaders }
-        : { mobile: true, deviceProfile: device, extraHTTPHeaders });
-    }));
-
-    return res.status(200).json({ ok: true, provider: p.info().provider, urls, oidcAvailable: Boolean(oidc) });
+    p = await getProvider();
   } catch (e) {
-    return res.status(500).json({ error: e?.message || String(e) });
+    return sendError(res, 500, e);
   }
+
+  const sessions = body.sessions || {};
+  const entries = Object.entries(sessions).filter(([, s]) => s?.id);
+  if (!entries.length) return sendError(res, 400, 'No active device session to navigate.');
+
+  const oidc = await oidcContextFor(url);
+  const urls = {};
+  const results = {};
+  const failures = {};
+
+  await Promise.all(entries.map(async ([device, session]) => {
+    try {
+      const nav = await p.goto(session.id, url, {
+        device,
+        mobile: device !== 'pc',
+        deviceProfile: device,
+        extraHTTPHeaders: oidc.extraHTTPHeaders
+      });
+      urls[device] = nav.url;
+      results[device] = {
+        url: nav.url,
+        httpStatus: nav.status,
+        navError: nav.navError,
+        pageErrors: nav.errors,
+        viewport: nav.viewport
+      };
+    } catch (e) {
+      failures[device] = String(e?.message || e);
+    }
+  }));
+
+  if (!Object.keys(urls).length) {
+    return sendError(res, 502, `Navigation failed: ${Object.values(failures).join(' | ') || 'unknown error'}`, { failures });
+  }
+
+  return sendJson(res, 200, {
+    ok: true,
+    provider: p.info().provider,
+    urls,
+    results,
+    failures,
+    requestedUrl: url,
+    protectedQa: oidc.protectedQa,
+    oidcAvailable: oidc.oidcAvailable,
+    oidcError: oidc.oidcError
+  });
 }
