@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "mode": "maintenance",
+  "foundation_phase": "P5",
+  "requires_completed_phases": ["P1", "P2", "P3", "P4", "P5"],
+  "policy": {
+    "conoha_retired": true,
+    "vercel_preview_requires_explicit_norizo_request": true,
+    "production_deploy_requires_explicit_norizo_approval": true,
+    "retired_omnw_harvest_must_remain_absent": true,
+    "operations_must_be_low_cost_and_allowlisted": true
+  },
+  "tracked_projects": [
+    "SAYAKA",
+    "CNW",
+    "OMNW",
+    "OTHER_NIHON_WINE_JP"
+  ],
+  "required_observation": {
+    "github_main_sha": true,
+    "supabase_health": true,
+    "vercel_runtime_errors_1h": true,
+    "deployment_boundary": true,
+    "public_evidence": true,
+    "omnw_boundary_audit": true
+  }
+}
