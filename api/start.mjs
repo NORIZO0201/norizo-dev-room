@@ -7,6 +7,8 @@ export default async function handler(req, res) {
     ? req.body.url
     : 'https://example.com';
 
+  const deviceProfile = ['iphone','android','compact'].includes(req.body?.deviceProfile) ? req.body.deviceProfile : 'iphone';
+
   let p, pc, sp;
   try {
     p = await getProvider();
@@ -15,7 +17,7 @@ export default async function handler(req, res) {
 
     const [pcUrl, spUrl] = await Promise.all([
       p.goto(pc.id, url),
-      p.goto(sp.id, url, { mobile: true })
+      p.goto(sp.id, url, { mobile: true, deviceProfile })
     ]);
 
     return res.status(200).json({
@@ -24,6 +26,7 @@ export default async function handler(req, res) {
       sp,
       pcUrl,
       spUrl,
+      deviceProfile,
       expiresInMs: p.SESSION_MS,
       url
     });
