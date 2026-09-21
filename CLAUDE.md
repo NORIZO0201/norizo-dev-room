@@ -40,3 +40,8 @@ Do not call P0 complete based only on code or configuration.
 ConoHa/local QA first.
 No Vercel Preview unless NORIZO asks to see it.
 No Production deployment without explicit NORIZO approval.
+
+
+## Autonomous local ignition
+If this is a verified Mac-local Claude Code session, also read the "Autonomous ignition" section in docs/AI_HANDOFF.md.
+The next infrastructure task is to implement/install the Mac-local launchd runner that watches the shared task source and performs ConoHa OS work without NORIZO relaying messages.
