@@ -2,36 +2,42 @@ import vercelFunctions from '@vercel/functions';
 const { getVercelOidcToken } = vercelFunctions;
 import { getProvider } from './providers/index.mjs';
 
-function appetizeUrl(device, url) {
+function appetizeUrl(device, url, buildId) {
+  if (!buildId || !/^standalone_[A-Za-z0-9_-]+$/.test(buildId)) return null;
   const p = new URLSearchParams({
     autoplay: 'true',
     scale: 'auto',
     orientation: 'portrait',
-    screenOnly: 'false',
-    deviceColor: 'black',
+    screenOnly: 'true',
     codec: 'jpeg',
     launchUrl: url
   });
   if (device === 'iphone') {
     p.set('device','iphone16pro');
     p.set('osVersion','18.2');
+    p.set('launchApp','com.apple.mobilesafari');
   } else {
     p.set('device','pixel9pro');
     p.set('osVersion','15.0');
+    p.set('launchApp','com.android.chrome');
   }
-  return 'https://appetize.io/standalone?' + p.toString();
+  return 'https://appetize.io/embed/' + encodeURIComponent(buildId) + '?' + p.toString();
 }
 
 export default async function handler(req,res){
   if(req.method!=='POST')return res.status(405).json({error:'Method not allowed'});
   const url=typeof req.body?.url==='string'&&/^https?:\/\//i.test(req.body.url)?req.body.url:'https://example.com';
   const devices=Array.isArray(req.body?.devices)?req.body.devices.filter(d=>['iphone','android','pc'].includes(d)):['iphone','android'];
+  const appetizeBuildId = String(req.body?.appetizeBuildId || '').trim();
   if(!devices.length)return res.status(400).json({error:'Select at least one device'});
   const sessions={}, urls={}, embedUrls={};
   let p;
   try{
-    if(devices.includes('iphone')){urls.iphone=url;embedUrls.iphone=appetizeUrl('iphone',url)}
-    if(devices.includes('android')){urls.android=url;embedUrls.android=appetizeUrl('android',url)}
+    if(devices.includes('iphone')){urls.iphone=url;embedUrls.iphone=appetizeUrl('iphone',url,appetizeBuildId)}
+    if(devices.includes('android')){urls.android=url;embedUrls.android=appetizeUrl('android',url,appetizeBuildId)}
+    if ((devices.includes('iphone') || devices.includes('android')) && !appetizeBuildId) {
+      throw new Error('APPETIZE_SANDBOX_ID_REQUIRED');
+    }
     if(devices.includes('pc')){
       p=await getProvider();
       const protectedQa=/\.vercel\.app/i.test(url)&&/git-dev-room-qa/i.test(url);
