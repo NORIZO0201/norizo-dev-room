@@ -154,6 +154,26 @@ export async function goto(id, url, options = {}) {
   });
 }
 
+export async function screenshotPage(id) {
+  return withPage(id, async page => {
+    return await page.screenshot({ type: 'png', fullPage: false });
+  });
+}
+
+export async function tapPage(id, x, y) {
+  return withPage(id, async page => {
+    await page.mouse.click(Number(x), Number(y));
+    return true;
+  });
+}
+
+export async function scrollPage(id, deltaY) {
+  return withPage(id, async page => {
+    await page.mouse.wheel(0, Number(deltaY));
+    return true;
+  });
+}
+
 export async function inspectPage(id) {
   return withPage(id, async page => page.evaluate(() => {
     const imgs = Array.from(document.images);
