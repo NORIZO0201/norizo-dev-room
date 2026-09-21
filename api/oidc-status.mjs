@@ -1,10 +1,13 @@
+import { getVercelOidcToken } from '@vercel/functions';
+
 export default async function handler(_req, res) {
-  const token = process.env.VERCEL_OIDC_TOKEN || '';
+  const token = getVercelOidcToken() || '';
   const target = 'https://oh-my-nihon-wine-git-dev-room-qa-oh-my-nihon-wine.vercel.app/welcome';
   let status = null;
   let location = null;
   let ok = false;
   let error = null;
+
   try {
     const response = await fetch(target, {
       redirect: 'manual',
@@ -16,6 +19,7 @@ export default async function handler(_req, res) {
   } catch (cause) {
     error = cause?.message || String(cause);
   }
+
   return res.status(200).json({
     oidcAvailable: Boolean(token),
     target,
