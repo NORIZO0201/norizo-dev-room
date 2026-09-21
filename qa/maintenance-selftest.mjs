@@ -24,6 +24,7 @@ broken.observation.projects.OMNW.consumer_milestone_observed = 'M3';
 broken.observation.projects.OMNW.consumer_qa_status = 'FAIL';
 broken.observation.omnw_boundary_audit.harvest_surfaces = 1;
 broken.observation.operations.production_deploy_created_by_this_run = true;
+broken.observation.maintenance_gate_status = 'PASS';
 const failures = validateMaintenance(broken);
 
 assert(failures.includes('canonical state must remain P5 maintenance'));
@@ -33,6 +34,13 @@ assert(failures.includes('OMNW Consumer milestone observation must be M4'));
 assert(failures.includes('OMNW Consumer QA must be PASS'));
 assert(failures.includes('retired OMNW Harvest surface detected'));
 assert(failures.includes('maintenance observation must prove no Production created by this run'));
+assert(failures.includes('unverified external deployments require BLOCKED_HUMAN_CONFIRMATION'));
+
+const missingProvenance = structuredClone({ contract, state, handoff, observation });
+delete missingProvenance.observation.deployment_provenance;
+assert(
+  validateMaintenance(missingProvenance).includes('maintenance observation requires deployment provenance events'),
+);
 
 console.log(JSON.stringify({
   ok: true,
@@ -40,6 +48,7 @@ console.log(JSON.stringify({
   p1_p5_completion_guard: true,
   conoha_retirement_guard: true,
   preview_production_boundary_guard: true,
+  deployment_provenance_guard: true,
   omnw_harvest_guard: true,
   omnw_m4_regression_guard: true,
   omnw_consumer_qa_guard: true,
