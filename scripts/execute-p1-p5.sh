@@ -2,7 +2,6 @@
 set -uo pipefail
 [ "$(id -u)" -eq 0 ] || { echo "Run as root." >&2; exit 1; }
 ROOT=/opt/norizo
-DEVROOM="$ROOT/norizo-dev-room"
 SYSTEM="$ROOT/system"
 STATUS_DIR="$SYSTEM/phases"
 HOLD=75
