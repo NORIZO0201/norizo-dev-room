@@ -1,0 +1,142 @@
+{
+  "schema_version": 1,
+  "phase": "P5",
+  "observed_at": "2026-09-21T14:58:00Z",
+  "foundation_status": "PASS",
+  "deployment_policy": {
+    "preview_without_explicit_norizo_request": false,
+    "production_without_explicit_norizo_approval": false
+  },
+  "projects": {
+    "SAYAKA": {
+      "gate_status": "PASS",
+      "source": {
+        "repository": "NORIZO0201/sayaka-kitchen",
+        "main_sha": "c0e087f2cc1cf74cd9e0b30ff51c37f9d7eb7bf8"
+      },
+      "supabase": {
+        "project": "sayaka-kitchen",
+        "project_id": "jgwydzbrlwaynmvmkjkf",
+        "status": "ACTIVE_HEALTHY"
+      },
+      "vercel": {
+        "project_id": "prj_dyzaf3YTcJV66yDdvLx1YWozV1F8",
+        "latest_production_deployment": "dpl_APiT62bekmLfPbnFvZjvLhZ4zp52",
+        "latest_production_sha": "3b60fc81c316915de5c0966d78cf9c33a60736d9",
+        "latest_production_state": "READY",
+        "latest_observed_nonproduction_ready": "dpl_2iA125LK2EnLibkQ6gufWwFcWiTk",
+        "runtime_errors_24h": 0
+      },
+      "handoff": {
+        "source_ahead_of_production": true,
+        "production_action": "NO_AUTOMATIC_ACTION",
+        "reason": "Source contains newer admin cleanup. Production is healthy; any promotion remains an explicit NORIZO approval decision."
+      }
+    },
+    "CNW": {
+      "gate_status": "PASS",
+      "source": {
+        "repository": "NORIZO0201/craft-nihon-wine",
+        "main_sha": "7479f27bc0d784a36ef124c919c375123197bde1",
+        "verified_fix_file": "components/product/NextThree.tsx",
+        "verified_fix": "NextThree link uses the Unicode item.wine.slug directly and does not pre-encode the dynamic route."
+      },
+      "supabase": {
+        "project": "craft-nihon-wine",
+        "project_id": "koxhwtsqyvbcvdksjavl",
+        "status": "ACTIVE_HEALTHY"
+      },
+      "vercel": {
+        "project_id": "prj_N53JT0kTA4ZSb1aE2mtCa1VYwKqs",
+        "latest_production_deployment": "dpl_3N4Pq2DAf5uAgoB9jqcikTrwFrFd",
+        "latest_production_sha": "ca5d46a14256017ad13e37db45f2bcb390aa6ce4",
+        "latest_production_state": "READY",
+        "fix_branch_ready_deployments": [
+          "dpl_8oNnnPEe6ucHykBf7Ki3YX3CmiEE",
+          "dpl_CNSaSoFTNMjesVjNGGHHRmgfEeE4"
+        ],
+        "runtime_errors_24h": {
+          "groups": 7,
+          "primary": "failed to decode param",
+          "primary_count": 20,
+          "primary_route": "/wines/[slug]",
+          "last_seen": "2026-09-21T13:30:56Z"
+        }
+      },
+      "handoff": {
+        "source_ahead_of_production": true,
+        "production_action": "AWAITING_EXPLICIT_NORIZO_APPROVAL",
+        "reason": "The development fix is present in main and related non-production builds are READY, but current production is older and still recorded slug-decoding failures. DEV ROOM must not promote production automatically."
+      }
+    },
+    "OMNW": {
+      "gate_status": "PASS",
+      "source": {
+        "repository": "NORIZO0201/oh-my-nihon-wine",
+        "main_sha": "1a926caace6fe12621966a52e9593f6f721c68ba",
+        "consumer_work_branch": "agent/recognition-core-m0-m4"
+      },
+      "supabase": {
+        "project": "omnw-production",
+        "project_id": "alqnnnkuvdpxkqxdqted",
+        "status": "ACTIVE_HEALTHY"
+      },
+      "vercel": {
+        "project_id": "prj_9snNz2zJOdB3a8M2bED1ObBsAOx1",
+        "latest_production_deployment": "dpl_3udPCN6dyM4HFEJVTNo1xxdrmZup",
+        "latest_production_sha": "1a926caace6fe12621966a52e9593f6f721c68ba",
+        "latest_production_state": "READY",
+        "runtime_errors_24h": 0,
+        "consumer_branch_auto_deploys": "CANCELED_BY_POLICY"
+      },
+      "boundary": {
+        "discovery_consumer_separate": true,
+        "retired_harvest_absent": true,
+        "consumer_m0_m4_development_allowed": true
+      },
+      "handoff": {
+        "source_ahead_of_production": false,
+        "production_action": "NONE",
+        "reason": "Canonical main production is aligned and runtime error observation is clean. Consumer branch work remains isolated from Discovery/Master and does not require a DEV ROOM production promotion."
+      }
+    },
+    "OTHER_NIHON_WINE_JP": {
+      "gate_status": "PASS-NOT-REQUIRED",
+      "source": {
+        "repository": "NORIZO0201/nihonwine-rebuild",
+        "main_sha": "c235c76d03ed505899ac4cb9f93f5ed4dd50c19f"
+      },
+      "supabase": {
+        "project": "nihon-wine-jp-2",
+        "project_id": "zzhccjnszahpsgvlkfjl",
+        "status": "ACTIVE_HEALTHY"
+      },
+      "vercel": {
+        "project_id": "prj_734SjshXMER0GP6TO7UlWv3kFzgk",
+        "latest_production_deployment": "dpl_kYqQtHYp6Kwa2PJsWxgNAr7z264b",
+        "latest_production_sha": "2afc08e55200c62df7f462abe297d1b181826f1f",
+        "latest_production_state": "READY",
+        "runtime_errors_24h": {
+          "groups": 1,
+          "primary": "wordpress-admin-proxy-failed",
+          "primary_count": 4,
+          "primary_route": "/wp-json/[[...path]]",
+          "last_seen": "2026-09-21T11:40:45Z"
+        }
+      },
+      "handoff": {
+        "production_action": "PROJECT_SPECIFIC_FOLLOW_UP",
+        "reason": "NIHON WINE.JP is an observed non-required P5 project. Its external WordPress proxy concern is recorded but does not gate the DEV ROOM foundation."
+      }
+    }
+  },
+  "next_mode": "maintenance",
+  "maintenance_rules": [
+    "Keep P1-P5 contracts intact and validate state drift on future runs.",
+    "Do not revive or inspect ConoHa.",
+    "Never revive the retired OMNW Harvest pipeline.",
+    "Do not create Vercel Preview unless NORIZO explicitly asks to see one.",
+    "Do not deploy Production without explicit NORIZO approval.",
+    "Continue low-cost GitHub/Supabase/Vercel observation and repair deterministic foundation drift when safe."
+  ]
+}
