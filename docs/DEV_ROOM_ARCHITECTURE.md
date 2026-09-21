@@ -67,6 +67,25 @@ RELIS and similar projects reuse the same checkpoint / heartbeat / observation v
 ### P5 — Deterministic QA/batch handoff
 SAYAKA, CNW, OMNW, and other projects receive deterministic gates with explicit PASS / FAIL / PASS-NOT-REQUIRED outcomes plus handoff evidence.
 
+## Device runtime (iPhone / Android / PC panes)
+
+The DEV ROOM device frames are **streamed snapshots of a remote browser session**, not embedded third-party emulators. One session exists per visible device.
+
+| Device | Viewport | Presentation | Interaction |
+| --- | --- | --- | --- |
+| iPhone | 393 × 852, dpr 3, Mobile Safari UA | PNG snapshot polled into the device frame | click → remote touch tap, wheel/drag → remote scroll |
+| Android | 412 × 915, dpr 2.625, Mobile Chrome UA | PNG snapshot polled into the device frame | click → remote touch tap, wheel/drag → remote scroll |
+| PC | 1440 × 900 | provider live/debug viewer in an iframe | direct, inside the viewer |
+
+Two rules keep this working, and breaking either one silently degrades a mobile pane to a desktop screenshot:
+
+1. **The device belongs to the session, not to a CDP override.** `createSession()` sets the provider's own `dimensions` and `userAgent` for the target device. Chrome reverts every `Emulation.*` override when the CDP client that set it detaches, so an override alone is never a durable device profile.
+2. **One connection per session, reused.** `api/providers/_browser.mjs` pools the CDP connection inside the function instance, applies emulation once on connect, and re-asserts it if the viewport ever drifts. Connecting and disconnecting per operation both discards the emulation and adds a multi-second handshake to every snapshot.
+
+Snapshots are captured at CSS scale, so a snapshot PNG is exactly viewport-sized. The browser keeps one snapshot request in flight per device and maps clicks through the real drawn image rectangle, which is what makes tap coordinates correct despite the `object-fit: contain` letterbox inside the device shell.
+
+`npm run qa:devroom:runtime` exercises this whole path — start, snapshot, tap, scroll, navigate, inspect, stop — against local Chromium, with no provider key and no Preview deploy.
+
 ## GitHub policy
 
 GitHub is not a command bus.

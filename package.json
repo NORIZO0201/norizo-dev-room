@@ -12,11 +12,14 @@
     "qa:p3:chromium": "node qa/chromium-selftest.mjs",
     "qa:p4:workers": "node qa/worker-state-selftest.mjs",
     "qa:p5": "node scripts/validate-p5-gates.mjs && node qa/p5-gates-selftest.mjs",
-    "qa:maintenance": "node scripts/validate-maintenance-state.mjs && node qa/maintenance-selftest.mjs"
+    "qa:maintenance": "node scripts/validate-maintenance-state.mjs && node qa/maintenance-selftest.mjs",
+    "qa:devroom:runtime": "node qa/devroom-runtime-selftest.mjs"
   },
   "dependencies": {
-    "@vercel/functions": "latest",
-    "@vercel/oidc": "latest",
+    "@vercel/oidc": "^3.8.8",
     "playwright-core": "^1.63.0"
+  },
+  "engines": {
+    "node": ">=22.x"
   }
 }

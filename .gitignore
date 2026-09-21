@@ -4,3 +4,6 @@ node_modules/
 .env.*
 !.env.example
 artifacts/browser-qa/
+
+# Local QA capture output
+qa/.artifacts/
