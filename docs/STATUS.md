@@ -2,37 +2,48 @@
 
 Updated: 2026-09-21 JST
 
-## Current phase
+## Current operating model
 
-**NORIZO AI TEAM v1 bootstrap**
+NORIZO LAB is **Chatty-first**.
 
-Goal: establish GitHub-first collaboration between ChatGPT, Claude Code and Gemini before resuming ConoHa 24/7 orchestration.
+- NORIZO → ChatGPT / Chatty is the only normal command origin.
+- GitHub is code/document/history/audit storage only.
+- GitHub Issues, PR comments, mentions, labels, and Actions are not an AI-dispatch mechanism.
+- Claude Code, Codex, and Gemini are optional bounded tools, not standing execution owners.
+- ConoHa is a normal resident-batch host managed from Chatty, one workload at a time.
+- No autonomous AI-to-AI relay is part of the production operating model.
 
-## Canonical operating state
+## Current infrastructure direction
 
-- Source of Truth: GitHub `main`
-- Work queue: GitHub Issues
-- Change gate: Pull Requests
-- Routine merge: automated after required checks + independent review
-- NORIZO gate: high-risk/Production/destructive/paid/security-sensitive changes only
-- ChatGPT: PM / architecture / dispatch
-- Claude Code: implementation owner
-- Gemini: research / audit / review
+### GitHub
+Keep repositories, code, documents, diffs and audit history.
+Do not use GitHub as an AI command bus.
 
-## Historical infrastructure state
+### ConoHa
+Use only for proven long-running deterministic workloads.
+Each workload is migrated individually after one-shot verification and must have:
+- explicit entrypoint
+- checkpoint/idempotency strategy
+- bounded retry behavior
+- systemd/timer/cron definition only when required
+- logs and health evidence
+- stop/removal procedure
 
-P0 ConoHa evidence and previous P1–P5 material remain in the repository for audit/history. They are not the current team-coordination mechanism.
+### Steel
+Use self-hosted Steel Browser as the browser-development/QA base for PC/SP when needed.
+Keep Steel private; do not expose browser-control ports publicly.
 
-Do not resume P1–P5 autonomous rollout until the AI TEAM v1 pilot has completed and NORIZO explicitly reopens that phase.
+### Vercel
+Local/ConoHa QA → Preview only when NORIZO asks → NORIZO confirmation → Production.
 
-## Active next action
+## Retired on 2026-09-21
 
-Run one real GitHub Issue through:
-ChatGPT planning → Claude Code implementation → Gemini review → automatic low-risk merge; NORIZO only if the change crosses a high-risk gate.
+- GitHub → Claude Code dispatch
+- GitHub → Codex dispatch
+- GitHub → Gemini dispatch
+- Claude resident orchestrator
+- GitHub Actions as AI handoff infrastructure
+- AI TEAM v1 / three-agent coordination model
+- autonomous P0→P5 AI rollout model
 
-## Deferred until pilot success
-
-- automatic GitHub Actions handoff
-- project coordination `state.json`
-- ConoHa resident AI orchestration
-- new coordination database/schema
+Historical git history remains the audit record. These mechanisms must not be restored without a new explicit NORIZO decision.
