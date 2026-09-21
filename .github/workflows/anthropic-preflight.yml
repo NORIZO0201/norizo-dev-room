@@ -44,3 +44,32 @@ jobs:
           req.on('error', () => { console.log('PREFLIGHT NETWORK_OR_HEADER_ERROR'); process.exitCode=1; });
           req.end();
           JS
+
+  independent-review:
+    needs: preflight
+    if: github.actor == 'NORIZO0201'
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: main
+      - name: Independent Claude review of workspace fix
+        uses: anthropics/claude-code-action@v1
+        env:
+          ANTHROPIC_CUSTOM_HEADERS: "anthropic-workspace-id: wrkspc_01HQY7Hxp141tuLdxZF3Dig8"
+        with:
+          github_token: ${{ github.token }}
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          claude_args: '--max-turns 6 --max-budget-usd 1 --allowedTools "Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr comment:*)"'
+          prompt: |
+            ```markdown
+            Independently review NORIZO0201/norizo-dev-room PR #24 at head e5d5963fa0623800faf9031efd85191470a66bf5. Do not implement, push, merge or access secrets.
+            Read AGENTS.md and the PR diff with gh. The owner explicitly authorized this integration repair and provided Default workspace ID wrkspc_01HQY7Hxp141tuLdxZF3Dig8. The GET models preflight with this header returned HTTP 200, AUTH_ACCEPTED and DEFAULT_MODEL_LISTED=true in run 35593858352.
+            Official Claude Code documentation https://code.claude.com/docs/en/env-vars documents ANTHROPIC_CUSTOM_HEADERS as Name: Value format. Check that this two-line env addition only selects the authorized workspace on the Claude action step, preserves secret references, trigger protections and time/turn limits, and does not change endpoints or expand permissions.
+            Post one concise independent review comment on PR #24 using gh pr comment, recording exact reviewed SHA, PASS or concrete blockers and what you checked. Treat API auth success as distinct from successful implementation. No other repo or production changes. Stay within 6 turns.
+            ```
