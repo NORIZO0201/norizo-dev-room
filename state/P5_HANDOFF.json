@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "phase": "P5",
-  "observed_at": "2026-09-21T14:58:00Z",
+  "observed_at": "2026-09-21T15:17:30Z",
   "foundation_status": "PASS",
   "deployment_policy": {
     "preview_without_explicit_norizo_request": false,
@@ -25,7 +25,7 @@
         "latest_production_sha": "3b60fc81c316915de5c0966d78cf9c33a60736d9",
         "latest_production_state": "READY",
         "latest_observed_nonproduction_ready": "dpl_2iA125LK2EnLibkQ6gufWwFcWiTk",
-        "runtime_errors_24h": 0
+        "runtime_errors_1h": 0
       },
       "handoff": {
         "source_ahead_of_production": true,
@@ -37,9 +37,19 @@
       "gate_status": "PASS",
       "source": {
         "repository": "NORIZO0201/craft-nihon-wine",
-        "main_sha": "7479f27bc0d784a36ef124c919c375123197bde1",
-        "verified_fix_file": "components/product/NextThree.tsx",
-        "verified_fix": "NextThree link uses the Unicode item.wine.slug directly and does not pre-encode the dynamic route."
+        "main_sha": "a428d294ac44783d2673aac9eede4b0e3e413caa",
+        "verified_fix_files": [
+          "components/product/NextThree.tsx",
+          "app/favorites/FavoritesClient.tsx",
+          "components/product/ProductHero.tsx",
+          "proxy.ts"
+        ],
+        "maintenance_commits": [
+          "9c5eb56d330e422be60bac53e793fa3787a257c0",
+          "0180a8c2cf82f60b6bb511a5c40ce2a118126f48",
+          "a428d294ac44783d2673aac9eede4b0e3e413caa"
+        ],
+        "verified_fix": "Internal wine navigation keeps Unicode slugs raw and malformed percent wine paths are rejected before Next dynamic-route decoding."
       },
       "supabase": {
         "project": "craft-nihon-wine",
@@ -48,25 +58,23 @@
       },
       "vercel": {
         "project_id": "prj_N53JT0kTA4ZSb1aE2mtCa1VYwKqs",
-        "latest_production_deployment": "dpl_3N4Pq2DAf5uAgoB9jqcikTrwFrFd",
-        "latest_production_sha": "ca5d46a14256017ad13e37db45f2bcb390aa6ce4",
+        "latest_production_deployment": "dpl_DDYosa76kNfAaKXJSKR7aoqjBzrc",
+        "latest_production_sha": "24336a8fd84c5d64a1fbfb0ca47831eecb4f5eef",
         "latest_production_state": "READY",
-        "fix_branch_ready_deployments": [
-          "dpl_8oNnnPEe6ucHykBf7Ki3YX3CmiEE",
-          "dpl_CNSaSoFTNMjesVjNGGHHRmgfEeE4"
-        ],
-        "runtime_errors_24h": {
-          "groups": 7,
+        "latest_observed_nonproduction_ready": "dpl_BDigNpTjf4Y3DMFStxQUzBzRe4xU",
+        "runtime_errors_1h": {
+          "groups": 2,
           "primary": "failed to decode param",
-          "primary_count": 20,
+          "primary_count": 4,
           "primary_route": "/wines/[slug]",
-          "last_seen": "2026-09-21T13:30:56Z"
+          "last_seen": "2026-09-21T15:01:34Z",
+          "malformed_percent_path_observed": true
         }
       },
       "handoff": {
         "source_ahead_of_production": true,
         "production_action": "AWAITING_EXPLICIT_NORIZO_APPROVAL",
-        "reason": "The development fix is present in main and related non-production builds are READY, but current production is older and still recorded slug-decoding failures. DEV ROOM must not promote production automatically."
+        "reason": "The one-shot Production promotion is READY but still logged malformed long Japanese wine-slug decode failures. Additional source remediation is now on main with automatic main deployment disabled. No further Production promotion is permitted without explicit NORIZO approval."
       }
     },
     "OMNW": {
@@ -74,7 +82,9 @@
       "source": {
         "repository": "NORIZO0201/oh-my-nihon-wine",
         "main_sha": "1a926caace6fe12621966a52e9593f6f721c68ba",
-        "consumer_work_branch": "agent/recognition-core-m0-m4"
+        "consumer_work_branch": "agent/recognition-core-m0-m4",
+        "consumer_work_sha": "41c96fa26b94fdaf7b270106ccb5ae7be27ba5c4",
+        "consumer_milestone_observed": "M3"
       },
       "supabase": {
         "project": "omnw-production",
@@ -86,18 +96,20 @@
         "latest_production_deployment": "dpl_3udPCN6dyM4HFEJVTNo1xxdrmZup",
         "latest_production_sha": "1a926caace6fe12621966a52e9593f6f721c68ba",
         "latest_production_state": "READY",
-        "runtime_errors_24h": 0,
+        "runtime_errors_1h": 0,
         "consumer_branch_auto_deploys": "CANCELED_BY_POLICY"
       },
       "boundary": {
         "discovery_consumer_separate": true,
         "retired_harvest_absent": true,
-        "consumer_m0_m4_development_allowed": true
+        "consumer_m0_m4_development_allowed": true,
+        "consumer_learning_write_surface": "recognition_image_index",
+        "discovery_master_source_tables_read_only_from_consumer": true
       },
       "handoff": {
         "source_ahead_of_production": false,
         "production_action": "NONE",
-        "reason": "Canonical main production is aligned and runtime error observation is clean. Consumer branch work remains isolated from Discovery/Master and does not require a DEV ROOM production promotion."
+        "reason": "Canonical main Production remains aligned. Consumer Recognition Core work is isolated on its branch; observed M3 learning writes only the recognition_image_index sidecar while CWS/Master/Discovery source tables remain read-only."
       }
     },
     "OTHER_NIHON_WINE_JP": {
@@ -116,17 +128,11 @@
         "latest_production_deployment": "dpl_kYqQtHYp6Kwa2PJsWxgNAr7z264b",
         "latest_production_sha": "2afc08e55200c62df7f462abe297d1b181826f1f",
         "latest_production_state": "READY",
-        "runtime_errors_24h": {
-          "groups": 1,
-          "primary": "wordpress-admin-proxy-failed",
-          "primary_count": 4,
-          "primary_route": "/wp-json/[[...path]]",
-          "last_seen": "2026-09-21T11:40:45Z"
-        }
+        "runtime_errors_1h": 0
       },
       "handoff": {
         "production_action": "PROJECT_SPECIFIC_FOLLOW_UP",
-        "reason": "NIHON WINE.JP is an observed non-required P5 project. Its external WordPress proxy concern is recorded but does not gate the DEV ROOM foundation."
+        "reason": "NIHON WINE.JP remains an observed non-required P5 project. No runtime errors were observed in the latest one-hour maintenance window; historical external WordPress proxy concerns remain project-specific and do not gate the DEV ROOM foundation."
       }
     }
   },
