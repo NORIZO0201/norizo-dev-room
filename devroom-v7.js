@@ -1,10 +1,14 @@
-let current=null,endAt=0,tick=null,renewing=false;
+let current=null,endAt=0,tick=null,renewing=false,snapshotTick=null;
 const enabled={iphone:true,android:true,pc:false};
 const devices=['iphone','android','pc'];
 const OMNW_QA='https://oh-my-nihon-wine-git-dev-room-qa-oh-my-nihon-wine.vercel.app';
 const $=s=>document.querySelector(s);
 function setLog(s,bad=false){$('#log').textContent=s;$('#status').textContent=bad?'ERROR':s}
 function viewerUrl(u){if(!u)return 'about:blank';const sep=u.includes('?')?'&':'?';return u+sep+'interactive=true&showControls=true'}
+function startSnapshots(){if(snapshotTick)clearInterval(snapshotTick);refreshSnapshots();snapshotTick=setInterval(refreshSnapshots,700)}
+function stopSnapshots(){if(snapshotTick)clearInterval(snapshotTick);snapshotTick=null}
+function refreshSnapshots(){if(!current)return;for(const d of ['iphone','android']){const s=current.sessions?.[d];if(!enabled[d]||!s?.id)continue;const img=$('#'+d);img.src='/api/snapshot?id='+encodeURIComponent(s.id)+'&t='+Date.now()}}
+async function deviceAction(device,type,payload={}){const s=current?.sessions?.[device];if(!s?.id)return;try{await api('/api/device-action',{id:s.id,type,...payload});setTimeout(refreshSnapshots,120)}catch(e){setLog(e.message,true)}}
 function busy(device,text){const el=$('#'+device+'Busy');if(el){el.textContent=text;el.classList.add('show')}}
 function clearBusy(device){const el=$('#'+device+'Busy');if(el)el.classList.remove('show')}
 function activeDevices(){return devices.filter(d=>enabled[d])}
@@ -27,14 +31,14 @@ function toggleDevice(device){
 }
 function clearView(){
   for(const d of devices){
-    $('#'+d).src='about:blank';
+    if(d==='pc') $('#'+d).src='about:blank'; else $('#'+d).removeAttribute('src');
     $('#'+d+'Empty').style.display='grid';
     $('#'+d+'State').textContent='OFFLINE';
     clearBusy(d);
   }
   $('#timer').textContent='—';$('#currentUrls').textContent='—';
   for(const id of ['#stop','#go','#qa','#renew'])$(id).disabled=true;
-  current=null;if(tick)clearInterval(tick);
+  current=null;if(tick)clearInterval(tick);stopSnapshots();
 }
 async function api(path,body){
   const r=await fetch(path,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)});
@@ -46,13 +50,13 @@ function applySession(j){
   current={sessions:j.sessions,urls:j.urls,expiresInMs:j.expiresInMs};
   for(const d of activeDevices()){
     const s=j.sessions[d];if(!s)continue;
-    $('#'+d).src=viewerUrl(s.debugUrl);
+    if(d==='pc') $('#'+d).src=viewerUrl(s.debugUrl);
     $('#'+d+'Empty').style.display='none';
     $('#'+d+'State').textContent='LIVE';
     clearBusy(d);
   }
   for(const id of ['#stop','#go','#qa','#renew'])$(id).disabled=false;
-  endAt=Date.now()+j.expiresInMs;startTimer();renderUrls(j.urls);setLog('LIVE');
+  endAt=Date.now()+j.expiresInMs;startTimer();renderUrls(j.urls);startSnapshots();setLog('LIVE');
 }
 function renderUrls(urls={}){
   $('#currentUrls').innerHTML=activeDevices().map(d=>d+': '+(urls[d]||'—')).join('<br>');
@@ -152,4 +156,27 @@ $('#project').onchange=()=>{if(current)stop();applyProjectPreset();refreshTarget
 $('#environment').onchange=()=>{refreshTarget();if(current)navigateAll()};
 $('#url').addEventListener('keydown',e=>{if(e.key==='Enter'){current?navigateAll():openDevices()}});
 window.addEventListener('beforeunload',()=>{if(current)navigator.sendBeacon('/api/stop',new Blob([JSON.stringify({sessions:current.sessions})],{type:'application/json'}))});
+for(const d of ['iphone','android']){
+  const img=$('#'+d);
+  let touchStartY=null;
+  img.addEventListener('click',e=>{
+    if(!current)return;
+    const r=img.getBoundingClientRect();
+    const vw=d==='iphone'?393:412, vh=d==='iphone'?852:915;
+    const x=(e.clientX-r.left)*vw/r.width;
+    const y=(e.clientY-r.top)*vh/r.height;
+    deviceAction(d,'tap',{x,y});
+  });
+  img.addEventListener('wheel',e=>{
+    e.preventDefault();
+    deviceAction(d,'scroll',{deltaY:e.deltaY});
+  },{passive:false});
+  img.addEventListener('touchstart',e=>{touchStartY=e.touches[0]?.clientY??null},{passive:true});
+  img.addEventListener('touchend',e=>{
+    if(touchStartY===null)return;
+    const y=e.changedTouches[0]?.clientY??touchStartY;
+    const dy=touchStartY-y;touchStartY=null;
+    if(Math.abs(dy)>10)deviceAction(d,'scroll',{deltaY:dy*3});
+  },{passive:true});
+}
 $('#project').value='https://oh-my-nihon-wine.jp';applyProjectPreset();refreshTarget();loadQaBridge();
