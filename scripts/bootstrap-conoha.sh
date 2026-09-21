@@ -19,12 +19,13 @@ fi
 export DEBIAN_FRONTEND=noninteractive
 ROOT_DIR=/opt/norizo
 DEVROOM_DIR="$ROOT_DIR/norizo-dev-room"
+DEVROOM_REF="${DEVROOM_REF:-dev-room-p0-p5}"
 STEEL_DIR="$ROOT_DIR/steel"
 INSTALL_HEALTH="${INSTALL_HEALTH:-1}"
 INSTALL_STEEL="${INSTALL_STEEL:-0}"
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 echo "== NORIZO AI WORK FACTORY convergence bootstrap =="
+echo "DEV ROOM ref: $DEVROOM_REF"
 
 apt-get update -y
 apt-get install -y \
@@ -53,20 +54,30 @@ fi
 systemctl enable --now docker
 mkdir -p "$ROOT_DIR" "$ROOT_DIR/system"
 
-# DEV ROOM is public. Preserve local branches and work. Only fast-forward main
-# when the checkout is already clean and on main; otherwise leave it untouched
-# for the implementation agent to reconcile deliberately.
+# P0 is developed on DEVROOM_REF. Never silently install stale files from main.
+# Existing local work is preserved: a dirty checkout is a HOLD, not something
+# bootstrap is allowed to reset or overwrite.
 if [ -d "$DEVROOM_DIR/.git" ]; then
-  current_branch="$(git -C "$DEVROOM_DIR" symbolic-ref --quiet --short HEAD || true)"
   dirty="$(git -C "$DEVROOM_DIR" status --porcelain)"
-  if [ "$current_branch" = "main" ] && [ -z "$dirty" ]; then
-    git -C "$DEVROOM_DIR" fetch origin main
-    git -C "$DEVROOM_DIR" merge --ff-only origin/main
-  else
-    echo "DEV ROOM checkout not auto-updated (branch=$current_branch, dirty=$([ -n "$dirty" ] && echo yes || echo no))."
+  if [ -n "$dirty" ]; then
+    echo "DEV ROOM checkout is dirty; refusing to change branch or overwrite local work." >&2
+    exit 75
   fi
+
+  git -C "$DEVROOM_DIR" fetch origin "$DEVROOM_REF"
+  current_branch="$(git -C "$DEVROOM_DIR" symbolic-ref --quiet --short HEAD || true)"
+
+  if [ "$current_branch" != "$DEVROOM_REF" ]; then
+    if git -C "$DEVROOM_DIR" show-ref --verify --quiet "refs/heads/$DEVROOM_REF"; then
+      git -C "$DEVROOM_DIR" switch "$DEVROOM_REF"
+    else
+      git -C "$DEVROOM_DIR" switch --track -c "$DEVROOM_REF" "origin/$DEVROOM_REF"
+    fi
+  fi
+
+  git -C "$DEVROOM_DIR" merge --ff-only "origin/$DEVROOM_REF"
 else
-  git clone --depth 1 https://github.com/NORIZO0201/norizo-dev-room.git "$DEVROOM_DIR"
+  git clone --branch "$DEVROOM_REF" --single-branch https://github.com/NORIZO0201/norizo-dev-room.git "$DEVROOM_DIR"
 fi
 
 # Health monitoring comes before resident workers so failures are observable
@@ -116,18 +127,31 @@ printf "compose:  "; docker compose version || true
 printf "tmux:     "; tmux -V || true
 printf "rg:       "; rg --version 2>/dev/null | head -1 || echo "not available"
 
-if command -v claude >/dev/null 2>&1; then
-  printf "claude:   "
-  claude --version || true
+# Node/pnpm/Claude/Codex are audited by baseline.json, but they are not P0
+# completion gates. P0's resident control plane is Python-based. Missing CLIs
+# remain explicit stack_gaps and can be closed in a later implementation phase.
+if command -v node >/dev/null 2>&1; then
+  printf "node:     "; node --version || true
 else
-  echo "claude:   not found; leave authentication/install remediation to the implementation agent"
+  echo "node:     not found (recorded as stack gap)"
+fi
+
+if command -v pnpm >/dev/null 2>&1; then
+  printf "pnpm:     "; pnpm --version || true
+else
+  echo "pnpm:     not found (recorded as stack gap)"
+fi
+
+if command -v claude >/dev/null 2>&1; then
+  printf "claude:   "; claude --version || true
+else
+  echo "claude:   not found (recorded as stack gap)"
 fi
 
 if command -v codex >/dev/null 2>&1; then
-  printf "codex:    "
-  codex --version || true
+  printf "codex:    "; codex --version || true
 else
-  echo "codex:    not found; leave authentication/install remediation to the implementation agent"
+  echo "codex:    not found (recorded as stack gap)"
 fi
 
 echo
@@ -137,9 +161,12 @@ docker ps --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}'
 
 echo
 echo "== Phase 0 baseline =="
-python3 "$SCRIPT_DIR/write-baseline.py"
+python3 "$DEVROOM_DIR/scripts/write-baseline.py"
+python3 -m json.tool "$ROOT_DIR/system/baseline.json" >/dev/null
+curl --fail --silent --show-error http://127.0.0.1:8787/health >/dev/null
 
 echo
 echo "DEV ROOM: $DEVROOM_DIR"
+echo "DEV ROOM ref: $DEVROOM_REF"
 echo "No production deployment was performed."
 echo "No new public port was opened."
