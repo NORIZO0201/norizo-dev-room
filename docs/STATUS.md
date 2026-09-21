@@ -13,7 +13,8 @@ Goal: establish GitHub-first collaboration between ChatGPT, Claude Code and Gemi
 - Source of Truth: GitHub `main`
 - Work queue: GitHub Issues
 - Change gate: Pull Requests
-- Final merge authority: NORIZO
+- Routine merge: automated after required checks + independent review
+- NORIZO gate: high-risk/Production/destructive/paid/security-sensitive changes only
 - ChatGPT: PM / architecture / dispatch
 - Claude Code: implementation owner
 - Gemini: research / audit / review
@@ -27,7 +28,7 @@ Do not resume P1–P5 autonomous rollout until the AI TEAM v1 pilot has complete
 ## Active next action
 
 Run one real GitHub Issue through:
-ChatGPT planning → Claude Code implementation → Gemini review → NORIZO merge.
+ChatGPT planning → Claude Code implementation → Gemini review → automatic low-risk merge; NORIZO only if the change crosses a high-risk gate.
 
 ## Deferred until pilot success
 
