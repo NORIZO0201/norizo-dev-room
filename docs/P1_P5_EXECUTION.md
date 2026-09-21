@@ -1,3 +1,7 @@
+> **Historical / deferred execution reference.**  
+> P1–P5 rollout is currently paused while NORIZO AI TEAM v1 collaboration is validated.  
+> Do not use this file as current work state; see `docs/STATUS.md` and GitHub Issues.
+
 # DEV ROOM P1-P5 Executor
 
 Updated: 2026-09-21 JST
