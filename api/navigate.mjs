@@ -1,3 +1,4 @@
+import { getVercelOidcToken } from '@vercel/functions';
 import { getProvider } from './providers/index.mjs';
 
 export default async function handler(req, res) {
@@ -12,16 +13,18 @@ export default async function handler(req, res) {
     const pcId = req.body?.pcId;
     const spId = req.body?.spId;
     const protectedQa = /\.vercel\.app/i.test(url) && /git-dev-room-qa/i.test(url);
-    const oidc = protectedQa ? process.env.VERCEL_OIDC_TOKEN : null;
+    const oidc = protectedQa ? getVercelOidcToken() : undefined;
     const extraHTTPHeaders = oidc
       ? { 'x-vercel-trusted-oidc-idp-token': oidc }
       : undefined;
     const deviceProfile = ['iphone','android','compact'].includes(req.body?.deviceProfile) ? req.body.deviceProfile : 'iphone';
+
     const [pcUrl, spUrl] = await Promise.all([
       pcId ? p.goto(pcId, url, { extraHTTPHeaders }) : Promise.resolve(null),
       spId ? p.goto(spId, url, { mobile: true, deviceProfile, extraHTTPHeaders }) : Promise.resolve(null)
     ]);
-    return res.status(200).json({ ok: true, provider: p.info().provider, pcUrl, spUrl });
+
+    return res.status(200).json({ ok: true, provider: p.info().provider, pcUrl, spUrl, oidcAvailable: Boolean(oidc) });
   } catch (e) {
     return res.status(500).json({ error: e?.message || String(e) });
   }
