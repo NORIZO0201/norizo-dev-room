@@ -1,4 +1,5 @@
-import { getVercelOidcToken } from '@vercel/functions';
+import vercelFunctions from '@vercel/functions';
+const { getVercelOidcToken } = vercelFunctions;
 import { getProvider } from './providers/index.mjs';
 
 export default async function handler(req, res) {
