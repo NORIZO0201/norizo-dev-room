@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "project": "OMNW",
+  "worker": "discovery-observer",
+  "purpose": "Observe OMNW Discovery/Master progress and health using the same provider-neutral checkpoint/heartbeat contract while preserving the P2 Discovery/Consumer boundary.",
+  "execution": {
+    "provider": "unbound",
+    "mode": "condition_watch",
+    "requires_vps": false
+  },
+  "checkpoint": {
+    "version": 1,
+    "sequence": 0,
+    "cursor": null,
+    "watermark": null,
+    "last_success_at": null,
+    "input_fingerprint": null,
+    "output_fingerprint": null
+  },
+  "heartbeat": {
+    "status": "ready",
+    "observed_at": "2026-09-21T14:36:00Z",
+    "last_success_at": null,
+    "consecutive_failures": 0,
+    "run_id": null,
+    "detail": "Observer contract only. The retired Harvest pipeline remains forbidden; this worker does not mutate Discovery or Consumer data."
+  },
+  "safety": {
+    "idempotent": true,
+    "conoha_dependency": false,
+    "allowed_mutations": [],
+    "max_side_effects_per_run": null
+  }
+}
