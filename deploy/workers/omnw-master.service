@@ -1,0 +1,30 @@
+[Unit]
+Description=OMNW resident Master worker
+After=network-online.target norizo-health.service norizo-control-agent.service
+Wants=network-online.target norizo-health.service norizo-control-agent.service
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+User=root
+Group=root
+Environment=NORIZO_ROOT=/opt/norizo
+Environment=NORIZO_NODE_ID=conoha-01
+Environment=OMNW_WORKER_INTERVAL_SECONDS=900
+Environment=OMNW_WORKER_HTTP_TIMEOUT_SECONDS=150
+Environment=OMNW_WORKER_MAX_BACKOFF_SECONDS=3600
+ExecStart=/usr/bin/python3 /opt/norizo/norizo-dev-room/deploy/workers/omnw_resident_worker.py master
+Restart=on-failure
+RestartSec=30
+RestartPreventExitStatus=75
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+ReadWritePaths=/opt/norizo/system/workers
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=omnw-master
+
+[Install]
+WantedBy=multi-user.target
