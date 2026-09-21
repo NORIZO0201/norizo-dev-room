@@ -21,6 +21,7 @@ broken.state.maintenance_mode = false;
 broken.observation.operations.conoha_touched = true;
 broken.observation.projects.OMNW.supabase_status = 'UNKNOWN';
 broken.observation.projects.OMNW.consumer_milestone_observed = 'M3';
+broken.observation.projects.OMNW.consumer_qa_status = 'FAIL';
 broken.observation.omnw_boundary_audit.harvest_surfaces = 1;
 broken.observation.operations.production_deploy_created_by_this_run = true;
 const failures = validateMaintenance(broken);
@@ -29,6 +30,7 @@ assert(failures.includes('canonical state must remain P5 maintenance'));
 assert(failures.includes('maintenance observation must prove ConoHa untouched'));
 assert(failures.includes('OMNW Supabase must be ACTIVE_HEALTHY'));
 assert(failures.includes('OMNW Consumer milestone observation must be M4'));
+assert(failures.includes('OMNW Consumer QA must be PASS'));
 assert(failures.includes('retired OMNW Harvest surface detected'));
 assert(failures.includes('maintenance observation must prove no Production created by this run'));
 
@@ -40,5 +42,6 @@ console.log(JSON.stringify({
   preview_production_boundary_guard: true,
   omnw_harvest_guard: true,
   omnw_m4_regression_guard: true,
+  omnw_consumer_qa_guard: true,
   cross_project_health_guard: true
 }, null, 2));
