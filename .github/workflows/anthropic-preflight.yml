@@ -1,0 +1,46 @@
+name: Anthropic read-only preflight
+on:
+  push:
+    branches: [diag/anthropic-auth-20260921]
+    paths: [.github/workflows/anthropic-preflight.yml]
+permissions: {}
+jobs:
+  preflight:
+    if: github.actor == 'NORIZO0201'
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Check configured key without generating tokens
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          node <<'JS'
+          const https = require('https');
+          const key = process.env.ANTHROPIC_API_KEY;
+          if (!key) { console.log('PREFLIGHT MISSING_SECRET'); process.exit(1); }
+          const req = https.request('https://api.anthropic.com/v1/models?limit=1000', {
+            method: 'GET', timeout: 20000,
+            headers: {'x-api-key': key, 'anthropic-version': '2023-06-01'}
+          }, res => {
+            let raw = '';
+            res.on('data', chunk => { raw += chunk; if (raw.length > 1000000) req.destroy(); });
+            res.on('end', () => {
+              console.log('PREFLIGHT HTTP_STATUS', res.statusCode);
+              let data; try { data = JSON.parse(raw); } catch { console.log('PREFLIGHT INVALID_RESPONSE'); process.exitCode=1; return; }
+              if (res.statusCode !== 200) {
+                const allowed = ['authentication_error','permission_error','invalid_request_error','rate_limit_error','overloaded_error','api_error','not_found_error'];
+                console.log('PREFLIGHT ERROR_TYPE', allowed.includes(data.error?.type) ? data.error.type : 'unclassified');
+                const msg = String(data.error?.message || '').toLowerCase();
+                console.log('PREFLIGHT CREDIT_RELATED', /credit|billing|balance/.test(msg));
+                console.log('PREFLIGHT WORKSPACE_RELATED', /workspace/.test(msg));
+                process.exitCode=1; return;
+              }
+              const ids = (data.data || []).map(x => x.id);
+              console.log('PREFLIGHT AUTH_ACCEPTED');
+              console.log('PREFLIGHT DEFAULT_MODEL_LISTED', ids.includes('claude-opus-5'));
+            });
+          });
+          req.on('timeout', () => req.destroy());
+          req.on('error', () => { console.log('PREFLIGHT NETWORK_OR_HEADER_ERROR'); process.exitCode=1; });
+          req.end();
+          JS
