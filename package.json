@@ -13,7 +13,8 @@
     "qa:p4:workers": "node qa/worker-state-selftest.mjs",
     "qa:p5": "node scripts/validate-p5-gates.mjs && node qa/p5-gates-selftest.mjs",
     "qa:maintenance": "node scripts/validate-maintenance-state.mjs && node qa/maintenance-selftest.mjs",
-    "qa:devroom:runtime": "node qa/devroom-runtime-selftest.mjs"
+    "qa:devroom:runtime": "node qa/devroom-runtime-selftest.mjs",
+    "qa:devroom:ui": "node qa/devroom-ui-selftest.mjs"
   },
   "dependencies": {
     "@vercel/oidc": "^3.8.8",

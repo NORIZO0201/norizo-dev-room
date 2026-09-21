@@ -8,6 +8,8 @@ const devices = ['iphone', 'android', 'pc'];
 const MOBILE = ['iphone', 'android'];
 const FALLBACK_VIEWPORT = { iphone: { width: 393, height: 852 }, android: { width: 412, height: 915 } };
 const OMNW_QA = 'https://oh-my-nihon-wine-git-dev-room-qa-oh-my-nihon-wine.vercel.app';
+const PREVIEW_DEFAULTS = { 'https://oh-my-nihon-wine.jp': OMNW_QA };
+let activeTarget = 'production';
 
 // Snapshot cadence. One request at a time per device (see pumpSnapshot), so the
 // real rate is self-limiting: ~1.1 req/s per mobile device at best, less when
@@ -317,7 +319,7 @@ function applySession(j) {
     sessions: j.sessions || {},
     urls: j.urls || {},
     ready: j.ready || {},
-    requestedUrl: j.url || $('#url').value.trim(),
+    requestedUrl: j.url || currentTargetUrl(),
     expiresInMs: j.expiresInMs || 840000
   };
 
@@ -369,7 +371,7 @@ function startTimer() {
 async function openDevices() {
   if (current) await stop();
   const list = activeDevices();
-  const url = $('#url').value.trim();
+  const url = currentTargetUrl();
   $('#open').disabled = true;
   setLog('端末を起動中…');
   list.forEach(d => { busy(d, '接続中…'); $('#' + d + 'State').textContent = 'STARTING'; });
@@ -396,7 +398,7 @@ async function stop() {
 
 async function navigateAll() {
   if (!current) return;
-  const url = $('#url').value.trim();
+  const url = currentTargetUrl();
   activeDevices().forEach(d => busy(d, 'ページ反映待ち…'));
   setLog('NAVIGATING…');
   try {
@@ -456,7 +458,7 @@ async function renew(auto = false) {
   renewing = true;
   setLog(auto ? 'AUTO RENEW…' : 'RENEW…');
   try {
-    const j = await api('/api/renew', { sessions: current.sessions, fallbackUrl: $('#url').value.trim() });
+    const j = await api('/api/renew', { sessions: current.sessions, fallbackUrl: currentTargetUrl() });
     applySession(j);
     setLog(auto ? 'AUTO RENEWED' : 'RENEWED');
   } catch (e) {
@@ -467,15 +469,6 @@ async function renew(auto = false) {
 }
 
 /* ------------------------------------------------------------ project/target */
-function resolvedTarget() {
-  const project = $('#project').value, mode = $('#environment').value;
-  if (project === 'https://oh-my-nihon-wine.jp') {
-    if (mode === 'qa-guest') return OMNW_QA + '/welcome';
-    if (mode === 'qa-auth') return OMNW_QA + '/collection?qa=1';
-  }
-  return project || $('#url').value.trim();
-}
-
 function applyProjectPreset() {
   const p = $('#project').value;
   if (p === 'https://oh-my-nihon-wine.jp') { enabled.iphone = true; enabled.android = true; enabled.pc = false; }
@@ -484,12 +477,42 @@ function applyProjectPreset() {
   updateLayout();
 }
 
-function refreshTarget() {
-  const next = resolvedTarget();
-  if (next) $('#url').value = next;
-  const isOmnw = $('#project').value === 'https://oh-my-nihon-wine.jp';
-  $('#environment').disabled = !isOmnw;
-  if (!isOmnw) $('#environment').value = 'production';
+function previewKey() {
+  return 'devroom_preview_url:' + ($('#project').value || 'custom');
+}
+
+function currentTargetUrl() {
+  return (activeTarget === 'preview' ? $('#previewUrl').value : $('#productionUrl').value).trim();
+}
+
+function updateTargetUi() {
+  $('#useProduction').classList.toggle('active', activeTarget === 'production');
+  $('#usePreview').classList.toggle('active', activeTarget === 'preview');
+  $('#targetHint').textContent = '選択中: ' + (activeTarget === 'preview' ? 'Preview' : 'Production');
+}
+
+function setTargetMode(mode, navigate = true) {
+  if (mode === 'preview' && !$('#previewUrl').value.trim()) {
+    setLog('Preview URLが未設定です', true);
+    return;
+  }
+  activeTarget = mode;
+  updateTargetUi();
+  if (current && navigate) navigateAll();
+}
+
+function loadProjectUrls() {
+  const project = $('#project').value;
+  $('#productionUrl').value = project || '';
+  $('#previewUrl').value = localStorage.getItem(previewKey()) || PREVIEW_DEFAULTS[project] || '';
+  activeTarget = 'production';
+  updateTargetUi();
+}
+
+function savePreviewUrl() {
+  const value = $('#previewUrl').value.trim();
+  if (value) localStorage.setItem(previewKey(), value);
+  else localStorage.removeItem(previewKey());
 }
 
 async function reviewWithChatty() {
@@ -498,8 +521,8 @@ async function reviewWithChatty() {
   const payload = {
     reviewId: 'review_' + Date.now(),
     project: $('#project').selectedOptions[0]?.textContent || 'CUSTOM',
-    environment: $('#environment').value,
-    url: $('#url').value.trim(),
+    environment: activeTarget,
+    url: currentTargetUrl(),
     devices: activeDevices(),
     qa: qaState,
     log: $('#log').textContent,
@@ -523,7 +546,7 @@ async function releaseIntent(kind) {
   const body = {
     kind,
     project: $('#project').selectedOptions[0]?.textContent || 'CUSTOM',
-    url: $('#url').value.trim(),
+    url: currentTargetUrl(),
     qa: qaState,
     at: new Date().toISOString()
   };
@@ -547,9 +570,8 @@ async function loadQaBridge() {
     $('#qaBridgeState').textContent = ready ? 'READY' : 'LOCKED';
     $('#qaBridgeState').className = ready ? 'pass' : 'check';
     $('#qaBridgeDetail').textContent = ready
-      ? 'OMNW固定QA環境へ接続可能。'
-      : ('Production確認は利用可能。QA環境は保護解除待ち。' + (j.error ? ' (' + j.error + ')' : ''));
-    for (const o of $('#environment').options) if (o.value !== 'production') o.disabled = !ready;
+      ? 'Preview保護付きURLへの接続準備OK。'
+      : ('Production確認は利用可能。保護付きPreviewは接続条件を確認。' + (j.error ? ' (' + j.error + ')' : ''));
   } catch (e) {
     // The QA bridge card is informational only — it never blocks device start.
     $('#qaBridgeState').textContent = 'ERROR';
@@ -570,9 +592,18 @@ $('#qa').onclick = qa;
 $('#renew').onclick = () => renew(false);
 $('#previewOk').onclick = () => releaseIntent('preview');
 $('#productionOk').onclick = () => releaseIntent('production');
-$('#project').onchange = () => { if (current) stop(); applyProjectPreset(); refreshTarget(); };
-$('#environment').onchange = () => { refreshTarget(); if (current) navigateAll(); };
-$('#url').addEventListener('keydown', e => { if (e.key === 'Enter') { current ? navigateAll() : openDevices(); } });
+$('#project').onchange = () => { if (current) stop(); applyProjectPreset(); loadProjectUrls(); };
+$('#useProduction').onclick = () => setTargetMode('production');
+$('#usePreview').onclick = () => setTargetMode('preview');
+$('#previewUrl').addEventListener('change', savePreviewUrl);
+$('#previewUrl').addEventListener('blur', savePreviewUrl);
+for (const id of ['productionUrl', 'previewUrl']) {
+  $('#' + id).addEventListener('keydown', e => {
+    if (e.key !== 'Enter') return;
+    if (id === 'previewUrl') savePreviewUrl();
+    current ? navigateAll() : openDevices();
+  });
+}
 window.addEventListener('beforeunload', () => {
   if (current) navigator.sendBeacon('/api/stop', new Blob([JSON.stringify({ sessions: current.sessions })], { type: 'application/json' }));
 });
@@ -581,5 +612,5 @@ for (const d of MOBILE) bindDeviceInput(d);
 
 $('#project').value = 'https://oh-my-nihon-wine.jp';
 applyProjectPreset();
-refreshTarget();
+loadProjectUrls();
 loadQaBridge();
