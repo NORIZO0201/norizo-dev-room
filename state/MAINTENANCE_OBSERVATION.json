@@ -1,8 +1,29 @@
 {
   "schema_version": 1,
   "mode": "maintenance",
-  "observed_at": "2026-09-21T18:10:00Z",
+  "observed_at": "2026-09-21T19:08:53Z",
   "foundation_status": "PASS",
+  "maintenance_gate_status": "BLOCKED_HUMAN_CONFIRMATION",
+  "blockers": [
+    {
+      "id": "OMNW_PRODUCTION_PROVENANCE_UNVERIFIED",
+      "project": "OMNW",
+      "reason": "OMNW main advanced to Recognition Core M0-M4 and Vercel created a Production deployment for that SHA, but DEV ROOM has no explicit NORIZO approval provenance for the Production change.",
+      "required_human_action": "Confirm whether dpl_77tfhLbeCkDs2MoXx4yTXkxWP3cV / 72e0582c4a9c9894af10f471ffc1f173d24a3601 is accepted as the approved Production baseline."
+    },
+    {
+      "id": "CNW_PRODUCTION_MALFORMED_SLUG_500",
+      "project": "CNW",
+      "reason": "Current Production emitted four HTTP 500 error logs on /wines/[slug] from malformed percent-encoded paths while later guards remain source-ahead.",
+      "required_human_action": "Production promotion remains prohibited until NORIZO explicitly approves a release after the normal local QA / requested Preview / confirmation path."
+    },
+    {
+      "id": "CNW_PREVIEW_PROVENANCE_UNVERIFIED",
+      "project": "CNW",
+      "reason": "Three new READY nonproduction deployments appeared after the previous observation without approval provenance in DEV ROOM.",
+      "required_human_action": "No DEV ROOM Preview action will be taken. Confirm or investigate the external creator only if these deployments were not intended."
+    }
+  ],
   "operations": {
     "conoha_touched": false,
     "preview_deploy_created_by_this_run": false,
@@ -18,39 +39,44 @@
       "deployment_boundary": "NO_AUTOMATIC_ACTION"
     },
     "CNW": {
-      "github_main_sha": "c7a7d7289cf4c418856990349d50fb66033eaab2",
+      "github_main_sha": "98d40a13f1a3beab1fd2e8e49979650a9d11b562",
       "supabase_status": "ACTIVE_HEALTHY",
-      "vercel_runtime_errors_1h": 5,
+      "vercel_runtime_errors_1h": 4,
       "production_sha": "24336a8fd84c5d64a1fbfb0ca47831eecb4f5eef",
+      "production_deployment": "dpl_DDYosa76kNfAaKXJSKR7aoqjBzrc",
       "source_ahead_of_production": true,
+      "source_ahead_by_commits": 18,
       "deployment_boundary": "AWAITING_EXPLICIT_NORIZO_APPROVAL",
       "runtime_warning": {
-        "deployment_id": "dpl_DDYosa76kNfAaKXJSKR7aoqjBzrc",
         "route": "/wines/[slug]",
-        "http_status_observed": 200,
-        "message": "fetch failed",
-        "cause": "write ETIMEDOUT",
-        "last_seen": "2026-09-21T17:17:05Z",
-        "classification": "handled_upstream_fetch_timeout_logged_at_error_level"
+        "http_status_observed": 500,
+        "message": "failed to decode param",
+        "last_seen": "2026-09-21T18:55:30Z",
+        "count_1h": 4,
+        "classification": "malformed_percent_encoded_wine_path_reaches_current_production_decoder"
       },
       "nonproduction_deployments_observed": [
-        {"id": "dpl_FJLCDKQkZPVL8h6GxixZKwNKeDjC", "state": "READY", "branch": "seo/orange-owner-bridge-20260922"},
-        {"id": "dpl_EUwYjKjCsTzUYrxYrus1FPFbwkAP", "state": "READY", "branch": "seo/orange-owner-bridge-20260922"}
+        {"id": "dpl_xcoU9ARzpdkx9BdFS8NviEH1eD5g", "state": "READY", "branch": "seo/grape-owner-legacy-bridge-20260922", "sha": "903b6c5fda5805376f4f6bd0c155ca2656b9f815"},
+        {"id": "dpl_9jJpwRiJxn4CcmLVap1awWWAdz4E", "state": "READY", "branch": "seo/grape-owner-legacy-bridge-20260922", "sha": "825c82927898dccca3eab34383da4731a1630151"},
+        {"id": "dpl_A17z4ARnRPiFm4dELPVefN9HEmnW", "state": "READY", "branch": "seo/grape-owner-legacy-bridge-20260922", "sha": "98d40a13f1a3beab1fd2e8e49979650a9d11b562"}
       ],
       "nonproduction_deployments_created_by_this_run": false
     },
     "OMNW": {
-      "github_main_sha": "1a926caace6fe12621966a52e9593f6f721c68ba",
+      "github_main_sha": "72e0582c4a9c9894af10f471ffc1f173d24a3601",
       "consumer_branch": "agent/recognition-core-m0-m4",
       "consumer_branch_sha": "6d9cfa6466e817e5d0c8c2eaa26e0ec6b8cf4cfd",
       "consumer_milestone_observed": "M4",
+      "consumer_milestone_merged_to_main": true,
       "consumer_qa_status": "PASS",
       "consumer_qa_workflow": "Recognition Core QA",
       "consumer_qa_run_id": 35630485168,
       "consumer_qa_checks": ["typecheck", "qa", "py_compile", "eslint", "build"],
       "supabase_status": "ACTIVE_HEALTHY",
       "vercel_runtime_errors_1h": 0,
-      "deployment_boundary": "NONE",
+      "production_sha": "72e0582c4a9c9894af10f471ffc1f173d24a3601",
+      "production_deployment": "dpl_77tfhLbeCkDs2MoXx4yTXkxWP3cV",
+      "deployment_boundary": "BLOCKED_HUMAN_CONFIRMATION",
       "consumer_branch_vercel_deployments": "CANCELED_BY_POLICY",
       "latest_consumer_branch_deployment": "dpl_8awgcVYesUmfRUQbBrEzxboBMnGJ"
     },
@@ -60,6 +86,43 @@
       "vercel_runtime_errors_1h": 0,
       "deployment_boundary": "PROJECT_SPECIFIC_FOLLOW_UP"
     }
+  },
+  "deployment_provenance": {
+    "events": [
+      {
+        "project": "OMNW",
+        "environment": "production",
+        "deployment_id": "dpl_77tfhLbeCkDs2MoXx4yTXkxWP3cV",
+        "sha": "72e0582c4a9c9894af10f471ffc1f173d24a3601",
+        "previous_sha": "1a926caace6fe12621966a52e9593f6f721c68ba",
+        "created_by_this_run": false,
+        "authorization_status": "UNVERIFIED_EXTERNAL_CHANGE"
+      },
+      {
+        "project": "CNW",
+        "environment": "preview",
+        "deployment_id": "dpl_xcoU9ARzpdkx9BdFS8NviEH1eD5g",
+        "sha": "903b6c5fda5805376f4f6bd0c155ca2656b9f815",
+        "created_by_this_run": false,
+        "authorization_status": "UNVERIFIED_EXTERNAL_CHANGE"
+      },
+      {
+        "project": "CNW",
+        "environment": "preview",
+        "deployment_id": "dpl_9jJpwRiJxn4CcmLVap1awWWAdz4E",
+        "sha": "825c82927898dccca3eab34383da4731a1630151",
+        "created_by_this_run": false,
+        "authorization_status": "UNVERIFIED_EXTERNAL_CHANGE"
+      },
+      {
+        "project": "CNW",
+        "environment": "preview",
+        "deployment_id": "dpl_A17z4ARnRPiFm4dELPVefN9HEmnW",
+        "sha": "98d40a13f1a3beab1fd2e8e49979650a9d11b562",
+        "created_by_this_run": false,
+        "authorization_status": "UNVERIFIED_EXTERNAL_CHANGE"
+      }
+    ]
   },
   "omnw_boundary_audit": {
     "harvest_surfaces": 0,
@@ -72,12 +135,13 @@
   "public_evidence": {
     "nihonwine_jp_homepage_observed": true,
     "nihonwine_jp_latest_news_date_observed": "2026-09-21",
-    "cnw_homepage_observed": true,
-    "cnw_homepage_http_status": 200,
+    "cnw_homepage_observed": false,
+    "cnw_generic_web_fetch_status": "UNAVAILABLE",
     "cnw_production_deployment_observed": "dpl_DDYosa76kNfAaKXJSKR7aoqjBzrc",
+    "omnw_production_deployment_observed": "dpl_77tfhLbeCkDs2MoXx4yTXkxWP3cV",
     "dev_room_vercel_production_state": "READY",
     "dev_room_vercel_runtime_errors_1h": 0,
     "sayaka_public_fetch": "UNAVAILABLE_FROM_GENERIC_WEB",
-    "note": "NIHON WINE.JP and CNW were directly observed. CNW currently serves HTTP 200 from the existing Production deployment while Vercel telemetry contains a handled upstream fetch timeout on one wine route. No Preview or Production deployment was created by this DEV ROOM maintenance run."
+    "note": "NIHON WINE.JP was directly observed. Vercel/Supabase/GitHub evidence was refreshed for tracked projects. CNW generic-web fetch was unavailable, so its current Production state is represented by Vercel deployment/runtime telemetry rather than a fabricated public-page PASS. No Preview or Production deployment was created by this DEV ROOM maintenance run."
   }
 }
