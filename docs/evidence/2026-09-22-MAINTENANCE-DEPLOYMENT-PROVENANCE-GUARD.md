@@ -28,6 +28,15 @@ The validator/self-test now guard this invariant:
 3. a blocked maintenance gate must carry an explicit blocker entry;
 4. P1-P5 foundation completion remains independent and stays `PASS`.
 
+The old CI path that syntax-checked VPS/systemd deployment artifacts was replaced by `DEV ROOM foundation QA`. GitHub Actions run `35643970546` on `205bf63ca043670b661ebc217281607febf2f454` completed `success`; its P1-P5 canonical state, P3 contract, P4 worker contract, P5 gates, maintenance gate, and retired-infrastructure policy steps all passed.
+
+The remaining executable VPS entrypoints were also hard-disabled without contacting any VPS:
+
+- `deploy/health/install-health-monitor.sh` now exits `78` before any `systemctl`/network action.
+- `deploy/workers/install-omnw-resident-workers.sh` now exits `78` before any service installation/start.
+- `scripts/write-baseline.py` is now a retired tombstone and no longer inspects host services, Docker, repositories, or systemd.
+- The foundation workflow asserts those retirement markers and rejects reintroduction of `systemctl`/`subprocess` behavior in those entrypoints.
+
 ## Vercel policy note
 
 Vercel's official project configuration supports `git.deploymentEnabled: false` to prevent automatic Git deployments. OMNW currently uses an `ignoreCommand` that allows `main`, so a main merge can create Production automatically. Changing OMNW's Production-branch configuration is intentionally not performed here because the canonical rule requires explicit NORIZO approval for Production-affecting operations.
