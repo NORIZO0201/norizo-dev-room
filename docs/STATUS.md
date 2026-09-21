@@ -1,6 +1,6 @@
 # STATUS — NORIZO DEV ROOM
 
-Updated: 2026-09-21 JST
+Updated: 2026-09-22 JST
 
 ## Current status
 
@@ -10,7 +10,7 @@ The P1→P5 development foundation is complete and DEV ROOM is now in **maintena
 
 Canonical machine-readable state: `state/DEV_ROOM_STATE.json`  
 P5 handoff: `state/P5_HANDOFF.json`  
-Completion evidence: `docs/evidence/`
+Completion and maintenance evidence: `docs/evidence/`
 
 ## Current operating model
 
@@ -31,7 +31,8 @@ NORIZO LAB is **Chatty-first**.
 4. **P4 — reusable worker/observation contracts for RELIS and similar projects — COMPLETE**
 5. **P5 — deterministic project batch/QA gates + handoff state — COMPLETE**
 
-P5 completion evidence: `docs/evidence/2026-09-21-P5-COMPLETE.md`.
+P5 completion evidence: `docs/evidence/2026-09-21-P5-COMPLETE.md`.  
+Latest maintenance evidence: `docs/evidence/2026-09-22-MAINTENANCE-CNW-ROUTE-DRIFT.md`.
 
 ## Infrastructure direction
 
@@ -56,12 +57,12 @@ Local/tooling QA → Preview only when NORIZO asks → NORIZO confirmation → P
 
 `state/P5_HANDOFF.json` records `foundation_status: PASS`.
 
-- SAYAKA: P5 gate PASS.
-- CNW: canonical fix is in `main` and non-production proof exists; current Production still records `/wines/[slug]` decode errors. Promotion remains blocked pending explicit NORIZO approval.
-- OMNW: P5 gate PASS; Discovery/Master and Consumer remain separate; retired Harvest remains absent.
-- NIHON WINE.JP: `PASS-NOT-REQUIRED`; project-specific WordPress proxy observations do not block the DEV ROOM foundation.
+- SAYAKA: P5 gate PASS; Supabase healthy and no runtime errors observed in the latest one-hour window.
+- CNW: P5 development gate PASS. A one-shot Production release was made after the original P5 handoff, but that Production still logged `/wines/[slug]` decode failures. Additional main-branch remediation now removes remaining pre-encoded internal wine routes and rejects malformed percent wine paths before dynamic-route decoding. Automatic `main` deployment is disabled; further Production promotion remains blocked pending explicit NORIZO approval.
+- OMNW: P5 gate PASS; Discovery/Master and Consumer remain separate; retired Harvest remains absent. The isolated Consumer branch has advanced through observed M3 work while its writes remain on the Consumer recognition-index sidecar rather than Discovery/Master source tables.
+- NIHON WINE.JP: `PASS-NOT-REQUIRED`; no runtime errors were observed in the latest one-hour window. Historical WordPress proxy observations remain project-specific and do not block the DEV ROOM foundation.
 
-No Preview or Production deployment is implied by P5 completion.
+No Preview or Production deployment is implied by P5 completion or maintenance repair.
 
 ## Maintenance mode
 
