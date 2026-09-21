@@ -9,7 +9,8 @@ export default async function handler(req, res) {
 
   try {
     const p = await getProvider();
-    if (p.configureMobile) await p.configureMobile(spId);
+    const deviceProfile = ['iphone','android','compact'].includes(req.body?.deviceProfile) ? req.body.deviceProfile : 'iphone';
+    if (p.configureMobile) await p.configureMobile(spId, deviceProfile);
     const [pc, sp] = await Promise.all([p.inspectPage(pcId), p.inspectPage(spId)]);
     const gradePc = x => x.hasVisibleContent && x.brokenImages === 0 ? 'PASS' : 'CHECK';
     const gradeSp = x => x.hasVisibleContent && x.brokenImages === 0 && x.mobileSignals ? 'PASS' : 'CHECK';
@@ -18,6 +19,7 @@ export default async function handler(req, res) {
       provider: p.info().provider,
       pc,
       sp,
+      deviceProfile,
       qa: { pc: gradePc(pc), sp: gradeSp(sp) }
     });
   } catch (e) {
