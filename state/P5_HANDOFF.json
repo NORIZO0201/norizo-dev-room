@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "phase": "P5",
-  "observed_at": "2026-09-21T17:06:30Z",
+  "observed_at": "2026-09-21T18:10:00Z",
   "foundation_status": "PASS",
   "deployment_policy": {
     "preview_without_explicit_norizo_request": false,
@@ -64,13 +64,20 @@
         "latest_production_deployment": "dpl_DDYosa76kNfAaKXJSKR7aoqjBzrc",
         "latest_production_sha": "24336a8fd84c5d64a1fbfb0ca47831eecb4f5eef",
         "latest_production_state": "READY",
-        "latest_observed_nonproduction_ready": "dpl_3k9Ac9Sg8PcxaJAEuFgkSrxLuEoJ",
-        "runtime_errors_1h": 0
+        "latest_observed_nonproduction_ready": "dpl_FJLCDKQkZPVL8h6GxixZKwNKeDjC",
+        "runtime_errors_1h": 5,
+        "runtime_warning": {
+          "route": "/wines/[slug]",
+          "http_status_observed": 200,
+          "message": "fetch failed",
+          "cause": "write ETIMEDOUT",
+          "last_seen": "2026-09-21T17:17:05Z"
+        }
       },
       "handoff": {
         "source_ahead_of_production": true,
         "production_action": "AWAITING_EXPLICIT_NORIZO_APPROVAL",
-        "reason": "Production is healthy in the latest one-hour observation, but it remains on 24336a8 while slug remediation and later CNW SEO/catalog changes are ahead on main. Zero recent errors does not prove those source changes have shipped. Production promotion remains forbidden without explicit NORIZO approval."
+        "reason": "Production still serves from 24336a8. The latest one-hour telemetry contains five repeated caught upstream fetch timeouts on one /wines/[slug] request, but that request returned HTTP 200. Slug remediation and later source changes remain ahead on main. No Production promotion is allowed without explicit NORIZO approval."
       }
     },
     "OMNW": {
@@ -79,8 +86,11 @@
         "repository": "NORIZO0201/oh-my-nihon-wine",
         "main_sha": "1a926caace6fe12621966a52e9593f6f721c68ba",
         "consumer_work_branch": "agent/recognition-core-m0-m4",
-        "consumer_work_sha": "a6911de80df7f7851562b741580cc91f9a61c4b7",
-        "consumer_milestone_observed": "M4"
+        "consumer_work_sha": "6d9cfa6466e817e5d0c8c2eaa26e0ec6b8cf4cfd",
+        "consumer_milestone_observed": "M4",
+        "consumer_qa_status": "PASS",
+        "consumer_qa_workflow": "Recognition Core QA",
+        "consumer_qa_run_id": 35630485168
       },
       "supabase": {
         "project": "omnw-production",
@@ -93,7 +103,8 @@
         "latest_production_sha": "1a926caace6fe12621966a52e9593f6f721c68ba",
         "latest_production_state": "READY",
         "runtime_errors_1h": 0,
-        "consumer_branch_auto_deploys": "CANCELED_BY_POLICY"
+        "consumer_branch_auto_deploys": "CANCELED_BY_POLICY",
+        "latest_consumer_branch_attempt": "dpl_8awgcVYesUmfRUQbBrEzxboBMnGJ"
       },
       "boundary": {
         "discovery_consumer_separate": true,
@@ -105,7 +116,7 @@
       "handoff": {
         "source_ahead_of_production": false,
         "production_action": "NONE",
-        "reason": "Canonical main Production remains aligned. The isolated Consumer Recognition Core branch has now reached M4 at a6911de8; its enrichment work reads canonical sources and retains Consumer-side learning in recognition_image_index. Discovery/Master separation is still proven, retired Harvest surfaces remain absent, and the M4 branch deployment attempt was canceled by policy."
+        "reason": "Canonical main Production remains aligned. The isolated Consumer Recognition Core branch is at M4 on 6d9cfa64 and GitHub Actions Recognition Core QA run 35630485168 passed typecheck, QA, Python compile, scoped ESLint, and build. Discovery/Master separation is still proven, retired Harvest tables/views and edge functions remain absent, and the Consumer branch deployment attempt was canceled by policy."
       }
     },
     "OTHER_NIHON_WINE_JP": {
@@ -136,6 +147,7 @@
   "maintenance_rules": [
     "Keep P1-P5 contracts intact and validate state drift on future runs.",
     "Use contracts/maintenance-mode.json and state/MAINTENANCE_OBSERVATION.json as the deterministic maintenance gate.",
+    "Require current OMNW Consumer M4 branch evidence to include a passing Recognition Core QA workflow run.",
     "Do not revive or inspect ConoHa.",
     "Never revive the retired OMNW Harvest pipeline.",
     "Do not create Vercel Preview unless NORIZO explicitly asks to see one.",
