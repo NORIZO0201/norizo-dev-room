@@ -22,6 +22,7 @@ DEVROOM_DIR="$ROOT_DIR/norizo-dev-room"
 STEEL_DIR="$ROOT_DIR/steel"
 INSTALL_HEALTH="${INSTALL_HEALTH:-1}"
 INSTALL_STEEL="${INSTALL_STEEL:-0}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 echo "== NORIZO AI WORK FACTORY convergence bootstrap =="
 
@@ -133,6 +134,10 @@ echo
 echo "== Local services =="
 systemctl is-active norizo-health.service 2>/dev/null || true
 docker ps --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}'
+
+echo
+echo "== Phase 0 baseline =="
+python3 "$SCRIPT_DIR/write-baseline.py"
 
 echo
 echo "DEV ROOM: $DEVROOM_DIR"
