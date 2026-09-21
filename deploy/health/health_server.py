@@ -35,6 +35,7 @@ KNOWN_REPOS = (
 
 KNOWN_UNITS = (
     "norizo-health.service",
+    "norizo-control-agent.service",
     "omnw-discovery.service",
     "omnw-recognition.service",
     "omnw-master.service",
