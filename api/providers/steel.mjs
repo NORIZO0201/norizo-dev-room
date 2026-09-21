@@ -1,16 +1,21 @@
-import { chromium } from 'playwright-core';
+// Steel remote-browser provider.
+// Session lifecycle lives here; all page operations come from _browser.mjs so
+// the Steel and local-CDP providers behave identically.
+import {
+  DEVICE_PROFILES,
+  makePageApi,
+  normalizeDevice,
+  profileFor,
+  purgeSession
+} from './_browser.mjs';
 
 export const SESSION_MS = 840000;
-
-export const DEVICE_PROFILES = {
-  iphone: { width: 393, height: 852, dpr: 3, safeTop: 59, safeBottom: 34, label: 'iPhone class' },
-  android: { width: 412, height: 915, dpr: 2.625, safeTop: 24, safeBottom: 24, label: 'Android class' },
-  compact: { width: 375, height: 812, dpr: 3, safeTop: 44, safeBottom: 34, label: 'Compact iPhone class' }
-};
+export { DEVICE_PROFILES, profileFor, normalizeDevice };
 
 function cfg() {
   const mode = process.env.BROWSER_PROVIDER || 'steel-cloud';
   const selfhost = mode === 'steel-selfhost';
+
   const apiBase = selfhost
     ? (process.env.STEEL_SELFHOST_API_BASE || 'http://127.0.0.1:3000/v1')
     : 'https://api.steel.dev/v1';
@@ -33,44 +38,88 @@ function headers(apiKey) {
   return h;
 }
 
-export async function createSession(body = {}) {
+function wsFor(sessionId) {
   const c = cfg();
-  const mobile = body?.deviceConfig?.device === 'mobile';
+  if (c.selfhost) {
+    if (!c.connectBase) throw new Error('STEEL_SELFHOST_CDP_BASE is not configured.');
+    const sep = c.connectBase.includes('?') ? '&' : '?';
+    return `${c.connectBase}${sep}sessionId=${encodeURIComponent(sessionId)}`;
+  }
+  return `${c.connectBase}?apiKey=${encodeURIComponent(c.apiKey)}&sessionId=${encodeURIComponent(sessionId)}`;
+}
+
+const pageApi = makePageApi(wsFor);
+
+export const configureMobile = pageApi.configureMobile;
+export const getUrl = pageApi.getUrl;
+export const goto = pageApi.goto;
+export const screenshotPage = pageApi.screenshotPage;
+export const tapPage = pageApi.tapPage;
+export const scrollPage = pageApi.scrollPage;
+export const inspectPage = pageApi.inspectPage;
+
+/**
+ * Create a Steel session whose *own* dimensions and user agent already match
+ * the target device. CDP emulation overrides are reverted whenever a client
+ * detaches, so the session-level values are what guarantee that a mobile pane
+ * never silently falls back to a desktop viewport.
+ */
+export async function createSession(options = {}) {
+  const c = cfg();
+  const device = normalizeDevice(options.device);
+  const profile = profileFor(device);
+
+  const body = {
+    timeout: SESSION_MS,
+    debugConfig: { interactive: true, systemCursor: true },
+    dimensions: { width: profile.width, height: profile.height }
+  };
+  if (profile.userAgent) body.userAgent = profile.userAgent;
+  if (options.profileId) body.profileId = options.profileId;
+  if (options.persistProfile) body.persistProfile = true;
+
   const r = await fetch(`${c.apiBase}/sessions`, {
     method: 'POST',
     headers: headers(c.apiKey),
-    body: JSON.stringify({
-      timeout: SESSION_MS,
-      debugConfig: { interactive: true, systemCursor: true },
-      ...body
-    })
+    body: JSON.stringify(body)
   });
   const text = await r.text();
-  if (!r.ok) throw new Error(`Steel ${r.status}: ${text}`);
-  const s = JSON.parse(text);
-  if (mobile) await configureMobile(s.id);
+  if (!r.ok) throw new Error(`Steel ${r.status}: ${text.slice(0, 500)}`);
+
+  let s;
+  try {
+    s = JSON.parse(text);
+  } catch {
+    throw new Error(`Steel returned a non-JSON session response: ${text.slice(0, 200)}`);
+  }
+  if (!s?.id) throw new Error('Steel did not return a session id.');
+
   return {
     id: s.id,
-    debugUrl: s.debugUrl || s.sessionViewerUrl,
+    debugUrl: s.debugUrl || s.sessionViewerUrl || null,
     profileId: s.profileId || null,
-    mode: mobile ? 'mobile' : 'desktop'
+    device,
+    mobile: profile.mobile,
+    viewport: { width: profile.width, height: profile.height, dpr: profile.dpr },
+    label: profile.label
   };
 }
 
 export async function release(id) {
   if (!id) return;
+  purgeSession(id);
   const c = cfg();
   const r = await fetch(`${c.apiBase}/sessions/${encodeURIComponent(id)}/release`, {
     method: 'POST',
     headers: headers(c.apiKey)
   });
-  if (!r.ok && r.status !== 404) throw new Error(await r.text());
+  if (!r.ok && r.status !== 404) throw new Error(`Steel release ${r.status}: ${(await r.text()).slice(0, 300)}`);
 }
 
 export async function profileReady(profileId) {
   if (!profileId) return false;
   const c = cfg();
-  for (let i = 0; i < 12; i++) {
+  for (let i = 0; i < 12; i += 1) {
     const r = await fetch(`${c.apiBase}/profiles/${encodeURIComponent(profileId)}`, {
       headers: headers(c.apiKey)
     });
@@ -79,125 +128,9 @@ export async function profileReady(profileId) {
       if (p.status === 'READY') return true;
       if (p.status === 'FAILED') return false;
     }
-    await new Promise(r => setTimeout(r, 500));
+    await new Promise(resolve => setTimeout(resolve, 500));
   }
   return false;
-}
-
-function wsFor(sessionId) {
-  const c = cfg();
-  if (c.selfhost) {
-    if (!c.connectBase) {
-      throw new Error('STEEL_SELFHOST_CDP_BASE is not configured.');
-    }
-    const sep = c.connectBase.includes('?') ? '&' : '?';
-    return `${c.connectBase}${sep}sessionId=${encodeURIComponent(sessionId)}`;
-  }
-  return `${c.connectBase}?apiKey=${encodeURIComponent(c.apiKey)}&sessionId=${encodeURIComponent(sessionId)}`;
-}
-
-async function withPage(sessionId, fn) {
-  const browser = await chromium.connectOverCDP(wsFor(sessionId));
-  try {
-    const ctx = browser.contexts()[0];
-    const page = ctx?.pages()[0];
-    if (!page) throw new Error('No active page in Steel session.');
-    return await fn(page);
-  } finally {
-    await browser.close();
-  }
-}
-
-export async function configureMobile(id, profileName = 'iphone') {
-  const profile = DEVICE_PROFILES[profileName] || DEVICE_PROFILES.iphone;
-  return withPage(id, async page => {
-    const cdp = await page.context().newCDPSession(page);
-    await cdp.send('Emulation.setDeviceMetricsOverride', {
-      width: profile.width,
-      height: profile.height,
-      deviceScaleFactor: profile.dpr,
-      mobile: true,
-      screenWidth: profile.width,
-      screenHeight: profile.height,
-      positionX: 0,
-      positionY: 0
-    });
-    await cdp.send('Emulation.setTouchEmulationEnabled', {
-      enabled: true,
-      maxTouchPoints: 5
-    });
-    await cdp.send('Emulation.setSafeAreaInsetsOverride', {
-      insets: {
-        top: profile.safeTop,
-        bottom: profile.safeBottom,
-        left: 0,
-        right: 0
-      }
-    }).catch(() => {});
-    await cdp.send('Emulation.setEmulatedMedia', {
-      features: [{ name: 'display-mode', value: 'standalone' }]
-    }).catch(() => {});
-    return profile;
-  });
-}
-
-export async function getUrl(id) {
-  return withPage(id, p => p.url());
-}
-
-export async function goto(id, url, options = {}) {
-  if (options.mobile) await configureMobile(id, options.deviceProfile || 'iphone');
-  return withPage(id, async p => {
-    if (options.extraHTTPHeaders) await p.setExtraHTTPHeaders(options.extraHTTPHeaders);
-    await p.goto(url, { waitUntil: 'domcontentloaded', timeout: 45000 });
-    return p.url();
-  });
-}
-
-export async function screenshotPage(id) {
-  return withPage(id, async page => {
-    return await page.screenshot({ type: 'png', fullPage: false });
-  });
-}
-
-export async function tapPage(id, x, y) {
-  return withPage(id, async page => {
-    await page.mouse.click(Number(x), Number(y));
-    return true;
-  });
-}
-
-export async function scrollPage(id, deltaY) {
-  return withPage(id, async page => {
-    await page.mouse.wheel(0, Number(deltaY));
-    return true;
-  });
-}
-
-export async function inspectPage(id) {
-  return withPage(id, async page => page.evaluate(() => {
-    const imgs = Array.from(document.images);
-    const brokenImages = imgs.filter(i => i.complete && i.naturalWidth === 0).length;
-    const bodyText = document.body?.innerText?.trim() || '';
-    return {
-      url: location.href,
-      title: document.title,
-      readyState: document.readyState,
-      bodyChars: bodyText.length,
-      links: document.querySelectorAll('a[href]').length,
-      images: imgs.length,
-      brokenImages,
-      hasVisibleContent: bodyText.length > 0 || document.body?.children?.length > 0,
-      viewport: { width: innerWidth, height: innerHeight, dpr: devicePixelRatio },
-      screen: { width: screen.width, height: screen.height },
-      userAgent: navigator.userAgent,
-      touchPoints: navigator.maxTouchPoints || 0,
-      coarsePointer: matchMedia('(pointer: coarse)').matches,
-      mobileSignals: innerWidth <= 430 && (navigator.maxTouchPoints || 0) > 0 && /(Mobile|Android|iPhone|iPad)/i.test(navigator.userAgent),
-      pwaStandalone: matchMedia('(display-mode: standalone)').matches,
-      scroll: { x: scrollX, y: scrollY }
-    };
-  }));
 }
 
 export function info() {
@@ -205,6 +138,10 @@ export function info() {
   return {
     provider: c.mode,
     sessionMs: SESSION_MS,
+    snapshotFormat: 'image/png',
+    snapshotScale: 'css',
+    pooledConnections: true,
+    devices: Object.keys(DEVICE_PROFILES),
     capabilities: {
       liveViewer: true,
       profiles: true,
