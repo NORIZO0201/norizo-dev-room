@@ -1,0 +1,73 @@
+name: Gemini PR Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  issue_comment:
+    types: [created]
+
+jobs:
+  review:
+    if: |
+      github.event_name == 'pull_request' ||
+      (github.event_name == 'issue_comment' &&
+       github.event.issue.pull_request &&
+       contains(github.event.comment.body, '@gemini-cli') &&
+       contains(github.event.comment.body, '/review'))
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Run Gemini review
+        id: gemini
+        continue-on-error: true
+        uses: google-github-actions/run-gemini-cli@v0
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
+          github_pr_number: ${{ github.event.pull_request.number || github.event.issue.number }}
+          prompt: |
+            Read AGENTS.md, GEMINI.md, docs/PROJECT.md, docs/SPEC.md, docs/DECISIONS.md and docs/STATUS.md.
+            Review this pull request as NORIZO DEV ROOM's independent auditor.
+            Focus on acceptance criteria, regressions, security, secret exposure, unintended Production/ConoHa/Supabase/Vercel effects, and duplicate Sources of Truth.
+            End with exactly:
+            VERDICT: PASS | CHANGES_REQUESTED | NEEDS_HUMAN
+            BLOCKERS:
+            NON_BLOCKING:
+            NEXT:
+
+      - name: Publish Gemini review result
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SUMMARY: ${{ steps.gemini.outputs.summary }}
+          ERROR_TEXT: ${{ steps.gemini.outputs.error }}
+          OUTCOME: ${{ steps.gemini.outcome }}
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            pr="${{ github.event.pull_request.number }}"
+          else
+            pr="${{ github.event.issue.number }}"
+          fi
+
+          if [ "$OUTCOME" = "success" ] && [ -n "$SUMMARY" ]; then
+            body="## Gemini automated review
+
+$SUMMARY"
+          else
+            body="## Gemini automated review wiring
+
+Gemini GitHub Action was triggered but did not complete successfully.
+
+- action outcome: $OUTCOME
+- authentication/setup may still be required
+
+The GitHub event → Gemini Action path is active. Check the Actions run for the exact setup failure."
+          fi
+          gh pr comment "$pr" --repo "${{ github.repository }}" --body "$body"
