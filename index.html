@@ -55,7 +55,7 @@ header{height:64px;border-bottom:1px solid var(--line);display:flex;align-items:
 <div class="card"><h3>CONTINUOUS WORKERS</h3><div class="kv"><span>OMNW Discovery</span><span class="pill">separate lifecycle</span></div><div class="kv"><span>RELIS</span><span class="pill">separate lifecycle</span></div><div class="msg">WebサービスQAとは分離。常時処理系はDEV ROOM本体のP1–P5実行とは混ぜず、個別ワーカーとして監視する。</div></div>
 <div class="card"><h3>RELEASE CONTROL</h3><div class="msg">QA後、ここからNORIZOの承認指示を記録できます。Previewは必要な時だけ、Productionは最終承認時だけ使います。</div><div class="release"><button id="previewOk">Preview依頼</button><button id="productionOk" class="prod">Production OK</button></div><div id="releaseState" class="releaseState">承認指示なし</div></div>
 <div class="card"><h3>操作の意味</h3><div class="kv"><span>SP + PC 起動</span><span>2画面を新規開始</span></div><div class="kv"><span>両方をこのURLへ</span><span>URL欄へ同時移動</span></div><div class="kv"><span>URL同期</span><span>片側の遷移を追従</span></div><div class="kv"><span>QA確認</span><span>表示/画像/SP分岐検証</span></div><div class="kv"><span>セッション延長</span><span>ブラウザ時間を更新</span></div></div>
-<div class="card"><h3>APP STATE</h3><div class="kv"><span>Production</span><span>現在公開中</span></div><div class="kv"><span>QA 未ログイン</span><span>Welcome / Sign in</span></div><div class="kv"><span>QA ログイン後</span><span>合成QA Session</span></div><div class="msg">OMNWは固定QAブランチを使い、Production前のSP分岐後画面を確認します。</div></div><div class="card"><h3>DEVICE LAB</h3><div class="kv"><span>SP priority</span><span class="pass">PRIMARY</span></div><div class="kv"><span>Viewport</span><span>393 × 852</span></div><div class="kv"><span>Touch</span><span>enabled</span></div><div class="kv"><span>Fingerprint</span><span>Steel mobile</span></div><div class="msg">SPは単なる縮小表示ではなく、モバイルfingerprint / touch / device viewportを使ってサーバー・クライアント両方のSP分岐を確認します。</div></div><div class="card"><h3>BROWSER PROVIDER</h3><div class="kv"><span>Active</span><span id="provider">loading…</span></div><div id="providerCaps" class="msg">Checking provider…</div></div>
+<div class="card"><h3>APP STATE</h3><div class="kv"><span>QA BRIDGE</span><span id="qaBridgeState" class="check">CHECKING</span></div><div class="kv"><span>Production</span><span>現在公開中</span></div><div class="kv"><span>QA 未ログイン</span><span>Welcome / Sign in</span></div><div class="kv"><span>QA ログイン後</span><span>ScreenGate QA</span></div><div class="msg" id="qaBridgeDetail">固定QAブランチへの接続状態を確認しています。</div></div><div class="card"><h3>DEVICE LAB</h3><div class="kv"><span>SP priority</span><span class="pass">PRIMARY</span></div><div class="kv"><span>Viewport</span><span>393 × 852</span></div><div class="kv"><span>Touch</span><span>enabled</span></div><div class="kv"><span>Fingerprint</span><span>Steel mobile</span></div><div class="msg">SPは単なる縮小表示ではなく、モバイルfingerprint / touch / device viewportを使ってサーバー・クライアント両方のSP分岐を確認します。</div></div><div class="card"><h3>BROWSER PROVIDER</h3><div class="kv"><span>Active</span><span id="provider">loading…</span></div><div id="providerCaps" class="msg">Checking provider…</div></div>
 <div class="card"><h3>SESSION</h3><div class="kv"><span>SP</span><span id="spId">—</span></div><div class="kv"><span>PC</span><span id="pcId">—</span></div><div class="kv"><span>残り</span><span id="timer" class="timer">—</span></div><div class="kv"><span>LINK</span><span id="linkState">OFF</span></div></div>
 <div class="card"><h3>QA</h3><div class="kv"><span>PC</span><span id="pcQa">—</span></div><div class="kv"><span>SP</span><span id="spQa">—</span></div><div id="qaDetail" class="msg">未実行</div></div>
 <div class="card"><h3>CURRENT URL</h3><div class="msg">PC: <span id="pcUrl">—</span></div><div class="msg" style="margin-top:5px">SP: <span id="spUrl">—</span></div></div>
@@ -108,6 +108,29 @@ $('#environment').onchange=()=>refreshTarget(true);
 async function releaseIntent(kind){const selected=$('#project').selectedOptions[0]?.textContent||'CUSTOM';const body={kind,project:selected,url:$('#url').value.trim(),qa:{sp:$('#spQa').textContent,pc:$('#pcQa').textContent},at:new Date().toISOString()};$('#releaseState').textContent='指示送信中…';try{const j=await api('/api/release-intent',body);$('#releaseState').textContent=j.message||'承認指示を記録しました';setLog(j.message||'RELEASE INTENT RECORDED')}catch(e){$('#releaseState').textContent=`送信失敗: ${e.message}`;setLog(e.message,true)}}
 $('#open').onclick=openPair;$('#go').onclick=goBoth;$('#stop').onclick=stop;$('#link').onclick=toggleLink;$('#qa').onclick=qa;$('#renew').onclick=()=>renew(false);$('#previewOk').onclick=()=>releaseIntent('preview');$('#productionOk').onclick=()=>releaseIntent('production');$('#master').onchange=()=>{$('#linkState').textContent=linkOn?`${$('#master').value.toUpperCase()} MASTER`:'OFF'};
 $('#url').addEventListener('keydown',e=>{if(e.key==='Enter'){current?goBoth():openPair()}});
+async function loadQaBridge(){
+  try{
+    const r=await fetch('/api/oidc-status',{cache:'no-store'});
+    const j=await r.json();
+    const ready=Boolean(j.oidcAvailable&&j.ok);
+    $('#qaBridgeState').textContent=ready?'READY':'LOCKED';
+    $('#qaBridgeState').className=ready?'pass':'check';
+    $('#qaBridgeDetail').textContent=ready
+      ?'DEV ROOMから保護付きOMNW QA Previewへ直接接続できます。'
+      :'Vercel OIDC / Trusted Sourceが未有効です。Production仮想実機は利用できます。';
+    for(const option of $('#environment').options){
+      if(option.value!=='production') option.disabled=!ready;
+    }
+    if(!ready&&$('#environment').value!=='production'){
+      $('#environment').value='production';
+      refreshTarget(false);
+    }
+  }catch(e){
+    $('#qaBridgeState').textContent='ERROR';
+    $('#qaBridgeState').className='fail';
+    $('#qaBridgeDetail').textContent=e.message;
+  }
+}
 async function loadProvider(){
   try{
     const r=await fetch('/api/provider',{cache:'no-store'});
@@ -121,7 +144,7 @@ async function loadProvider(){
     $('#providerCaps').textContent=e.message;
   }
 }
-loadProvider();
+loadProvider();loadQaBridge();
 window.addEventListener('beforeunload',()=>{if(current)navigator.sendBeacon('/api/stop',new Blob([JSON.stringify({pcId:current.pc.id,spId:current.sp.id})],{type:'application/json'}))});
 </script>
 </body></html>
