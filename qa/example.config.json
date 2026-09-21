@@ -1,0 +1,27 @@
+{
+  "runProfiles": ["pc", "sp"],
+  "profiles": {
+    "pc": { "width": 1440, "height": 900, "isMobile": false },
+    "sp": { "width": 393, "height": 852, "isMobile": true }
+  },
+  "targets": [
+    {
+      "project": "example",
+      "baseUrl": "https://example.com",
+      "routes": [
+        {
+          "path": "/",
+          "assertions": {
+            "hasVisibleContent": true,
+            "noHorizontalOverflow": true,
+            "maxBrokenImages": 0,
+            "maxConsoleErrors": 0,
+            "maxPageErrors": 0,
+            "requiredSelectors": ["body"]
+          }
+        }
+      ]
+    }
+  ],
+  "baseline": {}
+}
