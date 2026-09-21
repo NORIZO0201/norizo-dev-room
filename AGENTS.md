@@ -18,7 +18,7 @@ If sources conflict, `main` wins.
 Product owner and final decision maker.
 - approves strategic direction
 - approves high-risk/destructive/paid/production changes
-- is the final merge authority
+- approves strategic direction and high-risk changes
 - must not be used as a message relay between agents
 
 ### ChatGPT
@@ -34,7 +34,7 @@ Primary implementation owner.
 - owns code changes, tests, lint/build, infrastructure implementation and PR creation
 - uses one feature branch per Issue/work unit
 - reports exact QA evidence and blockers
-- does not merge its own work unless NORIZO explicitly authorizes it
+- may not self-approve its own implementation PR; an independent review/check gate is required
 
 ### Gemini
 Researcher / auditor / reviewer.
@@ -88,7 +88,9 @@ Do not create a second handoff database or state file for human/project coordina
 - Do not overwrite unrelated work.
 - Rebase/merge conflicts must be resolved explicitly, never with destructive reset.
 - The PR body must include QA evidence and rollback/recovery notes when relevant.
-- Final merge is NORIZO's gate unless NORIZO explicitly delegates it.
+- Low-risk reversible PRs may merge automatically after required checks and independent review pass.
+- NORIZO approval is required only for high-risk, destructive, paid, security-sensitive, Production, DNS, secret/key, or architecture-boundary changes.
+- The implementation author must not be the sole approver of its own PR.
 
 ## Safety
 
