@@ -1,0 +1,19 @@
+# 配置:  /etc/systemd/system/observation-node.timer
+# 有効化: sudo systemctl daemon-reload && sudo systemctl enable --now observation-node.timer
+# 次回実行の確認: systemctl list-timers observation-node.timer
+
+[Unit]
+Description=Run LOCAL ENGINE Observation Node on a schedule
+
+[Timer]
+# 毎日 04:00 JST（VPSのタイムゾーンを Asia/Tokyo に設定した場合）
+OnCalendar=*-*-* 04:00:00
+
+# 0〜30分のランダム遅延。毎日きっかり同時刻に収集先を叩かないための礼儀
+RandomizedDelaySec=1800
+
+# VPSが停止していて実行を逃した場合、起動後に1回だけ実行する
+Persistent=true
+
+[Install]
+WantedBy=timers.target

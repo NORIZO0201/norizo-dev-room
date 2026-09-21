@@ -1,0 +1,48 @@
+# STAGE 4: Steel Self-host（VPS内部限定）
+#
+# 設計上の重要点：ポートは 127.0.0.1 にのみ公開します。
+# インターネットからは到達できないため、ファイアウォールに穴を開ける必要がありません。
+#
+#   起動:  docker compose -f deploy/steel/docker-compose.yml up -d
+#   状態:  docker compose -f deploy/steel/docker-compose.yml ps
+#   停止:  docker compose -f deploy/steel/docker-compose.yml down
+#
+# ⚠ image のタグは初回起動前に実在するものへ固定してください（latest 運用は禁止）。
+
+services:
+  steel-api:
+    image: ghcr.io/steel-dev/steel-browser-api:latest
+    container_name: steel-api
+    restart: unless-stopped
+
+    # ★ 127.0.0.1 のみ。"3000:3000" と書くと全世界に公開されるので絶対に変更しないこと
+    ports:
+      - "127.0.0.1:3000:3000"
+      - "127.0.0.1:9223:9223"
+
+    environment:
+      # 同時ブラウザ数の上限。12GB RAM のうち Steel には 4GB を割り当てる想定
+      MAX_CONCURRENT_SESSIONS: "${STEEL_MAX_SESSIONS:-3}"
+      # 放置セッションの自動終了（秒）。コスト・メモリ漏れ対策
+      SESSION_TIMEOUT: "${STEEL_SESSION_TIMEOUT:-600}"
+      NODE_ENV: production
+
+    # メモリ上限。超えたらこのコンテナだけが停止し、VPS全体は巻き込まれない
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+
+    # Chromium は /dev/shm を使う。既定の64MBだとタブがクラッシュする
+    shm_size: 2gb
+
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:3000/v1/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 40s
+
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }

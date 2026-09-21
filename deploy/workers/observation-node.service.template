@@ -1,0 +1,39 @@
+# STAGE 6: LOCAL ENGINE Observation Node（1回実行型）
+#
+# 配置:  /etc/systemd/system/observation-node.service
+# 単独実行: sudo systemctl start observation-node
+#
+# 常駐ではなく「タイマーで定期的に1回走る」構成です。
+# 理由: 観測は同じ対象を長期間くり返すことが価値であり、
+#       24時間回し続ける必要がないため（設計書12章）。
+
+[Unit]
+Description=LOCAL ENGINE Observation Node (scheduled collection)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=norizo
+Group=norizo
+WorkingDirectory=/home/norizo/workspace/<リポジトリ名>
+
+EnvironmentFile=/etc/norizo/observation-node.env
+
+ExecStart=/usr/bin/node <収集スクリプトのエントリポイント>
+
+# 1回の実行が6時間を超えたら異常とみなして停止
+TimeoutStartSec=21600
+
+MemoryMax=2G
+CPUQuota=100%
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/home/norizo/workspace /var/log/norizo
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=observation-node

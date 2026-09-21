@@ -1,0 +1,55 @@
+# STAGE 5: OMNW 常駐Worker
+#
+# 配置:  /etc/systemd/system/omnw-worker.service
+# 有効化: sudo systemctl daemon-reload && sudo systemctl enable --now omnw-worker
+# 状態:   systemctl status omnw-worker
+# ログ:   journalctl -u omnw-worker -f
+#
+# <> で囲んだ箇所は配置時に実際の値へ置き換えます。
+
+[Unit]
+Description=OMNW resident worker (CruX offload)
+After=network-online.target docker.service
+Wants=network-online.target
+
+# 10分間に3回失敗したら再起動をやめる（暴走して収集先に迷惑をかけないため）
+StartLimitIntervalSec=600
+StartLimitBurst=3
+
+[Service]
+Type=simple
+User=norizo
+Group=norizo
+WorkingDirectory=/home/norizo/workspace/<リポジトリ名>
+
+# 秘密情報はこのファイルに書かない。root only の env ファイルから読む
+EnvironmentFile=/etc/norizo/omnw-worker.env
+
+ExecStart=/usr/bin/node <worker のエントリポイント>
+
+# --- 再起動ポリシー ---
+Restart=on-failure
+RestartSec=30
+
+# ★ 終了コード 75 = 「収集先にブロックされた。人間の判断が必要」
+#    この場合は再起動せず停止する（設計書13章: 403/CAPTCHA は自動回避しない）
+RestartPreventExitStatus=75
+
+# --- リソース上限（VPS全体を巻き込まないため）---
+MemoryMax=3G
+CPUQuota=150%
+
+# --- 権限の最小化 ---
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/home/norizo/workspace /var/log/norizo
+
+# --- ログ ---
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=omnw-worker
+
+[Install]
+WantedBy=multi-user.target

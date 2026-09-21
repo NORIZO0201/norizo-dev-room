@@ -1,0 +1,19 @@
+# 秘密情報（絶対にコミットしない）
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+id_rsa*
+id_ed25519*
+
+# 依存関係・ビルド成果物
+node_modules/
+.vercel/
+dist/
+build/
+.next/
+
+# ログ・一時ファイル
+*.log
+.DS_Store
