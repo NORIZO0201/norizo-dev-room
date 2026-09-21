@@ -10,10 +10,10 @@
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:#f6f7f9;font-family:Inter,system-ui,-apple-system,sans-serif;height:100vh;overflow:hidden}
 header{height:62px;display:flex;align-items:center;gap:14px;padding:0 18px;border-bottom:1px solid var(--line);background:#0f1216}
 h1{font-size:18px;letter-spacing:.05em;margin:0}.sub{font-size:12px;color:var(--muted)}.status{margin-left:auto;border:1px solid var(--line);border-radius:999px;padding:6px 10px;font-size:11px;color:var(--muted)}
-.toolbar{height:118px;padding:10px 14px;border-bottom:1px solid var(--line);display:grid;gap:8px;background:#0d1014}
-.row{display:flex;gap:8px;align-items:center;min-height:38px}select,input,button{height:36px;border-radius:9px;border:1px solid #303740;background:#151a20;color:#fff;font-size:13px;padding:0 11px}select{min-width:160px}input{flex:1;background:#090b0e}.primary{background:#f3f4f6;color:#111;border-color:#f3f4f6;font-weight:700}button{cursor:pointer}button:disabled{opacity:.42;cursor:not-allowed}
+.toolbar{height:154px;padding:10px 14px;border-bottom:1px solid var(--line);display:grid;gap:6px;background:#0d1014}
+.row{display:flex;gap:8px;align-items:center;min-height:34px}select,input,button{height:34px;border-radius:9px;border:1px solid #303740;background:#151a20;color:#fff;font-size:13px;padding:0 11px}select{min-width:190px}input{flex:1;background:#090b0e}.primary{background:#f3f4f6;color:#111;border-color:#f3f4f6;font-weight:700}button{cursor:pointer}button:disabled{opacity:.42;cursor:not-allowed}.urlLabel{width:82px;color:var(--muted);font-size:11px;font-weight:700;letter-spacing:.04em}.urlMode{min-width:88px}.urlMode.active{background:#17304f;border-color:#60a5fa;color:#dbeafe}
 .deviceToggle{min-width:92px}.deviceToggle.on{background:#17304f;border-color:#60a5fa}.deviceToggle.on::before{content:"✓ ";color:#93c5fd}.hint{font-size:11px;color:var(--muted)}
-.layout{height:calc(100vh - 180px);display:grid;grid-template-columns:minmax(0,1fr) 310px}
+.layout{height:calc(100vh - 216px);display:grid;grid-template-columns:minmax(0,1fr) 310px}
 .deviceArea{display:grid;gap:1px;background:var(--line);min-width:0}.deviceArea.cols1{grid-template-columns:1fr}.deviceArea.cols2{grid-template-columns:1fr 1fr}.deviceArea.cols3{grid-template-columns:1fr 1fr 1fr}
 .pane{background:#090c10;min-width:0;display:flex;flex-direction:column}.pane.hidden{display:none}.paneTitle{height:40px;display:flex;align-items:center;gap:8px;padding:0 11px;border-bottom:1px solid var(--line);font-size:12px}.paneTitle small{color:var(--muted)}.paneTitle .state{margin-left:auto;color:var(--muted);font-size:10px}
 .viewer{flex:1;min-height:0;position:relative;display:flex;align-items:center;justify-content:center;padding:16px}.deviceShell{position:relative;width:min(100%,360px);height:100%;max-height:760px;min-height:420px;background:#000;border:9px solid #20242a;box-shadow:0 16px 45px rgba(0,0,0,.45);overflow:hidden}.iphoneShell{border-radius:38px}.androidShell{border-radius:28px}.pcShell{width:100%;max-width:none;height:100%;max-height:none;min-height:0;border-width:0;border-radius:0;background:#fff}.screen{position:absolute;inset:0;background:#fff;overflow:hidden}.iphoneShell .screen{border-radius:29px}.androidShell .screen{border-radius:19px}.island{position:absolute;z-index:5;top:8px;left:50%;transform:translateX(-50%);width:88px;height:21px;background:#08090a;border-radius:999px}.punch{position:absolute;z-index:5;top:11px;left:50%;transform:translateX(-50%);width:12px;height:12px;background:#0b0b0c;border-radius:50%}.homebar{position:absolute;z-index:5;bottom:5px;left:50%;transform:translateX(-50%);width:90px;height:4px;background:rgba(255,255,255,.7);border-radius:999px}
@@ -29,11 +29,21 @@ iframe{width:100%;height:100%;border:0;background:#fff}.deviceShot{width:100%;he
     <select id="project">
       <option value="">CUSTOM URL</option><option value="https://oh-my-nihon-wine.jp">OMNW</option><option value="https://nihonwine.jp">日本ワイン.jp</option><option value="https://craft-nihon-wine.jp">クラフト日本ワイン (CNW)</option><option value="https://craftwineshop.com">Craft Wine Shop (CWS)</option><option value="https://dis.nihonwine.jp">DIS</option><option value="https://nihoncheese.jp">日本チーズ.jp</option><option value="https://sayaka-kitchen.com">SAYAKA KITCHEN Official</option><option value="https://app.sayaka-kitchen.com">SAYAKA KITCHEN App</option><option value="https://admin.sayaka-kitchen.com">SAYAKA KITCHEN Admin</option><option value="https://local-engine.jp">LOCAL ENGINE</option>
     </select>
-    <select id="environment"><option value="production">Production</option><option value="qa-guest">QA 未ログイン</option><option value="qa-auth">QA ログイン後</option></select>
-    <input id="url" value="https://oh-my-nihon-wine.jp" spellcheck="false"/>
-    <button id="open" class="primary">表示中の端末を起動</button><button id="go" disabled>表示中の端末をこのURLへ</button><button id="stop" disabled>終了</button>
+    <span class="urlLabel">PRODUCTION</span>
+    <input id="productionUrl" value="https://oh-my-nihon-wine.jp" spellcheck="false"/>
+    <button id="useProduction" class="urlMode active">本番を見る</button>
   </div>
-  <div class="row"><span class="hint">表示:</span><button id="toggleIphone" class="deviceToggle on">iPhone</button><button id="toggleAndroid" class="deviceToggle on">Android</button><button id="togglePc" class="deviceToggle">PC</button><button id="qa" disabled>QA確認</button><button id="renew" disabled>セッション延長</button><span class="hint">ONの端末だけ起動。OMNWはiPhone + Androidが標準。</span></div>
+  <div class="row">
+    <span style="width:190px"></span>
+    <span class="urlLabel">PREVIEW</span>
+    <input id="previewUrl" placeholder="Preview URL（ある時だけ）" spellcheck="false"/>
+    <button id="usePreview" class="urlMode">Previewを見る</button>
+  </div>
+  <div class="row">
+    <span class="hint">表示:</span><button id="toggleIphone" class="deviceToggle on">iPhone</button><button id="toggleAndroid" class="deviceToggle on">Android</button><button id="togglePc" class="deviceToggle">PC</button>
+    <button id="open" class="primary">表示中の端末を起動</button><button id="go" disabled>選択中URLへ</button><button id="stop" disabled>終了</button><button id="qa" disabled>QA確認</button><button id="renew" disabled>セッション延長</button>
+    <span id="targetHint" class="hint">選択中: Production</span>
+  </div>
 </div>
 <div class="layout">
   <main id="deviceArea" class="deviceArea cols2">
