@@ -10,7 +10,8 @@
     "qa:browser:local": "node qa/browser-qa-local.mjs",
     "qa:p3:contract": "node qa/selftest.mjs",
     "qa:p3:chromium": "node qa/chromium-selftest.mjs",
-    "qa:p4:workers": "node qa/worker-state-selftest.mjs"
+    "qa:p4:workers": "node qa/worker-state-selftest.mjs",
+    "qa:p5": "node scripts/validate-p5-gates.mjs && node qa/p5-gates-selftest.mjs"
   },
   "dependencies": {
     "playwright-core": "^1.63.0"
