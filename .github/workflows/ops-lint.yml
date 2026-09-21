@@ -7,6 +7,8 @@ on:
       - 'state/**'
       - 'qa/**'
       - 'scripts/validate-*.mjs'
+      - 'scripts/write-baseline.py'
+      - 'deploy/**'
       - 'package.json'
       - '.github/workflows/ops-lint.yml'
   push:
@@ -17,6 +19,8 @@ on:
       - 'state/**'
       - 'qa/**'
       - 'scripts/validate-*.mjs'
+      - 'scripts/write-baseline.py'
+      - 'deploy/**'
       - 'package.json'
       - '.github/workflows/ops-lint.yml'
   workflow_dispatch:
@@ -61,3 +65,9 @@ jobs:
           test ! -e .mcp.json || ! grep -qi 'conoha' .mcp.json
           grep -q '"status": "retired"' state/DEV_ROOM_STATE.json
           grep -q '"conoha_touched": false' state/MAINTENANCE_OBSERVATION.json
+          grep -q '^RETIRED:' deploy/health/install-health-monitor.sh
+          grep -q '^RETIRED:' deploy/workers/install-omnw-resident-workers.sh
+          grep -q 'Retired tombstone' scripts/write-baseline.py
+          ! grep -q 'systemctl' deploy/health/install-health-monitor.sh
+          ! grep -q 'systemctl' deploy/workers/install-omnw-resident-workers.sh
+          ! grep -q 'subprocess' scripts/write-baseline.py
