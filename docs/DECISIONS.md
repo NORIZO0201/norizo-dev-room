@@ -35,3 +35,12 @@ Issues are work/intent. PRs are proposed changes. Chat is draft context.
 **Decision:** `docs/AI_HANDOFF.md` remains as historical P0 evidence until archived, but it is no longer the active coordination source.
 
 Current state belongs in `docs/STATUS.md`; work belongs in Issues.
+
+
+## 2026-09-21 — D006: NORIZO is not a routine approval bottleneck
+
+**Decision:** Routine low-risk, reversible changes do not require NORIZO to press merge or relay instructions.
+
+They may merge after required CI/checks and independent review. NORIZO remains the mandatory gate for high-risk, destructive, paid, security-sensitive, Production, DNS, secret/key, and major architecture-boundary changes.
+
+**Reason:** Requiring NORIZO for every merge recreates the human bottleneck the AI-team design is meant to remove.
