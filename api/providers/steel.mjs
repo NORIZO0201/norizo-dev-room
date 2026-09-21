@@ -29,6 +29,7 @@ function headers(apiKey) {
 
 export async function createSession(body = {}) {
   const c = cfg();
+  const mobile = body?.deviceConfig?.device === 'mobile';
   const r = await fetch(`${c.apiBase}/sessions`, {
     method: 'POST',
     headers: headers(c.apiKey),
@@ -41,10 +42,12 @@ export async function createSession(body = {}) {
   const text = await r.text();
   if (!r.ok) throw new Error(`Steel ${r.status}: ${text}`);
   const s = JSON.parse(text);
+  if (mobile) await configureMobile(s.id);
   return {
     id: s.id,
     debugUrl: s.debugUrl || s.sessionViewerUrl,
-    profileId: s.profileId || null
+    profileId: s.profileId || null,
+    mode: mobile ? 'mobile' : 'desktop'
   };
 }
 
@@ -99,11 +102,33 @@ async function withPage(sessionId, fn) {
   }
 }
 
+export async function configureMobile(id) {
+  return withPage(id, async page => {
+    const cdp = await page.context().newCDPSession(page);
+    await cdp.send('Emulation.setDeviceMetricsOverride', {
+      width: 393,
+      height: 852,
+      deviceScaleFactor: 3,
+      mobile: true,
+      screenWidth: 393,
+      screenHeight: 852,
+      positionX: 0,
+      positionY: 0
+    });
+    await cdp.send('Emulation.setTouchEmulationEnabled', {
+      enabled: true,
+      maxTouchPoints: 5
+    });
+    return true;
+  });
+}
+
 export async function getUrl(id) {
   return withPage(id, p => p.url());
 }
 
-export async function goto(id, url) {
+export async function goto(id, url, options = {}) {
+  if (options.mobile) await configureMobile(id);
   return withPage(id, async p => {
     await p.goto(url, { waitUntil: 'domcontentloaded', timeout: 45000 });
     return p.url();
@@ -125,6 +150,11 @@ export async function inspectPage(id) {
       brokenImages,
       hasVisibleContent: bodyText.length > 0 || document.body?.children?.length > 0,
       viewport: { width: innerWidth, height: innerHeight, dpr: devicePixelRatio },
+      screen: { width: screen.width, height: screen.height },
+      userAgent: navigator.userAgent,
+      touchPoints: navigator.maxTouchPoints || 0,
+      coarsePointer: matchMedia('(pointer: coarse)').matches,
+      mobileSignals: innerWidth <= 430 && (navigator.maxTouchPoints || 0) > 0,
       scroll: { x: scrollX, y: scrollY }
     };
   }));
