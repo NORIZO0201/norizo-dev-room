@@ -52,10 +52,18 @@ fi
 systemctl enable --now docker
 mkdir -p "$ROOT_DIR" "$ROOT_DIR/system"
 
-# DEV ROOM is public. Preserve local changes; never hard-reset the working copy.
+# DEV ROOM is public. Preserve local branches and work. Only fast-forward main
+# when the checkout is already clean and on main; otherwise leave it untouched
+# for the implementation agent to reconcile deliberately.
 if [ -d "$DEVROOM_DIR/.git" ]; then
-  git -C "$DEVROOM_DIR" fetch origin main
-  git -C "$DEVROOM_DIR" merge --ff-only origin/main
+  current_branch="$(git -C "$DEVROOM_DIR" symbolic-ref --quiet --short HEAD || true)"
+  dirty="$(git -C "$DEVROOM_DIR" status --porcelain)"
+  if [ "$current_branch" = "main" ] && [ -z "$dirty" ]; then
+    git -C "$DEVROOM_DIR" fetch origin main
+    git -C "$DEVROOM_DIR" merge --ff-only origin/main
+  else
+    echo "DEV ROOM checkout not auto-updated (branch=$current_branch, dirty=$([ -n "$dirty" ] && echo yes || echo no))."
+  fi
 else
   git clone --depth 1 https://github.com/NORIZO0201/norizo-dev-room.git "$DEVROOM_DIR"
 fi
