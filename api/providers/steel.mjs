@@ -2,6 +2,12 @@ import { chromium } from 'playwright-core';
 
 export const SESSION_MS = 840000;
 
+export const DEVICE_PROFILES = {
+  iphone: { width: 393, height: 852, dpr: 3, safeTop: 59, safeBottom: 34, label: 'iPhone class' },
+  android: { width: 412, height: 915, dpr: 2.625, safeTop: 24, safeBottom: 24, label: 'Android class' },
+  compact: { width: 375, height: 812, dpr: 3, safeTop: 44, safeBottom: 34, label: 'Compact iPhone class' }
+};
+
 function cfg() {
   const mode = process.env.BROWSER_PROVIDER || 'steel-cloud';
   const selfhost = mode === 'steel-selfhost';
@@ -102,16 +108,17 @@ async function withPage(sessionId, fn) {
   }
 }
 
-export async function configureMobile(id) {
+export async function configureMobile(id, profileName = 'iphone') {
+  const profile = DEVICE_PROFILES[profileName] || DEVICE_PROFILES.iphone;
   return withPage(id, async page => {
     const cdp = await page.context().newCDPSession(page);
     await cdp.send('Emulation.setDeviceMetricsOverride', {
-      width: 393,
-      height: 852,
-      deviceScaleFactor: 3,
+      width: profile.width,
+      height: profile.height,
+      deviceScaleFactor: profile.dpr,
       mobile: true,
-      screenWidth: 393,
-      screenHeight: 852,
+      screenWidth: profile.width,
+      screenHeight: profile.height,
       positionX: 0,
       positionY: 0
     });
@@ -119,7 +126,18 @@ export async function configureMobile(id) {
       enabled: true,
       maxTouchPoints: 5
     });
-    return true;
+    await cdp.send('Emulation.setSafeAreaInsetsOverride', {
+      insets: {
+        top: profile.safeTop,
+        bottom: profile.safeBottom,
+        left: 0,
+        right: 0
+      }
+    }).catch(() => {});
+    await cdp.send('Emulation.setEmulatedMedia', {
+      features: [{ name: 'display-mode', value: 'standalone' }]
+    }).catch(() => {});
+    return profile;
   });
 }
 
@@ -128,7 +146,7 @@ export async function getUrl(id) {
 }
 
 export async function goto(id, url, options = {}) {
-  if (options.mobile) await configureMobile(id);
+  if (options.mobile) await configureMobile(id, options.deviceProfile || 'iphone');
   return withPage(id, async p => {
     await p.goto(url, { waitUntil: 'domcontentloaded', timeout: 45000 });
     return p.url();
@@ -155,6 +173,7 @@ export async function inspectPage(id) {
       touchPoints: navigator.maxTouchPoints || 0,
       coarsePointer: matchMedia('(pointer: coarse)').matches,
       mobileSignals: innerWidth <= 430 && (navigator.maxTouchPoints || 0) > 0 && /(Mobile|Android|iPhone|iPad)/i.test(navigator.userAgent),
+      pwaStandalone: matchMedia('(display-mode: standalone)').matches,
       scroll: { x: scrollX, y: scrollY }
     };
   }));
