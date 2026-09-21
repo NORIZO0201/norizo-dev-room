@@ -9,9 +9,13 @@ export default async function handler(req, res) {
 
   try {
     const p = await getProvider();
-    const ids = [req.body?.pcId, req.body?.spId].filter(Boolean);
-    const urls = await Promise.all(ids.map(id => p.goto(id, url)));
-    return res.status(200).json({ ok: true, provider: p.info().provider, urls });
+    const pcId = req.body?.pcId;
+    const spId = req.body?.spId;
+    const [pcUrl, spUrl] = await Promise.all([
+      pcId ? p.goto(pcId, url) : Promise.resolve(null),
+      spId ? p.goto(spId, url, { mobile: true }) : Promise.resolve(null)
+    ]);
+    return res.status(200).json({ ok: true, provider: p.info().provider, pcUrl, spUrl });
   } catch (e) {
     return res.status(500).json({ error: e?.message || String(e) });
   }
