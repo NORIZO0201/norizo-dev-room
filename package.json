@@ -5,10 +5,12 @@
   "scripts": {
     "dev": "vercel dev",
     "qa:state": "node scripts/validate-phase-state.mjs",
+    "qa:workers": "node scripts/validate-worker-state.mjs",
     "qa:browser:managed": "node qa/browser-qa.mjs",
     "qa:browser:local": "node qa/browser-qa-local.mjs",
     "qa:p3:contract": "node qa/selftest.mjs",
-    "qa:p3:chromium": "node qa/chromium-selftest.mjs"
+    "qa:p3:chromium": "node qa/chromium-selftest.mjs",
+    "qa:p4:workers": "node qa/worker-state-selftest.mjs"
   },
   "dependencies": {
     "playwright-core": "^1.63.0"
