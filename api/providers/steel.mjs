@@ -148,6 +148,7 @@ export async function getUrl(id) {
 export async function goto(id, url, options = {}) {
   if (options.mobile) await configureMobile(id, options.deviceProfile || 'iphone');
   return withPage(id, async p => {
+    if (options.extraHTTPHeaders) await p.setExtraHTTPHeaders(options.extraHTTPHeaders);
     await p.goto(url, { waitUntil: 'domcontentloaded', timeout: 45000 });
     return p.url();
   });
