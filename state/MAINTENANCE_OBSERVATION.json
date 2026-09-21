@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "mode": "maintenance",
+  "observed_at": "2026-09-21T16:10:00Z",
+  "foundation_status": "PASS",
+  "operations": {
+    "conoha_touched": false,
+    "preview_deploy_created_by_this_run": false,
+    "production_deploy_created_by_this_run": false,
+    "cost_profile": "low-cost/read-mostly",
+    "allowlisted_only": true
+  },
+  "projects": {
+    "SAYAKA": {
+      "github_main_sha": "c0e087f2cc1cf74cd9e0b30ff51c37f9d7eb7bf8",
+      "supabase_status": "ACTIVE_HEALTHY",
+      "vercel_runtime_errors_1h": 0,
+      "deployment_boundary": "NO_AUTOMATIC_ACTION"
+    },
+    "CNW": {
+      "github_main_sha": "1140ccf60b676c7c10acd95dd9107bbe24776f69",
+      "supabase_status": "ACTIVE_HEALTHY",
+      "vercel_runtime_errors_1h": 0,
+      "production_sha": "24336a8fd84c5d64a1fbfb0ca47831eecb4f5eef",
+      "source_ahead_of_production": true,
+      "deployment_boundary": "AWAITING_EXPLICIT_NORIZO_APPROVAL",
+      "nonproduction_deployments_observed": [
+        {"id": "dpl_7CTcUbF8ZRduskmN4St487QZ4nT4", "state": "READY", "branch": "seo/wineries-owner-surface-20260922"},
+        {"id": "dpl_ANt44bi3sMQewKnku8o7CXAmaRUk", "state": "ERROR", "branch": "seo/wineries-owner-surface-20260922"},
+        {"id": "dpl_43HuRm55oHchgU62NGGeVLWtsNzt", "state": "ERROR", "branch": "seo/wineries-owner-surface-20260922"}
+      ],
+      "nonproduction_deployments_created_by_this_run": false
+    },
+    "OMNW": {
+      "github_main_sha": "1a926caace6fe12621966a52e9593f6f721c68ba",
+      "consumer_branch": "agent/recognition-core-m0-m4",
+      "consumer_branch_sha": "fef80993180dbb7e48e44fe5d009b9d9a740dfa4",
+      "consumer_milestone_observed": "M3",
+      "supabase_status": "ACTIVE_HEALTHY",
+      "vercel_runtime_errors_1h": 0,
+      "deployment_boundary": "NONE",
+      "consumer_branch_vercel_deployments": "CANCELED_BY_POLICY"
+    },
+    "OTHER_NIHON_WINE_JP": {
+      "github_main_sha": "c235c76d03ed505899ac4cb9f93f5ed4dd50c19f",
+      "supabase_status": "ACTIVE_HEALTHY",
+      "vercel_runtime_errors_1h": 0,
+      "deployment_boundary": "PROJECT_SPECIFIC_FOLLOW_UP"
+    }
+  },
+  "omnw_boundary_audit": {
+    "harvest_surfaces": 0,
+    "consumer_discovery_foreign_keys": 0,
+    "recognition_image_index_exists": true,
+    "retired_harvest_absent": true,
+    "discovery_consumer_separate": true
+  },
+  "public_evidence": {
+    "nihonwine_jp_homepage_observed": true,
+    "nihonwine_jp_latest_news_date_observed": "2026-09-21",
+    "dev_room_vercel_production_state": "READY",
+    "dev_room_vercel_runtime_errors_1h": 0,
+    "note": "CNW and SAYAKA public-domain fetches were not available through the generic web fetch path during this observation; Vercel deployment/runtime evidence was used instead."
+  }
+}
