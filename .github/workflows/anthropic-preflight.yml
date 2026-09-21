@@ -20,7 +20,7 @@ jobs:
           if (!key) { console.log('PREFLIGHT MISSING_SECRET'); process.exit(1); }
           const req = https.request('https://api.anthropic.com/v1/models?limit=1000', {
             method: 'GET', timeout: 20000,
-            headers: {'x-api-key': key, 'anthropic-version': '2023-06-01'}
+            headers: {'x-api-key': key, 'anthropic-version': '2023-06-01', 'anthropic-workspace-id': 'wrkspc_01HQY7Hxp141tuLdxZF3Dig8'}
           }, res => {
             let raw = '';
             res.on('data', chunk => { raw += chunk; if (raw.length > 1000000) req.destroy(); });
