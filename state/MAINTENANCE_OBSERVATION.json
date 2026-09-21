@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "mode": "maintenance",
-  "observed_at": "2026-09-21T16:10:00Z",
+  "observed_at": "2026-09-21T17:06:30Z",
   "foundation_status": "PASS",
   "operations": {
     "conoha_touched": false,
@@ -18,24 +18,24 @@
       "deployment_boundary": "NO_AUTOMATIC_ACTION"
     },
     "CNW": {
-      "github_main_sha": "1140ccf60b676c7c10acd95dd9107bbe24776f69",
+      "github_main_sha": "c7a7d7289cf4c418856990349d50fb66033eaab2",
       "supabase_status": "ACTIVE_HEALTHY",
       "vercel_runtime_errors_1h": 0,
       "production_sha": "24336a8fd84c5d64a1fbfb0ca47831eecb4f5eef",
       "source_ahead_of_production": true,
       "deployment_boundary": "AWAITING_EXPLICIT_NORIZO_APPROVAL",
       "nonproduction_deployments_observed": [
-        {"id": "dpl_7CTcUbF8ZRduskmN4St487QZ4nT4", "state": "READY", "branch": "seo/wineries-owner-surface-20260922"},
-        {"id": "dpl_ANt44bi3sMQewKnku8o7CXAmaRUk", "state": "ERROR", "branch": "seo/wineries-owner-surface-20260922"},
-        {"id": "dpl_43HuRm55oHchgU62NGGeVLWtsNzt", "state": "ERROR", "branch": "seo/wineries-owner-surface-20260922"}
+        {"id": "dpl_3k9Ac9Sg8PcxaJAEuFgkSrxLuEoJ", "state": "READY", "branch": "seo/catalog-eligibility-20260922"},
+        {"id": "dpl_JTCSziSBpJhLrM6oH1QvzpGshnxZ", "state": "READY", "branch": "seo/catalog-eligibility-20260922"},
+        {"id": "dpl_7CTcUbF8ZRduskmN4St487QZ4nT4", "state": "READY", "branch": "seo/wineries-owner-surface-20260922"}
       ],
       "nonproduction_deployments_created_by_this_run": false
     },
     "OMNW": {
       "github_main_sha": "1a926caace6fe12621966a52e9593f6f721c68ba",
       "consumer_branch": "agent/recognition-core-m0-m4",
-      "consumer_branch_sha": "fef80993180dbb7e48e44fe5d009b9d9a740dfa4",
-      "consumer_milestone_observed": "M3",
+      "consumer_branch_sha": "a6911de80df7f7851562b741580cc91f9a61c4b7",
+      "consumer_milestone_observed": "M4",
       "supabase_status": "ACTIVE_HEALTHY",
       "vercel_runtime_errors_1h": 0,
       "deployment_boundary": "NONE",
@@ -60,6 +60,8 @@
     "nihonwine_jp_latest_news_date_observed": "2026-09-21",
     "dev_room_vercel_production_state": "READY",
     "dev_room_vercel_runtime_errors_1h": 0,
-    "note": "CNW and SAYAKA public-domain fetches were not available through the generic web fetch path during this observation; Vercel deployment/runtime evidence was used instead."
+    "cnw_public_fetch": "UNAVAILABLE_FROM_GENERIC_WEB",
+    "sayaka_public_fetch": "UNAVAILABLE_FROM_GENERIC_WEB",
+    "note": "NIHON WINE.JP was directly observed with 2026-09-21 NEWS. CNW and SAYAKA public-domain fetches remained unavailable through the generic web fetch path; current Vercel deployment/runtime evidence was used instead."
   }
 }
