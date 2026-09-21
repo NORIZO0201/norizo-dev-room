@@ -15,7 +15,6 @@ for required in "$SRC/norizo-p1-p5.service" "$SRC/norizo-p1-p5.timer" "$WRAPPER"
   [ -f "$required" ] || { echo "Missing required file: $required" >&2; exit 75; }
 done
 
-chmod 0755 "$WRAPPER" "$EXECUTOR"
 install -d -m 0755 "${NORIZO_LOG_DIR:-/var/log/norizo}"
 install -m 0644 "$SRC/norizo-p1-p5.service" /etc/systemd/system/norizo-p1-p5.service
 install -m 0644 "$SRC/norizo-p1-p5.timer" /etc/systemd/system/norizo-p1-p5.timer

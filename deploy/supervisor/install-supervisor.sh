@@ -9,7 +9,6 @@ for f in recovery_supervisor.py desired-state.json norizo-supervisor.service nor
 install -d -m 0755 "$LOG_DIR" /opt/norizo/system
 install -d -m 0700 /etc/norizo
 install -m 0644 "$SRC/desired-state.json" "$CONFIG_DST"
-chmod 0755 "$SRC/recovery_supervisor.py"
 install -m 0644 "$SRC/norizo-supervisor.service" /etc/systemd/system/norizo-supervisor.service
 install -m 0644 "$SRC/norizo-supervisor.timer" /etc/systemd/system/norizo-supervisor.timer
 systemctl daemon-reload
