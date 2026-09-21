@@ -28,53 +28,26 @@ jobs:
       - name: Python syntax
         run: |
           python3 -m py_compile deploy/health/health_server.py
-          python3 -m py_compile deploy/control-plane/telemetry_agent.py
-          python3 -m py_compile deploy/supervisor/recovery_supervisor.py
           python3 -m py_compile scripts/write-baseline.py
-          python3 -m json.tool deploy/supervisor/desired-state.json > /dev/null
 
       - name: Bash syntax
         run: |
           bash -n deploy/health/install-health-monitor.sh
-          bash -n deploy/control-plane/install-control-agent.sh
-          bash -n deploy/supervisor/install-supervisor.sh
-          bash -n deploy/executor/install-p1-p5-timer.sh
-          bash -n scripts/bootstrap-conoha.sh
-          bash -n scripts/p0-converge.sh
-          bash -n scripts/run-p1-p5-executor.sh
-          bash -n scripts/execute-p1-p5.sh
+          bash -n scripts/setup-conoha-batch-host.sh
 
       - name: ShellCheck
         run: |
           shellcheck deploy/health/install-health-monitor.sh
-          shellcheck deploy/control-plane/install-control-agent.sh
-          shellcheck deploy/supervisor/install-supervisor.sh
-          shellcheck deploy/executor/install-p1-p5-timer.sh
-          shellcheck scripts/bootstrap-conoha.sh
-          shellcheck scripts/p0-converge.sh
-          shellcheck scripts/run-p1-p5-executor.sh
-          shellcheck scripts/execute-p1-p5.sh
+          shellcheck scripts/setup-conoha-batch-host.sh
 
       - name: systemd unit syntax
         run: |
           systemd-analyze verify deploy/health/norizo-health.service
-          systemd-analyze verify deploy/control-plane/norizo-control-agent.service
-          systemd-analyze verify deploy/supervisor/norizo-supervisor.service
-          systemd-analyze verify deploy/supervisor/norizo-supervisor.timer
-          systemd-analyze verify deploy/executor/norizo-p1-p5.service
-          systemd-analyze verify deploy/executor/norizo-p1-p5.timer
 
-      - name: Safety invariants
+      - name: Policy guard
         run: |
-          if grep -nE '"(stop|disable|mask|unmask)"' deploy/supervisor/recovery_supervisor.py; then
-            echo "Supervisor must never stop/disable/mask/unmask units." >&2
-            exit 1
-          fi
-          if grep -n 'Requires=norizo-health.service' deploy/workers/omnw-worker@.service.template; then
-            echo "OMNW workers must not be stop-coupled to health." >&2
-            exit 1
-          fi
-          if grep -n 'ALLOWED_STOP_UNITS=.*norizo-health.service' deploy/control-plane/telemetry_agent.py; then
-            echo "Health must not be remotely stoppable." >&2
+          if grep -RInE '@claude|@codex|claude-code-action|gemini-cli|norizo-claude-orchestrator|norizo-control-agent|norizo-p1-p5|norizo-supervisor' \
+            --exclude-dir=.git .github deploy scripts; then
+            echo "Retired AI dispatch/control-plane artifact detected." >&2
             exit 1
           fi
