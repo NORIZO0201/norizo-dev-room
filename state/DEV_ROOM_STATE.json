@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-09-21T14:30:00Z",
-  "current_phase": "P4",
+  "updated_at": "2026-09-21T14:42:00Z",
+  "current_phase": "P5",
   "maintenance_mode": false,
   "retired_infrastructure": {
     "conoha": {
@@ -64,17 +64,22 @@
     },
     "P4": {
       "name": "Reusable project workers / observation contracts",
-      "status": "in_progress",
+      "status": "complete",
       "requirements": {
-        "provider_neutral_checkpoint": false,
-        "provider_neutral_heartbeat": false,
-        "relis_reuse_proven": false
+        "provider_neutral_checkpoint": true,
+        "provider_neutral_heartbeat": true,
+        "relis_reuse_proven": true
       },
-      "evidence": []
+      "evidence": [
+        "docs/evidence/2026-09-21-P4-COMPLETE.md",
+        "commit:fc24038b6699c8b2500eafbca9aaf1f844ba45c2",
+        "contract:contracts/worker-state-contract.json",
+        "selftest:qa/worker-state-selftest.mjs"
+      ]
     },
     "P5": {
       "name": "Deterministic project batch/QA gates + handoff state",
-      "status": "pending",
+      "status": "in_progress",
       "requirements": {
         "sayaka_gate": false,
         "cnw_gate": false,
