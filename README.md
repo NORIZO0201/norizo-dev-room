@@ -11,8 +11,8 @@ ChatGPT / Chatty
    ├─ GitHub        code / state / evidence
    ├─ Supabase      project data/backends
    ├─ Browser Provider
-   │    ├─ steel-cloud or other available managed provider
-   │    └─ playwright-compatible reachable provider when already available
+   │    ├─ local Chrome/Chromium via CDP (default zero-extra-cost path)
+   │    └─ steel-cloud managed browser when an account key is already available
    ├─ Vercel        hosting under approval rules
    └─ project APIs  Shopify / other allowlisted services
 ```
@@ -32,18 +32,25 @@ Execution order is fixed:
 4. P4 reusable project workers / observation contracts
 5. P5 deterministic project batch/QA gates + handoff state
 
-## Browser Provider architecture
+## Browser QA architecture
 
-All browser-facing DEV ROOM APIs route through `api/providers/index.mjs`; the UI must not hard-code a VPS.
+P3 has two provider paths and neither requires a VPS:
 
-Current usable modes are provider-dependent. Prefer managed tooling already available to the account, keep sessions on-demand, and collect evidence only as needed.
+- `npm run qa:browser:local -- <config>` uses an installed Chrome/Chromium through the DevTools Protocol. Set `BROWSER_EXECUTABLE` only when browser auto-discovery is insufficient.
+- `npm run qa:browser:managed -- <config>` uses Steel when `STEEL_API_KEY` is already available.
+
+Shared assertions live in `qa/browser-qa-core.mjs`. Both paths emit JSON evidence and screenshots under `artifacts/browser-qa/` by default.
 
 Required P3 coverage:
 - PC and SP/mobile responsive checks
 - navigation / critical route checks
 - console and runtime errors
-- screenshots or equivalent visual evidence
-- regression verification
+- screenshots / visual evidence with SHA-256
+- regression verification through baseline title, selector, document-width, and screenshot-hash checks
+
+Deterministic verification:
+- `npm run qa:p3:contract` validates assertion and regression logic without starting a browser.
+- `npm run qa:p3:chromium` runs a real PC/SP Chrome/Chromium fixture and proves viewport emulation, DOM checks, runtime cleanliness, and screenshot evidence.
 
 ## Deployment policy
 
@@ -57,6 +64,7 @@ Do not create a Preview merely because a small change was made. Group local chan
 
 - Never commit secrets or tokens.
 - Keep browser viewer/debug URLs private.
+- Prefer the local Chromium path when it is sufficient.
 - Start paid browser sessions only when needed and stop them promptly.
 - Prefer structured APIs over browser automation for data collection.
 - Do not add a paid service or material new spend without explicit approval.
