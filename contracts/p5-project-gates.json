@@ -51,11 +51,12 @@
       "data_boundary": "craft-nihon-wine Supabase only",
       "proof": [
         "GitHub package.json defines TypeScript lint, node:test suite, and Next build",
-        "Vercel observed READY non-production deployments for the NextThree slug fix branch",
-        "GitHub main components/product/NextThree.tsx uses the Unicode slug directly instead of pre-encoding it",
+        "Vercel observed READY non-production deployments for the NextThree and malformed-route guard fixes",
+        "GitHub main components/product/NextThree.tsx and app/favorites/FavoritesClient.tsx use Unicode wine slugs directly instead of pre-encoding Next Link routes",
+        "GitHub main proxy.ts rejects malformed percent wine paths before the dynamic-route decoder",
         "Supabase craft-nihon-wine project was ACTIVE_HEALTHY"
       ],
-      "production_note": "Current production is intentionally outside the PASS gate. It remains on an older deployment and recent production logs include failed-to-decode-param errors. Promotion of the current fix requires explicit NORIZO approval."
+      "production_note": "Production was promoted once at dpl_DDYosa76kNfAaKXJSKR7aoqjBzrc / 24336a8fd84c5d64a1fbfb0ca47831eecb4f5eef, but that deployment still logged failed-to-decode-param 500s on /wines/[slug]. Additional source remediation is now ahead of Production on main. Any further Production promotion requires explicit NORIZO approval."
     },
     {
       "id": "OMNW",
