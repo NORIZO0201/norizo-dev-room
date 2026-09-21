@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "name": "NORIZO DEV ROOM provider-neutral worker state contract",
+  "purpose": "Reusable checkpoint and heartbeat convention for RELIS, OMNW, CNW, SAYAKA and other project workers without binding state to a hosting provider.",
+  "required_top_level": [
+    "schema_version",
+    "project",
+    "worker",
+    "execution",
+    "checkpoint",
+    "heartbeat",
+    "safety"
+  ],
+  "execution": {
+    "required": ["provider", "mode", "requires_vps"],
+    "allowed_modes": ["manual", "scheduled", "condition_watch", "batch", "continuous_external"]
+  },
+  "checkpoint": {
+    "required": [
+      "version",
+      "sequence",
+      "cursor",
+      "watermark",
+      "last_success_at",
+      "input_fingerprint",
+      "output_fingerprint"
+    ],
+    "semantics": {
+      "sequence": "Monotonic integer advanced only after a durable successful checkpoint.",
+      "cursor": "Provider-neutral resume token or logical cursor; null before first durable progress.",
+      "watermark": "Source-domain watermark such as updated_at, source ID, page token, or batch boundary.",
+      "last_success_at": "ISO-8601 timestamp of the last completed durable unit.",
+      "input_fingerprint": "Optional deterministic fingerprint of input scope used to detect drift.",
+      "output_fingerprint": "Optional deterministic fingerprint of durable output used for handoff verification."
+    }
+  },
+  "heartbeat": {
+    "required": ["status", "observed_at", "last_success_at", "consecutive_failures", "run_id", "detail"],
+    "allowed_statuses": ["ready", "running", "healthy", "degraded", "blocked", "stopped", "maintenance"],
+    "semantics": {
+      "observed_at": "ISO-8601 timestamp of the latest observation.",
+      "last_success_at": "ISO-8601 timestamp or null when no successful run has occurred.",
+      "consecutive_failures": "Non-negative integer reset to zero after success.",
+      "run_id": "Provider-neutral run identifier; may be null when idle.",
+      "detail": "Short operational note with no secrets."
+    }
+  },
+  "safety": {
+    "required": ["idempotent", "conoha_dependency", "allowed_mutations", "max_side_effects_per_run"],
+    "rules": [
+      "conoha_dependency must always be false",
+      "allowed_mutations is an explicit allowlist",
+      "max_side_effects_per_run is a non-negative integer or null when the worker is read-only",
+      "state files must contain no secrets"
+    ]
+  }
+}
