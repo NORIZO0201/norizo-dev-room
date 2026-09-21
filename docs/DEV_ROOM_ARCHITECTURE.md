@@ -4,24 +4,22 @@ Updated: 2026-09-21 JST
 
 ## Purpose
 
-DEV ROOM is NORIZO LAB's development and operations surface.
+DEV ROOM is NORIZO LAB's development and operations foundation for PC/SP work, browser QA, OMNW, RELIS, SAYAKA, CNW, and other projects.
 
-Chatty is the command origin. DEV ROOM provides browser QA, resident-job visibility, and project status. It is not an AI-to-AI coordination system.
+Chatty is the command origin. DEV ROOM provides canonical phase state, deterministic checks, browser QA, observation contracts, and handoff evidence. It is not an AI-to-AI coordination system and has no VPS dependency.
 
 ## Roles
 
 | Component | Role |
 | --- | --- |
-| NORIZO | Owner / final approval for high-risk decisions |
+| NORIZO | Owner / final approval for Production and other high-risk decisions |
 | ChatGPT / Chatty | Single normal command origin, planning, QA, direct service operations |
-| GitHub | Code, docs, diffs, history, audit only |
-| ConoHa VPS | Deterministic resident jobs and Steel self-host |
-| Steel self-host | PC/SP browser development and QA base |
+| GitHub | Code, docs, diffs, phase state, history, audit only |
 | Supabase | Project data/backends where required |
-| Vercel | App hosting / Preview / Production under deployment rules |
+| Vercel | App hosting; Preview only on explicit request; Production only after approval |
+| Managed browser/provider tooling | PC/SP browser development and QA |
 | Shopify | CWS commerce system |
-| Claude Code / Codex | Optional bounded specialist tools only |
-| Gemini | Optional research/search/review tool only |
+| Claude Code / Codex / Gemini | Optional bounded specialist tools only |
 
 ## Architecture
 
@@ -29,41 +27,45 @@ Chatty is the command origin. DEV ROOM provides browser QA, resident-job visibil
 NORIZO
    ↓
 ChatGPT / Chatty
-   ├─ GitHub      code / docs / history
-   ├─ ConoHa
-   │    ├─ resident batch A
-   │    ├─ resident batch B
-   │    ├─ health / logs
-   │    └─ Steel self-host
-   │          ├─ PC QA
-   │          └─ SP QA
+   ├─ GitHub
+   │    ├─ code / docs
+   │    ├─ state/DEV_ROOM_STATE.json
+   │    └─ docs/evidence/
    ├─ Supabase
+   ├─ managed browser/provider tooling
    ├─ Vercel
-   └─ Shopify
+   └─ Shopify / project APIs
 ```
 
-## Resident workload policy
+ConoHa/VPS is intentionally absent. DEV ROOM phases P1–P5 must remain usable without it.
 
-Do not create a generic autonomous factory.
+## P1–P5 contracts
 
-For each heavy job:
-1. prove the one-shot job
-2. define checkpoint/idempotency
-3. move that job to ConoHa
-4. add only the scheduler/service it needs
-5. verify logs, restart and failure behavior
-6. then consider the next job
+### P1 — Control Room / health / canonical state
+- Canonical state is machine-readable and versioned.
+- Health means repository state, connected-service state, and deterministic checks; it does not mean a resident VPS daemon.
+- Completion evidence is persisted and resumable.
 
-## Browser QA policy
+### P2 — OMNW separation
+- Discovery/Master are backend/data-engine concerns.
+- Consumer development is a separate surface and must not mutate Discovery data merely to support UI development.
+- The retired Harvest pipeline must remain absent.
 
-Steel self-host is the default browser base for PC/SP development where browser execution is required.
+### P3 — Browser QA
+The reusable QA gate must cover:
+- PC and SP/mobile viewport checks
+- navigation / critical route checks
+- console/runtime errors
+- screenshots or equivalent visual evidence
+- regression re-checks
 
-- PC viewport and SP/mobile fingerprint are separate QA sessions/profiles.
-- Prefer structured APIs over browser automation for data collection.
-- Keep 9223 private.
-- Use Steel Cloud only if a managed capability is specifically required and approved.
+Use already-available managed browser/provider tooling. Do not introduce a VPS dependency.
 
-Steel Local/self-host supports one concurrent session according to current official documentation, so routine PC/SP QA should run sequentially unless a later need justifies another provider.
+### P4 — Reusable project observation
+RELIS and similar projects reuse the same checkpoint / heartbeat / observation vocabulary. The contract is provider-neutral and must not assume systemd, a fixed host, or ConoHa.
+
+### P5 — Deterministic QA/batch handoff
+SAYAKA, CNW, OMNW, and other projects receive deterministic gates with explicit PASS / FAIL / PASS-NOT-REQUIRED outcomes plus handoff evidence.
 
 ## GitHub policy
 
@@ -80,8 +82,8 @@ Do not restore:
 
 Vercel:
 
-Local/ConoHa QA → Preview only when NORIZO asks → NORIZO confirmation → Production.
+Local/tooling QA → Preview only when NORIZO asks → NORIZO confirmation → Production.
 
 ## Safety
 
-High-risk, Production, destructive, paid, DNS, secret/key, or VPS-rebuild operations require NORIZO approval.
+High-risk, Production, destructive, paid, DNS, or secret/key operations require NORIZO approval. ConoHa must not be inspected, started, rebuilt, or recreated.
