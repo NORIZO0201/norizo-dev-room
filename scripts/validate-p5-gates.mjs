@@ -13,8 +13,8 @@ export function validateP5({ contract, handoff, state }) {
   if (contract?.schema_version !== 1 || contract?.phase !== 'P5') errors.push('invalid P5 contract identity');
   if (contract?.scope !== 'development_foundation') errors.push('P5 scope must be development_foundation');
   if (contract?.policy?.conoha_dependency !== false) errors.push('P5 must not depend on ConoHa');
-  if (contract?.policy?.vercel_preview_requires_explicit_norizo_request !== true) {
-    errors.push('Preview must require explicit NORIZO request');
+  if (contract?.policy?.vercel_preview_requires_explicit_norizo_request !== false || contract?.policy?.preview_is_default_development_surface !== true) {
+    errors.push('Preview must be the default development surface');
   }
   if (contract?.policy?.production_deploy_requires_explicit_norizo_approval !== true) {
     errors.push('Production must require explicit NORIZO approval');
@@ -54,8 +54,8 @@ export function validateP5({ contract, handoff, state }) {
 
   if (handoff?.schema_version !== 1 || handoff?.phase !== 'P5') errors.push('invalid P5 handoff identity');
   if (handoff?.foundation_status !== 'PASS') errors.push('handoff foundation_status must be PASS');
-  if (handoff?.deployment_policy?.preview_without_explicit_norizo_request !== false) {
-    errors.push('handoff must forbid unrequested Preview');
+  if (handoff?.deployment_policy?.preview_without_explicit_norizo_request !== true || handoff?.deployment_policy?.preview_is_default_development_surface !== true) {
+    errors.push('handoff must enable Preview-first development');
   }
   if (handoff?.deployment_policy?.production_without_explicit_norizo_approval !== false) {
     errors.push('handoff must forbid unapproved Production');
