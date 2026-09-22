@@ -1,7 +1,9 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "git": {
-    "deploymentEnabled": true
+    "deploymentEnabled": {
+      "main": false
+    }
   },
   "functions": {
     "api/*.mjs": {
@@ -12,18 +14,9 @@
     {
       "source": "/(.*)",
       "headers": [
-        {
-          "key": "Referrer-Policy",
-          "value": "no-referrer"
-        },
-        {
-          "key": "Cache-Control",
-          "value": "no-store"
-        },
-        {
-          "key": "X-Content-Type-Options",
-          "value": "nosniff"
-        }
+        {"key": "Referrer-Policy", "value": "no-referrer"},
+        {"key": "Cache-Control", "value": "no-store"},
+        {"key": "X-Content-Type-Options", "value": "nosniff"}
       ]
     }
   ]
