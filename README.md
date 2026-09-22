@@ -56,9 +56,9 @@ Deterministic verification:
 
 Vercel operations follow:
 
-**Local/tooling QA → Preview only when NORIZO asks → NORIZO confirmation → Production**
+**GitHub development branch update → Preview → DEV ROOM → automated Visual QA → NORIZO confirmation → Production**
 
-Do not create a Preview merely because a small change was made. Group local changes into review sets.
+Preview is the normal shared development surface. Production remains blocked until explicit NORIZO approval. See `docs/PREVIEW_FIRST_WORKFLOW.md`.
 
 ## Security and cost
 
