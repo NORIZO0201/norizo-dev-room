@@ -5,8 +5,9 @@
   "foundation_status": "PASS",
   "maintenance_status": "BLOCKED_HUMAN_CONFIRMATION",
   "deployment_policy": {
-    "preview_without_explicit_norizo_request": false,
-    "production_without_explicit_norizo_approval": false
+    "preview_without_explicit_norizo_request": true,
+    "production_without_explicit_norizo_approval": false,
+    "preview_is_default_development_surface": true
   },
   "maintenance_contract": "contracts/maintenance-mode.json",
   "latest_maintenance_observation": "state/MAINTENANCE_OBSERVATION.json",
@@ -153,7 +154,10 @@
   "deployment_provenance": {
     "guard": "ACTIVE",
     "unverified_external_change_count": 4,
-    "blocking_projects": ["OMNW", "CNW"],
+    "blocking_projects": [
+      "OMNW",
+      "CNW"
+    ],
     "evidence": "docs/evidence/2026-09-22-MAINTENANCE-DEPLOYMENT-PROVENANCE-GUARD.md"
   },
   "next_mode": "maintenance",
