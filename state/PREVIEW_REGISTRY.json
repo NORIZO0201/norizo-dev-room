@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "updated_at": "2026-09-22T00:00:00Z",
+  "policy": "branch_preview_devroom_visual_qa_human_confirm_production",
+  "services": {
+    "OMNW": {
+      "platform": "vercel",
+      "project_id": "prj_9snNz2zJOdB3a8M2bED1ObBsAOx1",
+      "repository": "NORIZO0201/oh-my-nihon-wine",
+      "production_url": "https://oh-my-nihon-wine.jp",
+      "preview_url": null,
+      "preview_deployment_id": null
+    },
+    "NIHON_WINE_JP": {
+      "platform": "vercel",
+      "project_id": "prj_734SjshXMER0GP6TO7UlWv3kFzgk",
+      "repository": "NORIZO0201/nihonwine-rebuild",
+      "production_url": "https://nihonwine.jp",
+      "preview_url": null,
+      "preview_deployment_id": null
+    },
+    "CNW": {
+      "platform": "vercel",
+      "project_id": "prj_N53JT0kTA4ZSb1aE2mtCa1VYwKqs",
+      "repository": "NORIZO0201/craft-nihon-wine",
+      "production_url": "https://craft-nihon-wine.jp",
+      "preview_url": null,
+      "preview_deployment_id": null
+    },
+    "DIS": {
+      "platform": "vercel",
+      "project_id": "prj_DNzyK1UdsSPa6eWmmWFC6it4cSzZ",
+      "repository": "NORIZO0201/nihon-wine-dis",
+      "production_url": "https://dis.nihonwine.jp",
+      "preview_url": null,
+      "preview_deployment_id": null
+    },
+    "SAYAKA": {
+      "platform": "vercel",
+      "project_id": "prj_dyzaf3YTcJV66yDdvLx1YWozV1F8",
+      "repository": "NORIZO0201/sayaka-kitchen",
+      "production_url": "https://sayaka-kitchen.com",
+      "preview_url": null,
+      "preview_deployment_id": null
+    },
+    "NIHON_CHEESE": {
+      "platform": "vercel",
+      "project_id": "prj_ZZz7j8OUQFtq2QTTTzbMXC5Jn7qp",
+      "repository": "NORIZO0201/nihoncheese-jp",
+      "production_url": "https://nihoncheese.jp",
+      "preview_url": null,
+      "preview_deployment_id": null
+    },
+    "CSLS": {
+      "platform": "vercel",
+      "project_id": "prj_gQyKviuRypWZpcoqzyUjoJAvJMlR",
+      "repository": "NORIZO0201/cws-order-form",
+      "production_url": null,
+      "preview_url": null,
+      "preview_deployment_id": null
+    },
+    "VDOR": {
+      "platform": "vercel",
+      "project_id": "prj_XDudpLGvWLlKD0jfgMpA6mt4xma5",
+      "repository": "NORIZO0201/vdor-2027",
+      "production_url": null,
+      "preview_url": null,
+      "preview_deployment_id": null
+    },
+    "DEV_ROOM": {
+      "platform": "vercel",
+      "project_id": "prj_UuFiLqox2QHOKtGOR6NWREH92af6",
+      "repository": "NORIZO0201/norizo-dev-room",
+      "production_url": null,
+      "preview_url": null,
+      "preview_deployment_id": null
+    },
+    "CWS": {
+      "platform": "shopify",
+      "repository": "NORIZO0201/cws-shopify-theme",
+      "production_url": "https://craftwineshop.com",
+      "preview_url": null,
+      "preview_deployment_id": null
+    }
+  }
+}
