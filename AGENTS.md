@@ -45,11 +45,10 @@ Every phase completion must include exact evidence paths/identifiers so the next
 
 ## Deployment safety
 Vercel flow:
-Local/tooling QA → Preview only when NORIZO asks → NORIZO confirmation → Production.
+GitHub development branch update → Preview → DEV ROOM → automated Visual QA → NORIZO confirmation → Production.
 
 Explicit NORIZO approval is required for:
 - Production deployment
-- Vercel Preview creation when NORIZO has not asked to see it
 - destructive data deletion
 - DNS changes
 - secret/key rotation
