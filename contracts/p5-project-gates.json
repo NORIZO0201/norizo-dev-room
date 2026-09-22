@@ -4,10 +4,16 @@
   "scope": "development_foundation",
   "policy": {
     "conoha_dependency": false,
-    "vercel_preview_requires_explicit_norizo_request": true,
+    "vercel_preview_requires_explicit_norizo_request": false,
     "production_deploy_requires_explicit_norizo_approval": true,
-    "gate_statuses": ["PASS", "FAIL", "BLOCKED", "PASS-NOT-REQUIRED"],
-    "rule": "P5 proves deterministic development and QA gates plus handoff state. Production promotion is a separate approval boundary and is never implied by a PASS development gate."
+    "gate_statuses": [
+      "PASS",
+      "FAIL",
+      "BLOCKED",
+      "PASS-NOT-REQUIRED"
+    ],
+    "rule": "P5 proves deterministic development and QA gates plus handoff state. Preview is the normal shared development surface; Production promotion is a separate approval boundary and is never implied by a PASS development gate.",
+    "preview_is_default_development_surface": true
   },
   "projects": [
     {
@@ -22,7 +28,10 @@
       ],
       "browser_qa": {
         "contract": "P3",
-        "profiles": ["pc", "sp"],
+        "profiles": [
+          "pc",
+          "sp"
+        ],
         "required": true
       },
       "data_boundary": "sayaka-kitchen Supabase only",
@@ -45,7 +54,10 @@
       ],
       "browser_qa": {
         "contract": "P3",
-        "profiles": ["pc", "sp"],
+        "profiles": [
+          "pc",
+          "sp"
+        ],
         "required": true
       },
       "data_boundary": "craft-nihon-wine Supabase only",
@@ -71,7 +83,10 @@
       ],
       "browser_qa": {
         "contract": "P3",
-        "profiles": ["pc", "sp"],
+        "profiles": [
+          "pc",
+          "sp"
+        ],
         "required": true
       },
       "data_boundary": "contracts/omnw-boundary.json; Discovery/Master is isolated from Consumer and retired Harvest is forbidden",
@@ -90,7 +105,10 @@
       "deterministic_commands": [],
       "browser_qa": {
         "contract": "P3",
-        "profiles": ["pc", "sp"],
+        "profiles": [
+          "pc",
+          "sp"
+        ],
         "required": false
       },
       "data_boundary": "nihon-wine-jp-2 Supabase plus preserved legacy WordPress interfaces",
