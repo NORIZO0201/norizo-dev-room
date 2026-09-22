@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-09-21T19:29:25Z",
+  "updated_at": "2026-09-22T00:00:00Z",
   "current_phase": "P5",
   "maintenance_mode": true,
   "scheduled_dev_room_watch_executor": false,
@@ -13,8 +13,9 @@
     }
   },
   "deployment_policy": {
-    "vercel_preview_without_explicit_norizo_request": false,
-    "production_without_explicit_norizo_approval": false
+    "vercel_preview_without_explicit_norizo_request": true,
+    "production_without_explicit_norizo_approval": false,
+    "preview_is_default_development_surface": true
   },
   "phase_order": [
     "P1",
