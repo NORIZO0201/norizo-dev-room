@@ -13,12 +13,13 @@
   "policy": {
     "scheduled_dev_room_watch_executor": false,
     "conoha_retired": true,
-    "vercel_preview_requires_explicit_norizo_request": true,
+    "vercel_preview_requires_explicit_norizo_request": false,
     "production_deploy_requires_explicit_norizo_approval": true,
     "external_deployments_must_record_authorization_provenance": true,
     "retired_omnw_harvest_must_remain_absent": true,
     "operations_must_be_low_cost_and_allowlisted": true,
-    "retired_runtime_files_must_be_absent_from_live_tree": true
+    "retired_runtime_files_must_be_absent_from_live_tree": true,
+    "preview_is_default_development_surface": true
   },
   "tracked_projects": [
     "SAYAKA",
