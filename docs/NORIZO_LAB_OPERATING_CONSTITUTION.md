@@ -65,7 +65,7 @@ Vercel, Supabase, Shopify, Google services, and other systems are operated direc
 
 Vercel sequence:
 
-Local QA → Preview only when NORIZO asks to see it → NORIZO confirmation → Production.
+GitHub development branch update → Preview → DEV ROOM → automated Visual QA → NORIZO confirmation → Production.
 
 Production/destructive/paid/security-sensitive operations require explicit NORIZO approval.
 
