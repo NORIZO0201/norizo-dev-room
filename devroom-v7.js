@@ -2,6 +2,23 @@ let current=null,endAt=0,tick=null,renewing=false;
 const enabled={iphone:true,android:true,pc:false};
 const devices=['iphone','android','pc'];
 const OMNW_QA='https://oh-my-nihon-wine-git-dev-room-qa-oh-my-nihon-wine.vercel.app';
+const PREVIEW_REGISTRY_URLS=[
+  'https://raw.githubusercontent.com/NORIZO0201/norizo-dev-room/main/state/PREVIEW_REGISTRY.json',
+  'https://raw.githubusercontent.com/NORIZO0201/norizo-dev-room/ops/preview-first-2026-09-22/state/PREVIEW_REGISTRY.json'
+];
+let previewRegistry={services:{}};
+const PROJECT_KEYS={
+  'https://oh-my-nihon-wine.jp':'OMNW',
+  'https://nihonwine.jp':'NIHON_WINE_JP',
+  'https://craft-nihon-wine.jp':'CNW',
+  'https://craftwineshop.com':'CWS',
+  'https://dis.nihonwine.jp':'DIS',
+  'https://nihoncheese.jp':'NIHON_CHEESE',
+  'https://sayaka-kitchen.com':'SAYAKA',
+  'https://app.sayaka-kitchen.com':'SAYAKA',
+  'https://admin.sayaka-kitchen.com':'SAYAKA',
+  'https://local-engine.jp':'LOCAL_ENGINE'
+};
 const $=s=>document.querySelector(s);
 function setLog(s,bad=false){$('#log').textContent=s;$('#status').textContent=bad?'ERROR':s}
 function viewerUrl(u){if(!u)return 'about:blank';const sep=u.includes('?')?'&':'?';return u+sep+'interactive=true&showControls=true'}
@@ -27,9 +44,33 @@ async function stop(){if(!current)return;const old=current;clearView();try{await
 async function navigateAll(){if(!current)return;const url=$('#url').value.trim();activeDevices().forEach(d=>busy(d,'ページ反映待ち…'));try{const j=await api('/api/navigate',{sessions:current.sessions,devices:activeDevices(),url});current.urls=j.urls||{};current.embedUrls=j.embedUrls||{};if(enabled.iphone&&j.embedUrls?.iphone)$('#iphone').src=j.embedUrls.iphone;if(enabled.android&&j.embedUrls?.android)$('#android').src=j.embedUrls.android;renderUrls(current.urls);setLog('LIVE')}catch(e){setLog(e.message,true)}finally{activeDevices().forEach(clearBusy)}}
 async function qa(){if(!current)return;try{const j=await api('/api/inspect',{sessions:current.sessions,devices:activeDevices()});const details=[];for(const d of activeDevices()){const q=j.qa[d]||'CHECK',el=$('#'+d+'Qa');el.textContent=q;el.className=q==='PASS'?'pass':q==='VISUAL'?'check':'check';const x=j.result[d];if(x)details.push(d+': '+(x.browser||x.title||'visual check'))}$('#qaDetail').textContent=details.join(' / ');setLog('QA DONE')}catch(e){setLog(e.message,true)}}
 async function renew(auto=false){if(!current||renewing||!current.sessions?.pc)return;renewing=true;try{const j=await api('/api/renew',{sessions:current.sessions,fallbackUrl:$('#url').value.trim()});current.sessions={...current.sessions,...j.sessions};if(j.sessions?.pc?.debugUrl)$('#pc').src=viewerUrl(j.sessions.pc.debugUrl);endAt=Date.now()+(j.expiresInMs||840000);setLog(auto?'AUTO RENEWED':'RENEWED')}catch(e){setLog(e.message,true)}finally{renewing=false}}
-function resolvedTarget(){const p=$('#project').value,m=$('#environment').value;if(p==='https://oh-my-nihon-wine.jp'){if(m==='qa-guest')return OMNW_QA+'/welcome';if(m==='qa-auth')return OMNW_QA+'/collection?qa=1'}return p||$('#url').value.trim()}
+function projectKey(p){return PROJECT_KEYS[p]||''}
+function previewUrlFor(p){
+  const svc=previewRegistry?.services?.[projectKey(p)];
+  return svc?.preview_url||'';
+}
+function resolvedTarget(){
+  const p=$('#project').value,m=$('#environment').value;
+  const preview=previewUrlFor(p);
+  if(p==='https://oh-my-nihon-wine.jp'){
+    const base=preview||OMNW_QA;
+    if(m==='qa-guest')return base+'/welcome';
+    if(m==='qa-auth')return base+'/collection?qa=1';
+  }
+  if(m==='preview'&&preview)return preview;
+  return p||$('#url').value.trim();
+}
 function applyProjectPreset(){const p=$('#project').value;if(p==='https://oh-my-nihon-wine.jp'){enabled.iphone=true;enabled.android=true;enabled.pc=false}else if(p==='https://dis.nihonwine.jp'||p==='https://admin.sayaka-kitchen.com'){enabled.iphone=false;enabled.android=false;enabled.pc=true}else{enabled.iphone=true;enabled.android=true;enabled.pc=true}updateLayout()}
-function refreshTarget(){const next=resolvedTarget();if(next)$('#url').value=next;const isOmnw=$('#project').value==='https://oh-my-nihon-wine.jp';$('#environment').disabled=!isOmnw;if(!isOmnw)$('#environment').value='production'}
+function refreshTarget(){
+  const p=$('#project').value;
+  const isOmnw=p==='https://oh-my-nihon-wine.jp';
+  const m=$('#environment').value;
+  if(!isOmnw&&(m==='qa-guest'||m==='qa-auth'))$('#environment').value='preview';
+  const next=resolvedTarget();
+  if(next)$('#url').value=next;
+  const preview=previewUrlFor(p);
+  if($('#previewUrlState'))$('#previewUrlState').textContent=preview||'READY Previewなし';
+}
 async function reviewWithChatty(){
   const qaState={};for(const d of devices)qaState[d]=$('#'+d+'Qa').textContent;
   const payload={
@@ -63,4 +104,18 @@ $('#saveAppetizeId').onclick=()=>{
   setAppetizeUi();setLog(id?'APPETIZE SANDBOX SAVED':'APPETIZE SANDBOX CLEARED');
 };
 $('#chattyReview').onclick=reviewWithChatty;
-$('#toggleIphone').onclick=()=>toggleDevice('iphone');$('#toggleAndroid').onclick=()=>toggleDevice('android');$('#togglePc').onclick=()=>toggleDevice('pc');$('#open').onclick=openDevices;$('#stop').onclick=stop;$('#go').onclick=navigateAll;$('#qa').onclick=qa;$('#renew').onclick=()=>renew(false);$('#previewOk').onclick=()=>releaseIntent('preview');$('#productionOk').onclick=()=>releaseIntent('production');$('#project').onchange=()=>{if(current)stop();applyProjectPreset();refreshTarget()};$('#environment').onchange=()=>{refreshTarget();if(current)navigateAll()};$('#url').addEventListener('keydown',e=>{if(e.key==='Enter'){current?navigateAll():openDevices()}});window.addEventListener('beforeunload',()=>{if(current?.sessions?.pc)navigator.sendBeacon('/api/stop',new Blob([JSON.stringify({sessions:current.sessions})],{type:'application/json'}))});$('#project').value='https://oh-my-nihon-wine.jp';applyProjectPreset();refreshTarget();setAppetizeUi();loadQaBridge();
+$('#toggleIphone').onclick=()=>toggleDevice('iphone');$('#toggleAndroid').onclick=()=>toggleDevice('android');$('#togglePc').onclick=()=>toggleDevice('pc');$('#open').onclick=openDevices;$('#stop').onclick=stop;$('#go').onclick=navigateAll;$('#qa').onclick=qa;$('#renew').onclick=()=>renew(false);$('#productionOk').onclick=()=>releaseIntent('production');$('#project').onchange=()=>{if(current)stop();applyProjectPreset();refreshTarget()};$('#environment').onchange=()=>{refreshTarget();if(current)navigateAll()};$('#url').addEventListener('keydown',e=>{if(e.key==='Enter'){current?navigateAll():openDevices()}});window.addEventListener('beforeunload',()=>{if(current?.sessions?.pc)navigator.sendBeacon('/api/stop',new Blob([JSON.stringify({sessions:current.sessions})],{type:'application/json'}))});async function loadPreviewRegistry(){
+  for(const base of PREVIEW_REGISTRY_URLS){
+    try{
+      const r=await fetch(base+'?t='+Date.now(),{cache:'no-store'});
+      if(!r.ok)continue;
+      previewRegistry=await r.json();
+      refreshTarget();
+      return;
+    }catch{}
+  }
+  if($('#previewUrlState'))$('#previewUrlState').textContent='Preview registry unavailable';
+}
+$('#project').value='https://oh-my-nihon-wine.jp';
+$('#environment').value='preview';
+applyProjectPreset();refreshTarget();setAppetizeUi();loadQaBridge();loadPreviewRegistry();
