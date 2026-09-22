@@ -23,13 +23,13 @@ iframe{width:100%;height:100%;border:0;background:#fff}.deviceShot{width:100%;he
 </style>
 </head>
 <body>
-<header><h1>NORIZO DEV ROOM</h1><div class="sub">Device Lab · V8.1 · Appetize</div><div id="status" class="status">READY</div></header>
+<header><h1>NORIZO DEV ROOM</h1><div class="sub">Device Lab · V8.2 · Preview First</div><div id="status" class="status">READY</div></header>
 <div class="toolbar">
   <div class="row">
     <select id="project">
       <option value="">CUSTOM URL</option><option value="https://oh-my-nihon-wine.jp">OMNW</option><option value="https://nihonwine.jp">日本ワイン.jp</option><option value="https://craft-nihon-wine.jp">クラフト日本ワイン (CNW)</option><option value="https://craftwineshop.com">Craft Wine Shop (CWS)</option><option value="https://dis.nihonwine.jp">DIS</option><option value="https://nihoncheese.jp">日本チーズ.jp</option><option value="https://sayaka-kitchen.com">SAYAKA KITCHEN Official</option><option value="https://app.sayaka-kitchen.com">SAYAKA KITCHEN App</option><option value="https://admin.sayaka-kitchen.com">SAYAKA KITCHEN Admin</option><option value="https://local-engine.jp">LOCAL ENGINE</option>
     </select>
-    <select id="environment"><option value="production">Production</option><option value="qa-guest">QA 未ログイン</option><option value="qa-auth">QA ログイン後</option></select>
+    <select id="environment"><option value="preview" selected>Preview</option><option value="production">Production</option><option value="qa-guest">QA 未ログイン</option><option value="qa-auth">QA ログイン後</option></select>
     <input id="url" value="https://oh-my-nihon-wine.jp" spellcheck="false"/>
     <button id="open" class="primary">表示中の端末を起動</button><button id="go" disabled>表示中の端末をこのURLへ</button><button id="stop" disabled>終了</button>
   </div>
@@ -47,7 +47,7 @@ iframe{width:100%;height:100%;border:0;background:#fff}.deviceShot{width:100%;he
     <div class="card"><h3>APPETIZE</h3><div class="msg">初回だけDevice Sandbox ID（standalone_...）を設定します。</div><input id="appetizeId" placeholder="standalone_..." style="width:100%;margin-top:8px"/><button id="saveAppetizeId" style="width:100%;margin-top:7px">Sandbox IDを保存</button><div id="appetizeState" class="msg" style="margin-top:7px">未設定</div></div>
     <div class="card"><h3>APP STATE</h3><div class="kv"><span>QA BRIDGE</span><span id="qaBridgeState" class="check">CHECKING</span></div><div id="qaBridgeDetail" class="msg">OMNW固定QA環境への接続状態を確認中。</div></div>
     <div class="card"><h3>SESSION</h3><div class="kv"><span>残り</span><span id="timer">—</span></div><div class="msg">表示ONの端末だけ起動します。</div></div>
-    <div class="card"><h3>RELEASE CONTROL</h3><div class="msg">QA後、必要時のみPreview。最終確認後にProduction OK。</div><div class="release"><button id="previewOk">Preview依頼</button><button id="productionOk" class="prod">Production OK</button></div><div id="releaseState" class="msg" style="margin-top:7px">承認指示なし</div></div>
+    <div class="card"><h3>RELEASE CONTROL</h3><div class="msg">Previewは開発ブランチから自動更新。実画面QAとNORIZO確認後だけProduction OK。</div><div class="release"><button id="productionOk" class="prod">Production OK</button></div><div id="releaseState" class="msg" style="margin-top:7px">Production承認なし</div></div><div class="card"><h3>LATEST PREVIEW</h3><div id="previewUrlState" class="msg">読み込み中…</div></div>
     <div class="card"><h3>CURRENT URL</h3><div id="currentUrls" class="msg">—</div></div><div class="card"><h3>LOG</h3><div id="log" class="msg">Ready.</div></div>
   </aside>
 </div>
