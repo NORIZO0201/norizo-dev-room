@@ -24,8 +24,11 @@ if (state.retired_infrastructure?.conoha?.status !== 'retired') {
 if (state.retired_infrastructure?.conoha?.checked_in_current_model !== false) {
   errors.push('ConoHa must not be checked in the current model');
 }
-if (state.deployment_policy?.vercel_preview_without_explicit_norizo_request !== false) {
-  errors.push('Preview without explicit NORIZO request must remain disabled');
+if (state.deployment_policy?.vercel_preview_without_explicit_norizo_request !== true) {
+  errors.push('Preview must remain enabled as the default development surface');
+}
+if (state.deployment_policy?.preview_is_default_development_surface !== true) {
+  errors.push('Preview-first policy missing');
 }
 if (state.deployment_policy?.production_without_explicit_norizo_approval !== false) {
   errors.push('Production without explicit NORIZO approval must remain disabled');
