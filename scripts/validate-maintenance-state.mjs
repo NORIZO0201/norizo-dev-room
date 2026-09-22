@@ -9,7 +9,7 @@ const root = resolve(here, '..');
 const sha40 = /^[0-9a-f]{40}$/;
 const deploymentId = /^dpl_[A-Za-z0-9]+$/;
 const allowedDeploymentEnvironments = new Set(['preview', 'production']);
-const allowedAuthorization = new Set(['EXPLICITLY_APPROVED', 'UNVERIFIED_EXTERNAL_CHANGE']);
+const allowedAuthorization = new Set(['AUTO_PREVIEW_POLICY', 'EXPLICITLY_APPROVED', 'UNVERIFIED_EXTERNAL_CHANGE']);
 const allowedMaintenanceGateStatus = new Set(['PASS', 'BLOCKED_HUMAN_CONFIRMATION']);
 
 export function validateMaintenance({ contract, state, handoff, observation }) {
@@ -22,8 +22,8 @@ export function validateMaintenance({ contract, state, handoff, observation }) {
   if (contract?.execution_mode !== 'on_demand') errors.push('DEV ROOM maintenance must be on-demand');
   if (contract?.policy?.scheduled_dev_room_watch_executor !== false) errors.push('DEV ROOM Watch/Executor must remain retired');
   if (contract?.policy?.conoha_retired !== true) errors.push('maintenance contract must retire ConoHa');
-  if (contract?.policy?.vercel_preview_requires_explicit_norizo_request !== true) {
-    errors.push('maintenance contract must require explicit NORIZO request for Preview');
+  if (contract?.policy?.vercel_preview_requires_explicit_norizo_request !== false || contract?.policy?.preview_is_default_development_surface !== true) {
+    errors.push('maintenance contract must keep Preview enabled as the default development surface');
   }
   if (contract?.policy?.production_deploy_requires_explicit_norizo_approval !== true) {
     errors.push('maintenance contract must require explicit NORIZO approval for Production');
@@ -44,8 +44,8 @@ export function validateMaintenance({ contract, state, handoff, observation }) {
   if (state?.retired_infrastructure?.conoha?.rule !== 'do_not_check_start_rebuild_or_recreate') {
     errors.push('ConoHa retirement rule drifted');
   }
-  if (state?.deployment_policy?.vercel_preview_without_explicit_norizo_request !== false) {
-    errors.push('canonical state must forbid unrequested Preview');
+  if (state?.deployment_policy?.vercel_preview_without_explicit_norizo_request !== true || state?.deployment_policy?.preview_is_default_development_surface !== true) {
+    errors.push('canonical state must keep Preview-first development enabled');
   }
   if (state?.deployment_policy?.production_without_explicit_norizo_approval !== false) {
     errors.push('canonical state must forbid unapproved Production');
@@ -59,8 +59,8 @@ export function validateMaintenance({ contract, state, handoff, observation }) {
   if (handoff?.foundation_status !== 'PASS' || handoff?.next_mode !== 'maintenance') {
     errors.push('P5 handoff must remain PASS in maintenance mode');
   }
-  if (handoff?.deployment_policy?.preview_without_explicit_norizo_request !== false) {
-    errors.push('P5 handoff must forbid unrequested Preview');
+  if (handoff?.deployment_policy?.preview_without_explicit_norizo_request !== true || handoff?.deployment_policy?.preview_is_default_development_surface !== true) {
+    errors.push('P5 handoff must keep Preview-first development enabled');
   }
   if (handoff?.deployment_policy?.production_without_explicit_norizo_approval !== false) {
     errors.push('P5 handoff must forbid unapproved Production');
@@ -74,8 +74,8 @@ export function validateMaintenance({ contract, state, handoff, observation }) {
     errors.push('maintenance observation requires PASS or BLOCKED_HUMAN_CONFIRMATION gate status');
   }
   if (observation?.operations?.conoha_touched !== false) errors.push('maintenance observation must prove ConoHa untouched');
-  if (observation?.operations?.preview_deploy_created_by_this_run !== false) {
-    errors.push('maintenance observation must prove no Preview created by this run');
+  if (typeof observation?.operations?.preview_deploy_created_by_this_run !== 'boolean') {
+    errors.push('maintenance observation must record whether a Preview was created by this run');
   }
   if (observation?.operations?.production_deploy_created_by_this_run !== false) {
     errors.push('maintenance observation must prove no Production created by this run');
@@ -112,8 +112,8 @@ export function validateMaintenance({ contract, state, handoff, observation }) {
           errors.push('deployment provenance event requires a Vercel deployment id');
         }
         if (!sha40.test(event?.sha || '')) errors.push('deployment provenance event requires a 40-char SHA');
-        if (event?.created_by_this_run !== false) {
-          errors.push('deployment provenance external event must prove it was not created by this run');
+        if (typeof event?.created_by_this_run !== 'boolean') {
+          errors.push('deployment provenance event must record created_by_this_run');
         }
         if (!allowedAuthorization.has(event?.authorization_status)) {
           errors.push('deployment provenance event requires explicit authorization status');
