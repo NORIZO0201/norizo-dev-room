@@ -7,7 +7,7 @@
     "path": "state/telemetry/latest.json",
     "schema": "norizo.gmk.telemetry v1"
   },
-  "generated_at": "2026-09-24T21:34:54+00:00",
+  "generated_at": "2026-09-24T21:35:09+00:00",
   "overall": "OK",
   "gmk": "ONLINE",
   "versions": {
@@ -45,7 +45,7 @@
     "pid": 275147,
     "since": "Fri 2026-09-25 06:06:47 JST",
     "heartbeat_at": "2026-09-24T21:33:12+00:00",
-    "heartbeat_age_sec": 102.1,
+    "heartbeat_age_sec": 117.1,
     "last_outcome": "interactive"
   },
   "telemetry": {
@@ -146,7 +146,7 @@
       "liveness": "LIVE",
       "reason": null,
       "pid": 275147,
-      "heartbeat_age_sec": 102.1,
+      "heartbeat_age_sec": 117.1,
       "last_success": null,
       "last_failure": null,
       "last_error": null,
@@ -160,11 +160,11 @@
       "factory_id": "relis_factory",
       "kind": "systemd",
       "health": "OK",
-      "state": "RUNNING",
+      "state": "IDLE_WAITING_SOURCE_CADENCE",
       "liveness": "LIVE",
-      "reason": null,
+      "reason": "waiting for the next source revisit",
       "pid": 239572,
-      "heartbeat_age_sec": 1.1,
+      "heartbeat_age_sec": 15.1,
       "last_success": "2026-09-24T21:22:09+00:00",
       "last_failure": null,
       "last_error": null,
@@ -177,6 +177,7 @@
       "counts": {
         "raw_total": 99,
         "raw_24h": 50,
+        "queue_depth": 0,
         "partial_total": 0,
         "errors_1h": 0
       },
@@ -190,7 +191,7 @@
       "liveness": "LIVE",
       "reason": "generated work: variant_linked=0, rehashed=131, discover_site_enqueued=0",
       "pid": 243220,
-      "heartbeat_age_sec": 45.1,
+      "heartbeat_age_sec": 60.1,
       "last_success": null,
       "last_failure": null,
       "last_error": null,
@@ -240,7 +241,7 @@
       "liveness": "LIVE",
       "reason": null,
       "pid": 296,
-      "heartbeat_age_sec": 13.7,
+      "heartbeat_age_sec": 28.7,
       "last_success": null,
       "last_failure": null,
       "last_error": null,
@@ -262,12 +263,6 @@
   ],
   "current_runs": [
     {
-      "factory_id": "relis_factory",
-      "kind": "systemd",
-      "stage": "IDLE",
-      "pid": 239572
-    },
-    {
       "factory_id": "omnw_factory",
       "kind": "systemd",
       "stage": "RUNNING",
@@ -277,7 +272,7 @@
   "progress": {
     "window": "1h",
     "baseline_at": "2026-09-24T21:02:05+00:00",
-    "window_sec": 1969,
+    "window_sec": 1984,
     "reasons": [
       "COMPLETE",
       "WAITING_SOURCE_CADENCE",
@@ -293,7 +288,7 @@
       "bordeaux_japan_market": {
         "progress_total": 267.0,
         "progress_delta": 0.0,
-        "window_sec": 1969,
+        "window_sec": 1984,
         "state": "IDLE_WAITING_SOURCE_CADENCE",
         "health": "OK",
         "liveness": "LIVE",
@@ -313,7 +308,7 @@
       "wine_search_evidence": {
         "progress_total": 190.0,
         "progress_delta": 0.0,
-        "window_sec": 1969,
+        "window_sec": 1984,
         "state": "IDLE_WAITING_SOURCE_CADENCE",
         "health": "OK",
         "liveness": "LIVE",
@@ -333,12 +328,12 @@
       "orchestrator_command_board_poller": {
         "progress_total": null,
         "progress_delta": null,
-        "window_sec": 1969,
+        "window_sec": 1984,
         "state": null,
         "health": "OK",
         "liveness": "LIVE",
         "pid": 275147,
-        "heartbeat_age_sec": 102.1,
+        "heartbeat_age_sec": 117.1,
         "last_success": null,
         "queue": {},
         "current_stage": null,
@@ -350,12 +345,12 @@
       "relis_factory": {
         "progress_total": 99.0,
         "progress_delta": 1.0,
-        "window_sec": 1969,
-        "state": "RUNNING",
+        "window_sec": 1984,
+        "state": "IDLE_WAITING_SOURCE_CADENCE",
         "health": "OK",
         "liveness": "LIVE",
         "pid": 239572,
-        "heartbeat_age_sec": 1.1,
+        "heartbeat_age_sec": 15.1,
         "last_success": "2026-09-24T21:22:09+00:00",
         "queue": {
           "queued": 0,
@@ -370,12 +365,12 @@
       "omnw_factory": {
         "progress_total": 10512.0,
         "progress_delta": 4184.0,
-        "window_sec": 1969,
+        "window_sec": 1984,
         "state": "RUNNING",
         "health": "OK",
         "liveness": "LIVE",
         "pid": 243220,
-        "heartbeat_age_sec": 45.1,
+        "heartbeat_age_sec": 60.1,
         "last_success": null,
         "queue": {},
         "current_stage": null,
@@ -387,7 +382,7 @@
       "sayaka_bulk_gmk": {
         "progress_total": 0.0,
         "progress_delta": 0.0,
-        "window_sec": 1969,
+        "window_sec": 1984,
         "state": "IDLE_NO_WORK",
         "health": "OK",
         "liveness": "LIVE",
@@ -404,12 +399,12 @@
       "nihon_wine_demand_radar": {
         "progress_total": 209.0,
         "progress_delta": 0.0,
-        "window_sec": 1969,
+        "window_sec": 1984,
         "state": "IDLE_WAITING_SOURCE_CADENCE",
         "health": "OK",
         "liveness": "LIVE",
         "pid": 296,
-        "heartbeat_age_sec": 13.7,
+        "heartbeat_age_sec": 28.7,
         "last_success": null,
         "queue": {
           "queued": 0,
@@ -447,7 +442,7 @@
     "task_id": "github-claude-autofire-canary-v1-20260925",
     "status": "FAIL",
     "completed_at": "2026-09-24T21:13:23+00:00",
-    "age_sec": 1291.1,
+    "age_sec": 1306.1,
     "fresh": true
   },
   "command_board": {
