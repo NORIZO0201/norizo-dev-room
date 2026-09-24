@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "task_id": "dev-room-telemetry-integration-v1-20260924",
+  "project": "DEV_ROOM",
+  "status": "FAIL",
+  "completed_at": "2026-09-24T10:58:22+00:00",
+  "execution_result": {
+    "summary": "GMK claimed and executed the telemetry integration task. Repository QA passed, but the implementation did not reach completion because the generated code remained only in the GMK worktree and the external project publish could not authenticate to GitHub."
+  },
+  "failures_or_unresolved": [
+    "Implementation branch was not published to GitHub.",
+    "GMK external-repo push failed because the norizo-dev-room clone did not have the launcher parent repo's Git credential helper.",
+    "A real fresh GMK snapshot was not yet consumed by DEV ROOM, so the seven completion conditions were not met."
+  ],
+  "routing": {
+    "target_repo": "NORIZO0201/norizo-dev-room",
+    "target_branch": "repair/dev-room-telemetry-v1-20260924",
+    "canonical_handoff": "NORIZO0201/norizo-lab-orchestrator:gmk-handoff/state/handoff/latest.json"
+  },
+  "recovery_note": "This project-side failure handoff was published through the connected GitHub control plane so the resident launcher can recognize the failed project handoff as delivered, clear its pending-push deadlock, sync current orchestrator code, and accept a corrected retry task. No Production deploy, GitHub Actions, paid API, secret, or public GMK LAN exposure was used."
+}
