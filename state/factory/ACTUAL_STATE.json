@@ -7,7 +7,7 @@
     "path": "state/telemetry/latest.json",
     "schema": "norizo.gmk.telemetry v1"
   },
-  "generated_at": "2026-09-25T07:01:00+00:00",
+  "generated_at": "2026-09-25T07:01:28+00:00",
   "overall": "WARN",
   "gmk": "ONLINE",
   "versions": {
@@ -16,25 +16,23 @@
       "expected_branch": "main",
       "branch": "main",
       "expected_head": "26623eacc3f9",
-      "local_head": "850cfa41311b",
-      "in_sync": false,
+      "local_head": "26623eacc3f9",
+      "in_sync": true,
       "dirty": false,
-      "running_commit": "963e38c1d855"
+      "running_commit": "26623eacc3f9"
     },
     "installed_units": {
       "gmk-factory-runner.service": "ok",
       "norizo-orchestrator-poller.service": "ok"
     },
-    "drift": [
-      "checkout differs from origin/main (control sync pending or blocked)"
-    ]
+    "drift": []
   },
   "engine": {
     "active": "active",
-    "pid": 983727,
+    "pid": 1019368,
     "version": "2.0.0",
-    "since": "Fri 2026-09-25 15:44:38 JST",
-    "restarts": 15,
+    "since": "Fri 2026-09-25 16:01:09 JST",
+    "restarts": 16,
     "queue": {
       "ready": 0,
       "scheduled_later": 2,
@@ -46,14 +44,14 @@
     "active": "active",
     "pid": 983556,
     "since": "Fri 2026-09-25 15:44:34 JST",
-    "heartbeat_at": "2026-09-25T07:00:59+00:00",
-    "heartbeat_age_sec": 1.0,
+    "heartbeat_at": "2026-09-25T07:01:28+00:00",
+    "heartbeat_age_sec": 0.6,
     "last_outcome": "executing"
   },
   "telemetry": {
     "active": "active",
-    "pid": 983411,
-    "since": "Fri 2026-09-25 15:44:29 JST"
+    "pid": 1023278,
+    "since": "Fri 2026-09-25 16:01:28 JST"
   },
   "sre": {
     "installed": true,
@@ -82,8 +80,8 @@
       "state": "IDLE_WAITING_SOURCE_CADENCE",
       "liveness": "LIVE",
       "reason": "next source observation 2026-09-25T07:25:25+00:00",
-      "pid": 983727,
-      "heartbeat_age_sec": 0.0,
+      "pid": 1019368,
+      "heartbeat_age_sec": 0.6,
       "last_success": "2026-09-25T01:30:36+00:00",
       "last_failure": null,
       "last_error": null,
@@ -115,8 +113,8 @@
       "state": "IDLE_WAITING_SOURCE_CADENCE",
       "liveness": "LIVE",
       "reason": "next source observation 2026-09-25T07:58:30+00:00",
-      "pid": 983727,
-      "heartbeat_age_sec": 0.0,
+      "pid": 1019368,
+      "heartbeat_age_sec": 0.6,
       "last_success": "2026-09-25T06:58:52+00:00",
       "last_failure": null,
       "last_error": null,
@@ -146,12 +144,12 @@
     {
       "factory_id": "orchestrator_command_board_poller",
       "kind": "systemd",
-      "health": "WARN",
+      "health": "OK",
       "state": null,
       "liveness": "LIVE",
       "reason": null,
       "pid": 983556,
-      "heartbeat_age_sec": 1.0,
+      "heartbeat_age_sec": 0.6,
       "last_success": null,
       "last_failure": null,
       "last_error": null,
@@ -159,9 +157,7 @@
       "current_stage": null,
       "next_due_at": null,
       "counts": {},
-      "problems": [
-        "repo main@850cfa41311b != origin/main@26623eacc3f9"
-      ]
+      "problems": []
     },
     {
       "factory_id": "relis_factory",
@@ -171,7 +167,7 @@
       "liveness": "LIVE",
       "reason": "waiting for the next source revisit",
       "pid": 239572,
-      "heartbeat_age_sec": 20.0,
+      "heartbeat_age_sec": 48.6,
       "last_success": "2026-09-25T06:28:54+00:00",
       "last_failure": null,
       "last_error": null,
@@ -200,7 +196,7 @@
       "liveness": "LIVE",
       "reason": "all gaps closed; next source revisit at 2026-09-28T00:00:00+00:00",
       "pid": 243220,
-      "heartbeat_age_sec": 8.0,
+      "heartbeat_age_sec": 36.6,
       "last_success": null,
       "last_failure": null,
       "last_error": null,
@@ -231,7 +227,7 @@
       "liveness": "LIVE",
       "reason": null,
       "pid": 238457,
-      "heartbeat_age_sec": 11.0,
+      "heartbeat_age_sec": 10.6,
       "last_success": null,
       "last_failure": null,
       "last_error": null,
@@ -278,7 +274,7 @@
   "progress": {
     "window": "1h",
     "baseline_at": "2026-09-25T06:00:44+00:00",
-    "window_sec": 3616,
+    "window_sec": 3645,
     "reasons": [
       "COMPLETE",
       "WAITING_SOURCE_CADENCE",
@@ -294,12 +290,12 @@
       "bordeaux_japan_market": {
         "progress_total": 310.0,
         "progress_delta": 0.0,
-        "window_sec": 3616,
+        "window_sec": 3645,
         "state": "IDLE_WAITING_SOURCE_CADENCE",
         "health": "OK",
         "liveness": "LIVE",
-        "pid": 983727,
-        "heartbeat_age_sec": 0.0,
+        "pid": 1019368,
+        "heartbeat_age_sec": 0.6,
         "last_success": "2026-09-25T01:30:36+00:00",
         "queue": {
           "queued": 1,
@@ -314,12 +310,12 @@
       "wine_search_evidence": {
         "progress_total": 334.0,
         "progress_delta": 12.0,
-        "window_sec": 3616,
+        "window_sec": 3645,
         "state": "IDLE_WAITING_SOURCE_CADENCE",
         "health": "WARN",
         "liveness": "LIVE",
-        "pid": 983727,
-        "heartbeat_age_sec": 0.0,
+        "pid": 1019368,
+        "heartbeat_age_sec": 0.6,
         "last_success": "2026-09-25T06:58:52+00:00",
         "queue": {
           "queued": 1,
@@ -334,12 +330,12 @@
       "orchestrator_command_board_poller": {
         "progress_total": null,
         "progress_delta": null,
-        "window_sec": 3616,
+        "window_sec": 3645,
         "state": null,
-        "health": "WARN",
+        "health": "OK",
         "liveness": "LIVE",
         "pid": 983556,
-        "heartbeat_age_sec": 1.0,
+        "heartbeat_age_sec": 0.6,
         "last_success": null,
         "queue": {},
         "current_stage": null,
@@ -351,12 +347,12 @@
       "relis_factory": {
         "progress_total": 110.0,
         "progress_delta": 1.0,
-        "window_sec": 3616,
+        "window_sec": 3645,
         "state": "IDLE_WAITING_SOURCE_CADENCE",
         "health": "WARN",
         "liveness": "LIVE",
         "pid": 239572,
-        "heartbeat_age_sec": 20.0,
+        "heartbeat_age_sec": 48.6,
         "last_success": "2026-09-25T06:28:54+00:00",
         "queue": {
           "queued": 0,
@@ -371,12 +367,12 @@
       "omnw_factory": {
         "progress_total": 12758.0,
         "progress_delta": 0.0,
-        "window_sec": 3616,
+        "window_sec": 3645,
         "state": "IDLE_WAITING_SOURCE_CADENCE",
         "health": "WARN",
         "liveness": "LIVE",
         "pid": 243220,
-        "heartbeat_age_sec": 8.0,
+        "heartbeat_age_sec": 36.6,
         "last_success": null,
         "queue": {},
         "current_stage": null,
@@ -388,12 +384,12 @@
       "sayaka_bulk_gmk": {
         "progress_total": 0.0,
         "progress_delta": 0.0,
-        "window_sec": 3616,
+        "window_sec": 3645,
         "state": "IDLE_NO_WORK",
         "health": "WARN",
         "liveness": "LIVE",
         "pid": 238457,
-        "heartbeat_age_sec": 11.0,
+        "heartbeat_age_sec": 10.6,
         "last_success": null,
         "queue": {},
         "current_stage": null,
@@ -405,7 +401,7 @@
       "nihon_wine_demand_radar": {
         "progress_total": 295.0,
         "progress_delta": 0.0,
-        "window_sec": 3616,
+        "window_sec": 3645,
         "state": "IDLE_WAITING_SOURCE_CADENCE",
         "health": "OK",
         "liveness": "LIVE",
@@ -467,7 +463,7 @@
     "task_id": "ucp-freeze-guard-integration-v2b-20260925",
     "status": "FAIL",
     "completed_at": "2026-09-25T06:51:48+00:00",
-    "age_sec": 552.0,
+    "age_sec": 580.6,
     "fresh": true
   },
   "command_board": {
@@ -490,10 +486,6 @@
       "class": "TRANSIENT"
     },
     {
-      "message": "orchestrator_command_board_poller: repo main@850cfa41311b != origin/main@26623eacc3f9",
-      "class": "TRANSIENT"
-    },
-    {
       "message": "relis_factory: repo main@34c3682f5bca != origin/main@e686a5716835",
       "class": "TRANSIENT"
     },
@@ -503,10 +495,6 @@
     },
     {
       "message": "sayaka_bulk_gmk: repo main@34c3682f5bca != origin/main@e686a5716835",
-      "class": "TRANSIENT"
-    },
-    {
-      "message": "version drift: checkout differs from origin/main (control sync pending or blocked)",
       "class": "TRANSIENT"
     },
     {
@@ -552,11 +540,6 @@
     {
       "level": "INFO",
       "kind": "version_drift",
-      "message": "orchestrator_command_board_poller: repo main@850cfa41311b != origin/main@26623eacc3f9"
-    },
-    {
-      "level": "INFO",
-      "kind": "version_drift",
       "message": "relis_factory: repo main@34c3682f5bca != origin/main@e686a5716835"
     },
     {
@@ -568,16 +551,6 @@
       "level": "INFO",
       "kind": "version_drift",
       "message": "sayaka_bulk_gmk: repo main@34c3682f5bca != origin/main@e686a5716835"
-    },
-    {
-      "level": "WARN",
-      "kind": "version_drift",
-      "message": "checkout differs from origin/main (control sync pending or blocked)"
-    },
-    {
-      "level": "WARN",
-      "kind": "version_drift",
-      "message": "orchestrator local HEAD != origin/main"
     }
   ],
   "human_only": []
