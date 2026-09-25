@@ -41,7 +41,7 @@ function setAppetizeUi(){
 }
 async function openDevices(){if(current)await stop();const list=activeDevices(),url=$('#url').value.trim();$('#open').disabled=true;setLog('端末を起動中…');list.forEach(d=>{busy(d,'接続中…');$('#'+d+'State').textContent='STARTING'});try{const j=await api('/api/start',{url,devices:list,appetizeBuildId:getAppetizeId()});applySession(j);await new Promise(r=>setTimeout(r,700));list.forEach(clearBusy)}catch(e){list.forEach(clearBusy);clearView();setLog(e.message,true)}finally{$('#open').disabled=activeDevices().length===0}}
 async function stop(){if(!current)return;const old=current;clearView();try{await api('/api/stop',{sessions:old.sessions})}catch{}setLog('STOPPED')}
-async function navigateAll(){if(!current)return;const url=$('#url').value.trim();activeDevices().forEach(d=>busy(d,'ページ反映待ち…'));try{const j=await api('/api/navigate',{sessions:current.sessions,devices:activeDevices(),url});current.urls=j.urls||{};current.embedUrls=j.embedUrls||{};if(enabled.iphone&&j.embedUrls?.iphone)$('#iphone').src=j.embedUrls.iphone;if(enabled.android&&j.embedUrls?.android)$('#android').src=j.embedUrls.android;renderUrls(current.urls);setLog('LIVE')}catch(e){setLog(e.message,true)}finally{activeDevices().forEach(clearBusy)}}
+async function navigateAll(){if(!current)return;const url=$('#url').value.trim();activeDevices().forEach(d=>busy(d,'ページ反映待ち…'));try{const j=await api('/api/navigate',{sessions:current.sessions,devices:activeDevices(),url});current.urls=j.urls||{};current.embedUrls=j.embedUrls||{};if(enabled.iphone&&j.embedUrls?.iphone)$('#iphone').src=j.embedUrls.iphone;if(enabled.android&&j.embedUrls?.android)$('#android').src=j.embedUrls.android;renderUrls(current.urls);setLog('LIVE');pollNativeState()}catch(e){setLog(e.message,true)}finally{activeDevices().forEach(clearBusy)}}
 async function qa(){if(!current)return;try{const j=await api('/api/inspect',{sessions:current.sessions,devices:activeDevices()});const details=[];for(const d of activeDevices()){const q=j.qa[d]||'CHECK',el=$('#'+d+'Qa');el.textContent=q;el.className=q==='PASS'?'pass':q==='VISUAL'?'check':'check';const x=j.result[d];if(x)details.push(d+': '+(x.browser||x.title||'visual check'))}$('#qaDetail').textContent=details.join(' / ');setLog('QA DONE')}catch(e){setLog(e.message,true)}}
 async function renew(auto=false){if(!current||renewing||!current.sessions?.pc)return;renewing=true;try{const j=await api('/api/renew',{sessions:current.sessions,fallbackUrl:$('#url').value.trim()});current.sessions={...current.sessions,...j.sessions};if(j.sessions?.pc?.debugUrl)$('#pc').src=viewerUrl(j.sessions.pc.debugUrl);endAt=Date.now()+(j.expiresInMs||840000);setLog(auto?'AUTO RENEWED':'RENEWED')}catch(e){setLog(e.message,true)}finally{renewing=false}}
 function projectKey(p){return PROJECT_KEYS[p]||''}
@@ -96,6 +96,25 @@ async function reviewWithChatty(){
   }
 }
 async function releaseIntent(kind){const qaState={};for(const d of devices)qaState[d]=$('#'+d+'Qa').textContent;const body={kind,project:$('#project').selectedOptions[0]?.textContent||'CUSTOM',url:$('#url').value.trim(),qa:qaState,at:new Date().toISOString()};$('#releaseState').textContent='指示送信中…';try{const j=await api('/api/release-intent',body);$('#releaseState').textContent=j.message||'記録しました'}catch(e){$('#releaseState').textContent='送信失敗: '+e.message}}
+function formatNativeDetail(s){
+  if(s.state==='OFFLINE')return '未接続 — 不足している依存関係: '+(s.missingDependency||'unknown');
+  if(s.state==='ERROR')return 'エラー: '+(s.error||'unknown');
+  const freshness=Number.isFinite(s.evidenceFreshnessMs)?Math.round(s.evidenceFreshnessMs/1000)+'s前':'—';
+  return [s.runtime||'runtime不明',s.url||'URL不明','最終ナビゲーション: '+(s.lastNavigationResult||'—'),'証跡鮮度: '+freshness].join(' / ');
+}
+async function pollNativeState(){
+  try{
+    const r=await fetch('/api/native-state?devices=iphone,android',{cache:'no-store'});
+    const j=await r.json();
+    for(const d of ['iphone','android']){
+      const s=j.actualState?.[d];
+      if(!s)continue;
+      const stateEl=$('#'+d+'NativeState'),detailEl=$('#'+d+'NativeDetail');
+      if(stateEl){stateEl.textContent=s.state==='NATIVE_LIVE'?'NATIVE LIVE':s.state;stateEl.className=s.state==='NATIVE_LIVE'?'pass':s.state==='ERROR'?'fail':'check'}
+      if(detailEl)detailEl.textContent=formatNativeDetail(s);
+    }
+  }catch{}
+}
 async function loadQaBridge(){try{const r=await fetch('/api/oidc-status',{cache:'no-store'});const j=await r.json();const ready=Boolean(j.oidcAvailable&&j.ok);$('#qaBridgeState').textContent=ready?'READY':'APPETIZE DIRECT';$('#qaBridgeState').className=ready?'pass':'check';$('#qaBridgeDetail').textContent=ready?'PC/Steelは保護付きQAへ接続可能。Appetizeは公開URLを直接表示。':'AppetizeはProduction URLを直接表示。QA Previewは公開例外設定時に利用可能。'}catch(e){$('#qaBridgeState').textContent='CHECK';$('#qaBridgeDetail').textContent=e.message}}
 $('#saveAppetizeId').onclick=()=>{
   const id=$('#appetizeId').value.trim();
@@ -118,4 +137,4 @@ $('#toggleIphone').onclick=()=>toggleDevice('iphone');$('#toggleAndroid').onclic
 }
 $('#project').value='https://oh-my-nihon-wine.jp';
 $('#environment').value='preview';
-applyProjectPreset();refreshTarget();setAppetizeUi();loadQaBridge();loadPreviewRegistry();
+applyProjectPreset();refreshTarget();setAppetizeUi();loadQaBridge();loadPreviewRegistry();pollNativeState();setInterval(pollNativeState,15000);
