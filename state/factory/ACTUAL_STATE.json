@@ -7,7 +7,7 @@
     "path": "state/telemetry/latest.json",
     "schema": "norizo.gmk.telemetry v1"
   },
-  "generated_at": "2026-09-25T07:49:48+00:00",
+  "generated_at": "2026-09-25T07:50:03+00:00",
   "overall": "WARN",
   "gmk": "ONLINE",
   "versions": {
@@ -16,8 +16,8 @@
       "expected_branch": "main",
       "branch": "main",
       "expected_head": "10a1823c7e11",
-      "local_head": "85959bef27b5",
-      "in_sync": false,
+      "local_head": "10a1823c7e11",
+      "in_sync": true,
       "dirty": false,
       "running_commit": "70b3239cb97e"
     },
@@ -25,9 +25,7 @@
       "gmk-factory-runner.service": "ok",
       "norizo-orchestrator-poller.service": "ok"
     },
-    "drift": [
-      "checkout differs from origin/main (control sync pending or blocked)"
-    ]
+    "drift": []
   },
   "engine": {
     "active": "active",
@@ -46,8 +44,8 @@
     "active": "active",
     "pid": 1039013,
     "since": "Fri 2026-09-25 16:21:19 JST",
-    "heartbeat_at": "2026-09-25T07:49:41+00:00",
-    "heartbeat_age_sec": 7.4,
+    "heartbeat_at": "2026-09-25T07:50:01+00:00",
+    "heartbeat_age_sec": 2.5,
     "last_outcome": "executing"
   },
   "telemetry": {
@@ -83,7 +81,7 @@
       "liveness": "LIVE",
       "reason": "next source observation 2026-09-25T13:25:25+00:00",
       "pid": 1038974,
-      "heartbeat_age_sec": 0.4,
+      "heartbeat_age_sec": 0.5,
       "last_success": "2026-09-25T07:28:29+00:00",
       "last_failure": null,
       "last_error": null,
@@ -116,7 +114,7 @@
       "liveness": "LIVE",
       "reason": "next source observation 2026-09-25T07:58:30+00:00",
       "pid": 1038974,
-      "heartbeat_age_sec": 0.4,
+      "heartbeat_age_sec": 0.5,
       "last_success": "2026-09-25T06:58:52+00:00",
       "last_failure": null,
       "last_error": null,
@@ -143,12 +141,12 @@
     {
       "factory_id": "orchestrator_command_board_poller",
       "kind": "systemd",
-      "health": "WARN",
+      "health": "OK",
       "state": null,
       "liveness": "LIVE",
       "reason": null,
       "pid": 1039013,
-      "heartbeat_age_sec": 7.4,
+      "heartbeat_age_sec": 2.5,
       "last_success": null,
       "last_failure": null,
       "last_error": null,
@@ -156,9 +154,7 @@
       "current_stage": null,
       "next_due_at": null,
       "counts": {},
-      "problems": [
-        "repo main@85959bef27b5 != origin/main@10a1823c7e11"
-      ]
+      "problems": []
     },
     {
       "factory_id": "relis_factory",
@@ -168,7 +164,7 @@
       "liveness": "LIVE",
       "reason": "waiting for the next source revisit",
       "pid": 239572,
-      "heartbeat_age_sec": 44.4,
+      "heartbeat_age_sec": 1.5,
       "last_success": "2026-09-25T07:29:51+00:00",
       "last_failure": null,
       "last_error": null,
@@ -197,7 +193,7 @@
       "liveness": "LIVE",
       "reason": "all gaps closed; next source revisit at 2026-09-28T00:00:00+00:00",
       "pid": 243220,
-      "heartbeat_age_sec": 43.4,
+      "heartbeat_age_sec": 58.5,
       "last_success": null,
       "last_failure": null,
       "last_error": null,
@@ -228,7 +224,7 @@
       "liveness": "LIVE",
       "reason": null,
       "pid": 238457,
-      "heartbeat_age_sec": 10.4,
+      "heartbeat_age_sec": 10.5,
       "last_success": null,
       "last_failure": null,
       "last_error": null,
@@ -251,7 +247,7 @@
       "liveness": "LIVE",
       "reason": null,
       "pid": 296,
-      "heartbeat_age_sec": 16.2,
+      "heartbeat_age_sec": 2.8,
       "last_success": null,
       "last_failure": null,
       "last_error": null,
@@ -275,7 +271,7 @@
   "progress": {
     "window": "1h",
     "baseline_at": "2026-09-25T06:46:10+00:00",
-    "window_sec": 3818,
+    "window_sec": 3833,
     "reasons": [
       "COMPLETE",
       "WAITING_SOURCE_CADENCE",
@@ -291,12 +287,12 @@
       "bordeaux_japan_market": {
         "progress_total": 353.0,
         "progress_delta": 43.0,
-        "window_sec": 3818,
+        "window_sec": 3833,
         "state": "IDLE_WAITING_SOURCE_CADENCE",
         "health": "OK",
         "liveness": "LIVE",
         "pid": 1038974,
-        "heartbeat_age_sec": 0.4,
+        "heartbeat_age_sec": 0.5,
         "last_success": "2026-09-25T07:28:29+00:00",
         "queue": {
           "queued": 1,
@@ -311,12 +307,12 @@
       "wine_search_evidence": {
         "progress_total": 334.0,
         "progress_delta": 12.0,
-        "window_sec": 3818,
+        "window_sec": 3833,
         "state": "IDLE_WAITING_SOURCE_CADENCE",
         "health": "OK",
         "liveness": "LIVE",
         "pid": 1038974,
-        "heartbeat_age_sec": 0.4,
+        "heartbeat_age_sec": 0.5,
         "last_success": "2026-09-25T06:58:52+00:00",
         "queue": {
           "queued": 1,
@@ -331,12 +327,12 @@
       "orchestrator_command_board_poller": {
         "progress_total": null,
         "progress_delta": null,
-        "window_sec": 3818,
+        "window_sec": 3833,
         "state": null,
-        "health": "WARN",
+        "health": "OK",
         "liveness": "LIVE",
         "pid": 1039013,
-        "heartbeat_age_sec": 7.4,
+        "heartbeat_age_sec": 2.5,
         "last_success": null,
         "queue": {},
         "current_stage": null,
@@ -348,12 +344,12 @@
       "relis_factory": {
         "progress_total": 112.0,
         "progress_delta": 2.0,
-        "window_sec": 3818,
+        "window_sec": 3833,
         "state": "IDLE_WAITING_SOURCE_CADENCE",
         "health": "WARN",
         "liveness": "LIVE",
         "pid": 239572,
-        "heartbeat_age_sec": 44.4,
+        "heartbeat_age_sec": 1.5,
         "last_success": "2026-09-25T07:29:51+00:00",
         "queue": {
           "queued": 0,
@@ -368,12 +364,12 @@
       "omnw_factory": {
         "progress_total": 12758.0,
         "progress_delta": 0.0,
-        "window_sec": 3818,
+        "window_sec": 3833,
         "state": "IDLE_WAITING_SOURCE_CADENCE",
         "health": "WARN",
         "liveness": "LIVE",
         "pid": 243220,
-        "heartbeat_age_sec": 43.4,
+        "heartbeat_age_sec": 58.5,
         "last_success": null,
         "queue": {},
         "current_stage": null,
@@ -385,12 +381,12 @@
       "sayaka_bulk_gmk": {
         "progress_total": 0.0,
         "progress_delta": 0.0,
-        "window_sec": 3818,
+        "window_sec": 3833,
         "state": "IDLE_NO_WORK",
         "health": "WARN",
         "liveness": "LIVE",
         "pid": 238457,
-        "heartbeat_age_sec": 10.4,
+        "heartbeat_age_sec": 10.5,
         "last_success": null,
         "queue": {},
         "current_stage": null,
@@ -402,12 +398,12 @@
       "nihon_wine_demand_radar": {
         "progress_total": 295.0,
         "progress_delta": 0.0,
-        "window_sec": 3818,
+        "window_sec": 3833,
         "state": "IDLE_WAITING_SOURCE_CADENCE",
         "health": "OK",
         "liveness": "LIVE",
         "pid": 296,
-        "heartbeat_age_sec": 16.2,
+        "heartbeat_age_sec": 2.8,
         "last_success": null,
         "queue": {
           "queued": 0,
@@ -464,7 +460,7 @@
     "task_id": "ucp-autonomy-audit-v2-20260925",
     "status": "WARN",
     "completed_at": "2026-09-25T07:42:03+00:00",
-    "age_sec": 465.4,
+    "age_sec": 480.5,
     "fresh": true
   },
   "command_board": {
@@ -479,10 +475,6 @@
   },
   "problems": [
     {
-      "message": "orchestrator_command_board_poller: repo main@85959bef27b5 != origin/main@10a1823c7e11",
-      "class": "TRANSIENT"
-    },
-    {
       "message": "relis_factory: repo main@34c3682f5bca != origin/main@e686a5716835",
       "class": "TRANSIENT"
     },
@@ -492,10 +484,6 @@
     },
     {
       "message": "sayaka_bulk_gmk: repo main@34c3682f5bca != origin/main@e686a5716835",
-      "class": "TRANSIENT"
-    },
-    {
-      "message": "version drift: checkout differs from origin/main (control sync pending or blocked)",
       "class": "TRANSIENT"
     },
     {
@@ -531,11 +519,6 @@
     {
       "level": "INFO",
       "kind": "version_drift",
-      "message": "orchestrator_command_board_poller: repo main@85959bef27b5 != origin/main@10a1823c7e11"
-    },
-    {
-      "level": "INFO",
-      "kind": "version_drift",
       "message": "relis_factory: repo main@34c3682f5bca != origin/main@e686a5716835"
     },
     {
@@ -547,16 +530,6 @@
       "level": "INFO",
       "kind": "version_drift",
       "message": "sayaka_bulk_gmk: repo main@34c3682f5bca != origin/main@e686a5716835"
-    },
-    {
-      "level": "WARN",
-      "kind": "version_drift",
-      "message": "checkout differs from origin/main (control sync pending or blocked)"
-    },
-    {
-      "level": "WARN",
-      "kind": "version_drift",
-      "message": "orchestrator local HEAD != origin/main"
     }
   ],
   "human_only": []
