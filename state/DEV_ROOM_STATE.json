@@ -66,12 +66,14 @@
         "navigation": true,
         "console_runtime_errors": true,
         "screenshots_or_visual_evidence": true,
-        "regression_verification": true
+        "regression_verification": true,
+        "native_mobile_actual_state": false
       },
       "evidence": [
         "docs/evidence/2026-09-21-P3-COMPLETE.md",
         "runner:qa/browser-qa-local.mjs",
-        "selftest:qa/chromium-selftest.mjs"
+        "selftest:qa/chromium-selftest.mjs",
+        "docs/evidence/2026-09-25-NATIVE-MOBILE-HOST-INTEGRATION.md"
       ]
     },
     "P4": {
@@ -106,6 +108,40 @@
         "selftest:qa/p5-gates-selftest.mjs"
       ]
     }
+  },
+  "native_mobile": {
+    "order_ids": [
+      "dev-devroom-native-mobile-20260926-01",
+      "dev-devroom-native-mobile-20260926-02"
+    ],
+    "issues": [28, 29, 30],
+    "status": "host_integration_implemented_awaiting_host",
+    "contract": "api/native-host-core.mjs",
+    "provider": "api/providers/native-host.mjs",
+    "endpoint": "api/native-state.mjs",
+    "host_agents": [
+      "scripts/native-host-agent/ios-agent.mjs",
+      "scripts/native-host-agent/android-agent.mjs"
+    ],
+    "selftest": "qa/native-host-selftest.mjs",
+    "command": "npm run qa:native-host",
+    "actual_state": {
+      "iphone": {
+        "state": "OFFLINE",
+        "missing_dependency": "NATIVE_IOS_HOST_URL (macOS + Xcode host running scripts/native-host-agent/ios-agent.mjs; not reachable from Vercel serverless or this cloud dev session)"
+      },
+      "android": {
+        "state": "OFFLINE",
+        "missing_dependency": "NATIVE_ANDROID_HOST_URL (Android SDK + booted AVD host running scripts/native-host-agent/android-agent.mjs; not reachable from Vercel serverless or this cloud dev session)"
+      },
+      "pc": {
+        "state": "preserved",
+        "note": "Existing Steel/Playwright PC path unchanged"
+      }
+    },
+    "evidence": [
+      "docs/evidence/2026-09-25-NATIVE-MOBILE-HOST-INTEGRATION.md"
+    ]
   },
   "maintenance": {
     "status": "on_demand",
