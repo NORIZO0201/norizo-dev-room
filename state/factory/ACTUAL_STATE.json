@@ -7,8 +7,8 @@
     "path": "state/telemetry/latest.json",
     "schema": "norizo.gmk.telemetry v1"
   },
-  "generated_at": "2026-09-25T07:15:50+00:00",
-  "overall": "FAIL",
+  "generated_at": "2026-09-25T07:16:04+00:00",
+  "overall": "WARN",
   "gmk": "ONLINE",
   "versions": {
     "orchestrator": {
@@ -19,22 +19,20 @@
       "local_head": "dec2d28701c0",
       "in_sync": true,
       "dirty": false,
-      "running_commit": "60c3318694b4"
+      "running_commit": "dec2d28701c0"
     },
     "installed_units": {
       "gmk-factory-runner.service": "ok",
       "norizo-orchestrator-poller.service": "ok"
     },
-    "drift": [
-      "engine runs an older commit than the checkout (restart pending)"
-    ]
+    "drift": []
   },
   "engine": {
-    "active": "activating",
-    "pid": null,
+    "active": "active",
+    "pid": 1033579,
     "version": "2.0.0",
-    "since": "Fri 2026-09-25 16:08:35 JST",
-    "restarts": 17,
+    "since": "Fri 2026-09-25 16:15:55 JST",
+    "restarts": 18,
     "queue": {
       "ready": 0,
       "scheduled_later": 2,
@@ -46,9 +44,9 @@
     "active": "active",
     "pid": 1028389,
     "since": "Fri 2026-09-25 16:08:38 JST",
-    "heartbeat_at": "2026-09-25T07:15:50+00:00",
-    "heartbeat_age_sec": 0.8,
-    "last_outcome": "interactive"
+    "heartbeat_at": "2026-09-25T07:16:04+00:00",
+    "heartbeat_age_sec": 0.2,
+    "last_outcome": "executing"
   },
   "telemetry": {
     "active": "active",
@@ -60,7 +58,7 @@
     "timer": {
       "unit": "gmk-factory-sre.timer",
       "active": "active",
-      "sub": "waiting",
+      "sub": "running",
       "enabled": "enabled",
       "pid": null,
       "restarts": null,
@@ -78,12 +76,12 @@
     {
       "factory_id": "bordeaux_japan_market",
       "kind": "engine",
-      "health": "FAIL",
+      "health": "OK",
       "state": "IDLE_WAITING_SOURCE_CADENCE",
-      "liveness": "DOWN",
+      "liveness": "LIVE",
       "reason": "next source observation 2026-09-25T07:25:25+00:00",
-      "pid": null,
-      "heartbeat_age_sec": 0.8,
+      "pid": 1033579,
+      "heartbeat_age_sec": 0.2,
       "last_success": "2026-09-25T01:30:36+00:00",
       "last_failure": null,
       "last_error": null,
@@ -106,19 +104,17 @@
         "http_requests": 59,
         "report_elapsed_sec": 322.2
       },
-      "problems": [
-        "engine process not alive"
-      ]
+      "problems": []
     },
     {
       "factory_id": "wine_search_evidence",
       "kind": "engine",
-      "health": "FAIL",
+      "health": "OK",
       "state": "IDLE_WAITING_SOURCE_CADENCE",
-      "liveness": "DOWN",
+      "liveness": "LIVE",
       "reason": "next source observation 2026-09-25T07:58:30+00:00",
-      "pid": null,
-      "heartbeat_age_sec": 0.8,
+      "pid": 1033579,
+      "heartbeat_age_sec": 0.2,
       "last_success": "2026-09-25T06:58:52+00:00",
       "last_failure": null,
       "last_error": null,
@@ -140,9 +136,7 @@
         "skipped_sources": 0,
         "report_elapsed_sec": 21.16
       },
-      "problems": [
-        "engine process not alive"
-      ]
+      "problems": []
     },
     {
       "factory_id": "orchestrator_command_board_poller",
@@ -152,7 +146,7 @@
       "liveness": "LIVE",
       "reason": null,
       "pid": 1028389,
-      "heartbeat_age_sec": 0.8,
+      "heartbeat_age_sec": 14.2,
       "last_success": null,
       "last_failure": null,
       "last_error": null,
@@ -170,7 +164,7 @@
       "liveness": "LIVE",
       "reason": "waiting for the next source revisit",
       "pid": 239572,
-      "heartbeat_age_sec": 33.8,
+      "heartbeat_age_sec": 47.2,
       "last_success": "2026-09-25T07:05:37+00:00",
       "last_failure": null,
       "last_error": null,
@@ -199,7 +193,7 @@
       "liveness": "LIVE",
       "reason": "all gaps closed; next source revisit at 2026-09-28T00:00:00+00:00",
       "pid": 243220,
-      "heartbeat_age_sec": 29.8,
+      "heartbeat_age_sec": 43.2,
       "last_success": null,
       "last_failure": null,
       "last_error": null,
@@ -230,7 +224,7 @@
       "liveness": "LIVE",
       "reason": null,
       "pid": 238457,
-      "heartbeat_age_sec": 9.8,
+      "heartbeat_age_sec": 10.2,
       "last_success": null,
       "last_failure": null,
       "last_error": null,
@@ -253,7 +247,7 @@
       "liveness": "LIVE",
       "reason": null,
       "pid": 296,
-      "heartbeat_age_sec": 7.3,
+      "heartbeat_age_sec": 20.6,
       "last_success": null,
       "last_failure": null,
       "last_error": null,
@@ -276,8 +270,8 @@
   "current_runs": [],
   "progress": {
     "window": "1h",
-    "baseline_at": "2026-09-25T06:10:52+00:00",
-    "window_sec": 3899,
+    "baseline_at": "2026-09-25T06:15:55+00:00",
+    "window_sec": 3609,
     "reasons": [
       "COMPLETE",
       "WAITING_SOURCE_CADENCE",
@@ -293,12 +287,12 @@
       "bordeaux_japan_market": {
         "progress_total": 310.0,
         "progress_delta": 0.0,
-        "window_sec": 3899,
+        "window_sec": 3609,
         "state": "IDLE_WAITING_SOURCE_CADENCE",
-        "health": "FAIL",
-        "liveness": "DOWN",
-        "pid": null,
-        "heartbeat_age_sec": 0.8,
+        "health": "OK",
+        "liveness": "LIVE",
+        "pid": 1033579,
+        "heartbeat_age_sec": 0.2,
         "last_success": "2026-09-25T01:30:36+00:00",
         "queue": {
           "queued": 1,
@@ -308,17 +302,17 @@
         "next_due_at": "2026-09-25T07:25:25+00:00",
         "run_now_pending": 0,
         "measured": true,
-        "zero_progress_reason": "WORKER_DOWN"
+        "zero_progress_reason": "WAITING_SOURCE_CADENCE"
       },
       "wine_search_evidence": {
         "progress_total": 334.0,
         "progress_delta": 12.0,
-        "window_sec": 3899,
+        "window_sec": 3609,
         "state": "IDLE_WAITING_SOURCE_CADENCE",
-        "health": "FAIL",
-        "liveness": "DOWN",
-        "pid": null,
-        "heartbeat_age_sec": 0.8,
+        "health": "OK",
+        "liveness": "LIVE",
+        "pid": 1033579,
+        "heartbeat_age_sec": 0.2,
         "last_success": "2026-09-25T06:58:52+00:00",
         "queue": {
           "queued": 1,
@@ -333,12 +327,12 @@
       "orchestrator_command_board_poller": {
         "progress_total": null,
         "progress_delta": null,
-        "window_sec": 3899,
+        "window_sec": 3609,
         "state": null,
         "health": "OK",
         "liveness": "LIVE",
         "pid": 1028389,
-        "heartbeat_age_sec": 0.8,
+        "heartbeat_age_sec": 14.2,
         "last_success": null,
         "queue": {},
         "current_stage": null,
@@ -350,12 +344,12 @@
       "relis_factory": {
         "progress_total": 111.0,
         "progress_delta": 2.0,
-        "window_sec": 3899,
+        "window_sec": 3609,
         "state": "IDLE_WAITING_SOURCE_CADENCE",
         "health": "WARN",
         "liveness": "LIVE",
         "pid": 239572,
-        "heartbeat_age_sec": 33.8,
+        "heartbeat_age_sec": 47.2,
         "last_success": "2026-09-25T07:05:37+00:00",
         "queue": {
           "queued": 0,
@@ -370,12 +364,12 @@
       "omnw_factory": {
         "progress_total": 12758.0,
         "progress_delta": 0.0,
-        "window_sec": 3899,
+        "window_sec": 3609,
         "state": "IDLE_WAITING_SOURCE_CADENCE",
         "health": "WARN",
         "liveness": "LIVE",
         "pid": 243220,
-        "heartbeat_age_sec": 29.8,
+        "heartbeat_age_sec": 43.2,
         "last_success": null,
         "queue": {},
         "current_stage": null,
@@ -387,12 +381,12 @@
       "sayaka_bulk_gmk": {
         "progress_total": 0.0,
         "progress_delta": 0.0,
-        "window_sec": 3899,
+        "window_sec": 3609,
         "state": "IDLE_NO_WORK",
         "health": "WARN",
         "liveness": "LIVE",
         "pid": 238457,
-        "heartbeat_age_sec": 9.8,
+        "heartbeat_age_sec": 10.2,
         "last_success": null,
         "queue": {},
         "current_stage": null,
@@ -404,12 +398,12 @@
       "nihon_wine_demand_radar": {
         "progress_total": 295.0,
         "progress_delta": 0.0,
-        "window_sec": 3899,
+        "window_sec": 3609,
         "state": "IDLE_WAITING_SOURCE_CADENCE",
         "health": "OK",
         "liveness": "LIVE",
         "pid": 296,
-        "heartbeat_age_sec": 7.3,
+        "heartbeat_age_sec": 20.6,
         "last_success": null,
         "queue": {
           "queued": 0,
@@ -466,7 +460,7 @@
     "task_id": "ucp-p1-core-continue-v1-20260925",
     "status": "WARN",
     "completed_at": "2026-09-25T07:12:37+00:00",
-    "age_sec": 193.8,
+    "age_sec": 207.2,
     "fresh": true
   },
   "command_board": {
@@ -481,18 +475,6 @@
   },
   "problems": [
     {
-      "message": "gmk-factory-runner.service not active",
-      "class": "NORMAL"
-    },
-    {
-      "message": "bordeaux_japan_market: engine process not alive",
-      "class": "STRUCTURAL"
-    },
-    {
-      "message": "wine_search_evidence: engine process not alive",
-      "class": "STRUCTURAL"
-    },
-    {
       "message": "relis_factory: repo main@34c3682f5bca != origin/main@e686a5716835",
       "class": "TRANSIENT"
     },
@@ -502,10 +484,6 @@
     },
     {
       "message": "sayaka_bulk_gmk: repo main@34c3682f5bca != origin/main@e686a5716835",
-      "class": "TRANSIENT"
-    },
-    {
-      "message": "version drift: engine runs an older commit than the checkout (restart pending)",
       "class": "TRANSIENT"
     },
     {
@@ -539,16 +517,6 @@
   ],
   "alerts": [
     {
-      "level": "CRIT",
-      "kind": "structural_failure",
-      "message": "bordeaux_japan_market: engine process not alive"
-    },
-    {
-      "level": "CRIT",
-      "kind": "structural_failure",
-      "message": "wine_search_evidence: engine process not alive"
-    },
-    {
       "level": "INFO",
       "kind": "version_drift",
       "message": "relis_factory: repo main@34c3682f5bca != origin/main@e686a5716835"
@@ -562,11 +530,6 @@
       "level": "INFO",
       "kind": "version_drift",
       "message": "sayaka_bulk_gmk: repo main@34c3682f5bca != origin/main@e686a5716835"
-    },
-    {
-      "level": "WARN",
-      "kind": "version_drift",
-      "message": "engine runs an older commit than the checkout (restart pending)"
     }
   ],
   "human_only": []
