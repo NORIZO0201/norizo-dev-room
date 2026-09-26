@@ -1,6 +1,7 @@
 import vercelFunctions from '@vercel/functions';
 const { getVercelOidcToken } = vercelFunctions;
 import { getProvider } from './providers/index.mjs';
+import { navigateMany } from './providers/native-host.mjs';
 
 function appetizeUrl(device, url) {
   const p = new URLSearchParams({
@@ -38,6 +39,10 @@ export default async function handler(req,res){
       const extraHTTPHeaders=oidc?{'x-vercel-trusted-oidc-idp-token':oidc}:undefined;
       urls.pc=await p.goto(sessions.pc.id,url,{extraHTTPHeaders});
     }
-    return res.status(200).json({ok:true,urls,embedUrls});
+    // Best-effort: forward the URL change to a real iOS Simulator / Android
+    // Emulator host when one is configured, so "Go" reaches the native path
+    // too. A missing/unreachable host never blocks the Appetize/PC response.
+    const nativeState = await navigateMany(devices, url);
+    return res.status(200).json({ok:true,urls,embedUrls,nativeState});
   }catch(e){return res.status(500).json({error:e?.message||String(e)})}
 }

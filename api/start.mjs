@@ -1,6 +1,7 @@
 import vercelFunctions from '@vercel/functions';
 const { getVercelOidcToken } = vercelFunctions;
 import { getProvider } from './providers/index.mjs';
+import { navigateMany } from './providers/native-host.mjs';
 
 function appetizeUrl(device, url, buildId) {
   if (!buildId || !/^standalone_[A-Za-z0-9_-]+$/.test(buildId)) return null;
@@ -46,7 +47,12 @@ export default async function handler(req,res){
       sessions.pc=await p.createSession({dimensions:{width:1440,height:900},persistProfile:true});
       urls.pc=await p.goto(sessions.pc.id,url,{extraHTTPHeaders});
     }
-    return res.status(200).json({sessions,urls,embedUrls,devices,expiresInMs:p?.SESSION_MS||840000,url});
+    // Best-effort: the very first dispatch of the selected URL must reach a
+    // configured native iOS Simulator / Android Emulator host too, not only
+    // subsequent "Go" navigations. A missing/unreachable host never blocks
+    // the Appetize/PC session response.
+    const nativeState = await navigateMany(devices, url);
+    return res.status(200).json({sessions,urls,embedUrls,devices,expiresInMs:p?.SESSION_MS||840000,url,nativeState});
   }catch(e){
     if(p&&sessions.pc?.id)await p.release(sessions.pc.id).catch(()=>{});
     return res.status(500).json({error:e?.message||String(e)});

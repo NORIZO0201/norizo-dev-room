@@ -66,12 +66,14 @@
         "navigation": true,
         "console_runtime_errors": true,
         "screenshots_or_visual_evidence": true,
-        "regression_verification": true
+        "regression_verification": true,
+        "native_mobile_actual_state": false
       },
       "evidence": [
         "docs/evidence/2026-09-21-P3-COMPLETE.md",
         "runner:qa/browser-qa-local.mjs",
-        "selftest:qa/chromium-selftest.mjs"
+        "selftest:qa/chromium-selftest.mjs",
+        "docs/evidence/2026-09-25-NATIVE-MOBILE-HOST-INTEGRATION.md"
       ]
     },
     "P4": {
@@ -106,6 +108,46 @@
         "selftest:qa/p5-gates-selftest.mjs"
       ]
     }
+  },
+  "native_mobile": {
+    "order_ids": [
+      "dev-devroom-native-mobile-20260926-01",
+      "dev-devroom-native-mobile-20260926-02",
+      "dev-devroom-native-mobile-20260926-03"
+    ],
+    "issues": [28, 29, 30, 35],
+    "status": "host_integration_implemented_awaiting_host",
+    "contract": "api/native-host-core.mjs",
+    "provider": "api/providers/native-host.mjs",
+    "endpoint": "api/native-state.mjs",
+    "host_agents": [
+      "scripts/native-host-agent/ios-agent.mjs",
+      "scripts/native-host-agent/android-agent.mjs"
+    ],
+    "selftest": "qa/native-host-selftest.mjs",
+    "command": "npm run qa:native-host",
+    "dispatch": {
+      "note": "Both /api/start (initial device open) and /api/navigate (Go) forward the resolved URL to every configured native host via api/providers/native-host.mjs#navigateMany, so the selected Preview or Production URL reaches iPhone/Android native runtimes from the first dispatch, not only on a later navigation.",
+      "reachable_local_mac_or_android_sdk_assets": "none found in this cloud session or any DEV ROOM-controlled infrastructure (checked: xcrun/xcodebuild/simctl/adb/emulator/sdkmanager/avdmanager all absent, uname reports Linux not Darwin, no ANDROID_* env vars, /dev/kvm absent) — see docs/evidence/2026-09-26-NATIVE-MOBILE-QA-ISSUE-35.md"
+    },
+    "actual_state": {
+      "iphone": {
+        "state": "OFFLINE",
+        "missing_dependency": "NATIVE_IOS_HOST_URL (macOS + Xcode host running scripts/native-host-agent/ios-agent.mjs; not reachable from Vercel serverless or this cloud dev session)"
+      },
+      "android": {
+        "state": "OFFLINE",
+        "missing_dependency": "NATIVE_ANDROID_HOST_URL (Android SDK + booted AVD host running scripts/native-host-agent/android-agent.mjs; not reachable from Vercel serverless or this cloud dev session)"
+      },
+      "pc": {
+        "state": "preserved",
+        "note": "Existing Steel/Playwright PC path unchanged"
+      }
+    },
+    "evidence": [
+      "docs/evidence/2026-09-25-NATIVE-MOBILE-HOST-INTEGRATION.md",
+      "docs/evidence/2026-09-26-NATIVE-MOBILE-QA-ISSUE-35.md"
+    ]
   },
   "maintenance": {
     "status": "on_demand",
