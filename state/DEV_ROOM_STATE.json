@@ -112,9 +112,10 @@
   "native_mobile": {
     "order_ids": [
       "dev-devroom-native-mobile-20260926-01",
-      "dev-devroom-native-mobile-20260926-02"
+      "dev-devroom-native-mobile-20260926-02",
+      "dev-devroom-native-mobile-20260926-03"
     ],
-    "issues": [28, 29, 30],
+    "issues": [28, 29, 30, 35],
     "status": "host_integration_implemented_awaiting_host",
     "contract": "api/native-host-core.mjs",
     "provider": "api/providers/native-host.mjs",
@@ -125,6 +126,10 @@
     ],
     "selftest": "qa/native-host-selftest.mjs",
     "command": "npm run qa:native-host",
+    "dispatch": {
+      "note": "Both /api/start (initial device open) and /api/navigate (Go) forward the resolved URL to every configured native host via api/providers/native-host.mjs#navigateMany, so the selected Preview or Production URL reaches iPhone/Android native runtimes from the first dispatch, not only on a later navigation.",
+      "reachable_local_mac_or_android_sdk_assets": "none found in this cloud session or any DEV ROOM-controlled infrastructure (checked: xcrun/xcodebuild/simctl/adb/emulator/sdkmanager/avdmanager all absent, uname reports Linux not Darwin, no ANDROID_* env vars, /dev/kvm absent) — see docs/evidence/2026-09-26-NATIVE-MOBILE-QA-ISSUE-35.md"
+    },
     "actual_state": {
       "iphone": {
         "state": "OFFLINE",
@@ -140,7 +145,8 @@
       }
     },
     "evidence": [
-      "docs/evidence/2026-09-25-NATIVE-MOBILE-HOST-INTEGRATION.md"
+      "docs/evidence/2026-09-25-NATIVE-MOBILE-HOST-INTEGRATION.md",
+      "docs/evidence/2026-09-26-NATIVE-MOBILE-QA-ISSUE-35.md"
     ]
   },
   "maintenance": {

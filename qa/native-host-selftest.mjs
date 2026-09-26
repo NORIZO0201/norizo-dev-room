@@ -10,6 +10,7 @@ import {
   computeActualState,
   withBoundedRetry
 } from '../api/native-host-core.mjs';
+import { navigateMany } from '../api/providers/native-host.mjs';
 
 // --- device kinds / env key mapping -----------------------------------
 assert.deepEqual(NATIVE_DEVICE_KINDS, ['iphone', 'android']);
@@ -104,6 +105,27 @@ assert.throws(() => buildAndroidChromeLaunch({ serial: '', url: 'https://example
   assert.equal(calls, 2);
 }
 
+// --- navigateMany: the shared dispatch used by /api/start and /api/navigate
+// so the selected Preview/Production URL reaches every requested native
+// device kind, and a missing host is reported per-device rather than thrown.
+{
+  const nativeState = await navigateMany(['iphone', 'android', 'pc'], 'https://example.com/qa', {});
+  assert.deepEqual(Object.keys(nativeState).sort(), ['android', 'iphone']);
+  assert.equal(nativeState.iphone.ok, false);
+  assert.match(nativeState.iphone.error, /NATIVE_IOS_HOST_URL/);
+  assert.equal(nativeState.android.ok, false);
+  assert.match(nativeState.android.error, /NATIVE_ANDROID_HOST_URL/);
+}
+{
+  const nativeState = await navigateMany(['pc'], 'https://example.com/qa', {});
+  assert.deepEqual(nativeState, {});
+}
+{
+  const nativeState = await navigateMany(['iphone'], 'javascript:alert(1)', { NATIVE_IOS_HOST_URL: 'https://host:8787' });
+  assert.equal(nativeState.iphone.ok, false);
+  assert.match(nativeState.iphone.error, /SCHEME_NOT_ALLOWED/);
+}
+
 console.log(JSON.stringify({
   ok: true,
   contract: 'api/native-host-core.mjs',
@@ -118,6 +140,9 @@ console.log(JSON.stringify({
     'actual_state_error_surface',
     'evidence_freshness_computation',
     'bounded_retry_caps_attempts',
-    'bounded_retry_recovers_within_cap'
+    'bounded_retry_recovers_within_cap',
+    'navigate_many_dispatch_reports_missing_dependency_per_device',
+    'navigate_many_dispatch_ignores_non_native_devices',
+    'navigate_many_dispatch_blocks_disallowed_url_scheme'
   ]
 }, null, 2));

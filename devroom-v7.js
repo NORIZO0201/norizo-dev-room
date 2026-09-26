@@ -29,7 +29,7 @@ function updateLayout(){const a=activeDevices();$('#deviceArea').className='devi
 function toggleDevice(d){enabled[d]=!enabled[d];updateLayout();if(current){stop();setLog('表示端末を変更しました。再起動してください。')}}
 function clearView(){for(const d of devices){$('#'+d).src='about:blank';$('#'+d+'Empty').style.display='grid';$('#'+d+'State').textContent='OFFLINE';clearBusy(d)}$('#timer').textContent='—';$('#currentUrls').textContent='—';for(const id of ['#stop','#go','#qa','#renew'])$(id).disabled=true;current=null;if(tick)clearInterval(tick)}
 async function api(path,body){const r=await fetch(path,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)});const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||path+' failed');return j}
-function applySession(j){current={sessions:j.sessions||{},urls:j.urls||{},embedUrls:j.embedUrls||{},devices:j.devices||activeDevices(),expiresInMs:j.expiresInMs||840000};for(const d of activeDevices()){if(d==='pc'&&j.sessions?.pc?.debugUrl)$('#pc').src=viewerUrl(j.sessions.pc.debugUrl);if(d!=='pc'&&j.embedUrls?.[d])$('#'+d).src=j.embedUrls[d];$('#'+d+'Empty').style.display='none';$('#'+d+'State').textContent=d==='pc'?'LIVE · STEEL':'LIVE · APPETIZE';clearBusy(d)}for(const id of ['#stop','#go','#qa','#renew'])$(id).disabled=false;endAt=Date.now()+current.expiresInMs;startTimer();renderUrls(current.urls);setLog('LIVE')}
+function applySession(j){current={sessions:j.sessions||{},urls:j.urls||{},embedUrls:j.embedUrls||{},devices:j.devices||activeDevices(),expiresInMs:j.expiresInMs||840000};for(const d of activeDevices()){if(d==='pc'&&j.sessions?.pc?.debugUrl)$('#pc').src=viewerUrl(j.sessions.pc.debugUrl);if(d!=='pc'&&j.embedUrls?.[d])$('#'+d).src=j.embedUrls[d];$('#'+d+'Empty').style.display='none';$('#'+d+'State').textContent=d==='pc'?'LIVE · STEEL':'LIVE · APPETIZE';clearBusy(d)}for(const id of ['#stop','#go','#qa','#renew'])$(id).disabled=false;endAt=Date.now()+current.expiresInMs;startTimer();renderUrls(current.urls);setLog('LIVE');pollNativeState()}
 function renderUrls(urls={}){$('#currentUrls').innerHTML=activeDevices().map(d=>d+': '+(urls[d]||'—')).join('<br>')}
 function startTimer(){if(tick)clearInterval(tick);tick=setInterval(async()=>{const n=Math.max(0,endAt-Date.now());$('#timer').textContent=Math.floor(n/60000)+':'+String(Math.floor((n%60000)/1000)).padStart(2,'0');if(n<=75000&&!renewing&&current&&current.sessions?.pc)await renew(true);if(n<=0&&!renewing&&!current?.sessions?.pc){$('#timer').textContent='Appetize管理'}},1000)}
 function getAppetizeId(){return localStorage.getItem('devroom_appetize_sandbox_id')||''}
@@ -48,6 +48,10 @@ function projectKey(p){return PROJECT_KEYS[p]||''}
 function previewUrlFor(p){
   const svc=previewRegistry?.services?.[projectKey(p)];
   return svc?.preview_url||'';
+}
+function productionUrlFor(p){
+  const svc=previewRegistry?.services?.[projectKey(p)];
+  return svc?.production_url||p||'';
 }
 function resolvedTarget(){
   const p=$('#project').value,m=$('#environment').value;
@@ -70,6 +74,8 @@ function refreshTarget(){
   if(next)$('#url').value=next;
   const preview=previewUrlFor(p);
   if($('#previewUrlState'))$('#previewUrlState').textContent=preview||'READY Previewなし';
+  const production=productionUrlFor(p);
+  if($('#productionUrlState'))$('#productionUrlState').textContent=production||'未設定';
 }
 async function reviewWithChatty(){
   const qaState={};for(const d of devices)qaState[d]=$('#'+d+'Qa').textContent;

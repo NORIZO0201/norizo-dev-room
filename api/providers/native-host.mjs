@@ -65,3 +65,20 @@ export async function navigate(kind, url, env = process.env) {
   if (!res.ok) throw new Error(`HOST_NAVIGATE_HTTP_${res.status}`);
   return res.json();
 }
+
+// Best-effort fan-out used by both /api/start and /api/navigate: forwards a
+// URL to every requested native device kind and never throws — a missing or
+// unreachable host must never block the Appetize/PC response, and the caller
+// gets back a per-device {ok, result|error} so the UI can show the real
+// dispatch outcome instead of assuming success.
+export async function navigateMany(devices, url, env = process.env) {
+  const nativeState = {};
+  await Promise.all(NATIVE_DEVICE_KINDS.filter((k) => devices.includes(k)).map(async (k) => {
+    try {
+      nativeState[k] = { ok: true, result: await navigate(k, url, env) };
+    } catch (e) {
+      nativeState[k] = { ok: false, error: e?.message || String(e) };
+    }
+  }));
+  return nativeState;
+}

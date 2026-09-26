@@ -1,7 +1,7 @@
 import vercelFunctions from '@vercel/functions';
 const { getVercelOidcToken } = vercelFunctions;
 import { getProvider } from './providers/index.mjs';
-import { NATIVE_DEVICE_KINDS, navigate as navigateNativeHost } from './providers/native-host.mjs';
+import { navigateMany } from './providers/native-host.mjs';
 
 function appetizeUrl(device, url) {
   const p = new URLSearchParams({
@@ -29,7 +29,7 @@ export default async function handler(req,res){
   if(typeof url!=='string'||!/^https?:\/\//i.test(url))return res.status(400).json({error:'Invalid URL'});
   try{
     const sessions=req.body?.sessions||{},devices=req.body?.devices||[];
-    const urls={},embedUrls={},nativeState={};
+    const urls={},embedUrls={};
     if(devices.includes('iphone')){urls.iphone=url;embedUrls.iphone=appetizeUrl('iphone',url)}
     if(devices.includes('android')){urls.android=url;embedUrls.android=appetizeUrl('android',url)}
     if(sessions.pc?.id){
@@ -42,10 +42,7 @@ export default async function handler(req,res){
     // Best-effort: forward the URL change to a real iOS Simulator / Android
     // Emulator host when one is configured, so "Go" reaches the native path
     // too. A missing/unreachable host never blocks the Appetize/PC response.
-    await Promise.all(NATIVE_DEVICE_KINDS.filter(k=>devices.includes(k)).map(async k=>{
-      try{nativeState[k]={ok:true,result:await navigateNativeHost(k,url)}}
-      catch(e){nativeState[k]={ok:false,error:e?.message||String(e)}}
-    }));
+    const nativeState = await navigateMany(devices, url);
     return res.status(200).json({ok:true,urls,embedUrls,nativeState});
   }catch(e){return res.status(500).json({error:e?.message||String(e)})}
 }
