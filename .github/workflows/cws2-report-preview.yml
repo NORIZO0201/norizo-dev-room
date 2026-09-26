@@ -1,0 +1,20 @@
+name: CWS2 Report File
+on:
+  push:
+    branches:
+      - preview/cws2-technical-report
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/upload-artifact@v4
+        with:
+          name: CWS_2.0_Technical_Reconstruction_Report
+          path: cws2-technical-report.html
+          if-no-files-found: error
