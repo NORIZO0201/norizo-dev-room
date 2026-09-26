@@ -7,7 +7,7 @@
     "path": "state/telemetry/latest.json",
     "schema": "norizo.gmk.telemetry v1"
   },
-  "generated_at": "2026-09-26T08:56:13+00:00",
+  "generated_at": "2026-09-26T08:58:43+00:00",
   "overall": "WARN",
   "gmk": "ONLINE",
   "versions": {
@@ -35,8 +35,8 @@
     "restarts": 21,
     "queue": {
       "ready": 0,
-      "scheduled_later": 2,
-      "running": 0
+      "scheduled_later": 1,
+      "running": 1
     },
     "controller_mode": "deterministic_operational"
   },
@@ -44,8 +44,8 @@
     "active": "active",
     "pid": 1354817,
     "since": "Fri 2026-09-25 22:57:53 JST",
-    "heartbeat_at": "2026-09-26T08:56:05+00:00",
-    "heartbeat_age_sec": 8.1,
+    "heartbeat_at": "2026-09-26T08:58:32+00:00",
+    "heartbeat_age_sec": 11.2,
     "last_outcome": "interactive"
   },
   "telemetry": {
@@ -58,13 +58,13 @@
     "timer": {
       "unit": "gmk-factory-sre.timer",
       "active": "active",
-      "sub": "running",
+      "sub": "waiting",
       "enabled": "enabled",
       "pid": null,
       "restarts": null,
       "since": "Thu 2026-09-24 23:55:13 JST"
     },
-    "last_check_at": "2026-09-26T08:55:13+00:00",
+    "last_check_at": "2026-09-26T08:58:13+00:00",
     "healthy": true,
     "circuit_breakers_open": [
       "dev-room-telemetry-integration-v2-20260924",
@@ -81,7 +81,7 @@
       "liveness": "LIVE",
       "reason": "next source observation 2026-09-26T13:25:25+00:00",
       "pid": 1355245,
-      "heartbeat_age_sec": 0.1,
+      "heartbeat_age_sec": 0.2,
       "last_success": "2026-09-26T07:28:41+00:00",
       "last_failure": null,
       "last_error": null,
@@ -110,19 +110,19 @@
       "factory_id": "wine_search_evidence",
       "kind": "engine",
       "health": "OK",
-      "state": "IDLE_WAITING_SOURCE_CADENCE",
+      "state": "RUNNING",
       "liveness": "LIVE",
-      "reason": "next source observation 2026-09-26T08:58:30+00:00",
+      "reason": "run 20260926T085830117Z since 2026-09-26T08:58:30+00:00",
       "pid": 1355245,
-      "heartbeat_age_sec": 0.1,
+      "heartbeat_age_sec": 0.2,
       "last_success": "2026-09-26T07:58:49+00:00",
       "last_failure": null,
       "last_error": null,
       "queue": {
-        "queued": 1,
-        "running": 0
+        "queued": 0,
+        "running": 1
       },
-      "current_stage": null,
+      "current_stage": "RUNNING",
       "next_due_at": "2026-09-26T08:58:30+00:00",
       "counts": {
         "attempted_sources": 12,
@@ -146,7 +146,7 @@
       "liveness": "LIVE",
       "reason": null,
       "pid": 1354817,
-      "heartbeat_age_sec": 8.1,
+      "heartbeat_age_sec": 11.2,
       "last_success": null,
       "last_failure": null,
       "last_error": null,
@@ -164,7 +164,7 @@
       "liveness": "LIVE",
       "reason": "waiting for the next source revisit",
       "pid": 239572,
-      "heartbeat_age_sec": 12.1,
+      "heartbeat_age_sec": 41.2,
       "last_success": "2026-09-26T08:48:54+00:00",
       "last_failure": null,
       "last_error": null,
@@ -193,7 +193,7 @@
       "liveness": "LIVE",
       "reason": "all gaps closed; next source revisit at 2026-09-28T00:00:00+00:00",
       "pid": 243220,
-      "heartbeat_age_sec": 44.1,
+      "heartbeat_age_sec": 11.2,
       "last_success": null,
       "last_failure": null,
       "last_error": null,
@@ -224,7 +224,7 @@
       "liveness": "LIVE",
       "reason": null,
       "pid": 238457,
-      "heartbeat_age_sec": 4.1,
+      "heartbeat_age_sec": 3.2,
       "last_success": null,
       "last_failure": null,
       "last_error": null,
@@ -247,7 +247,7 @@
       "liveness": "LIVE",
       "reason": null,
       "pid": 296,
-      "heartbeat_age_sec": 8.6,
+      "heartbeat_age_sec": 8.4,
       "last_success": null,
       "last_failure": null,
       "last_error": null,
@@ -267,11 +267,19 @@
       "problems": []
     }
   ],
-  "current_runs": [],
+  "current_runs": [
+    {
+      "factory_id": "wine_search_evidence",
+      "kind": "observe",
+      "stage": null,
+      "job_id": 386,
+      "started_at": "2026-09-26T08:58:30.100643+00:00"
+    }
+  ],
   "progress": {
     "window": "1h",
-    "baseline_at": "2026-09-26T07:52:55+00:00",
-    "window_sec": 3798,
+    "baseline_at": "2026-09-26T07:57:55+00:00",
+    "window_sec": 3648,
     "reasons": [
       "COMPLETE",
       "WAITING_SOURCE_CADENCE",
@@ -287,12 +295,12 @@
       "bordeaux_japan_market": {
         "progress_total": 525.0,
         "progress_delta": 0.0,
-        "window_sec": 3798,
+        "window_sec": 3648,
         "state": "IDLE_WAITING_SOURCE_CADENCE",
         "health": "OK",
         "liveness": "LIVE",
         "pid": 1355245,
-        "heartbeat_age_sec": 0.1,
+        "heartbeat_age_sec": 0.2,
         "last_success": "2026-09-26T07:28:41+00:00",
         "queue": {
           "queued": 1,
@@ -307,18 +315,18 @@
       "wine_search_evidence": {
         "progress_total": 633.0,
         "progress_delta": 12.0,
-        "window_sec": 3798,
-        "state": "IDLE_WAITING_SOURCE_CADENCE",
+        "window_sec": 3648,
+        "state": "RUNNING",
         "health": "OK",
         "liveness": "LIVE",
         "pid": 1355245,
-        "heartbeat_age_sec": 0.1,
+        "heartbeat_age_sec": 0.2,
         "last_success": "2026-09-26T07:58:49+00:00",
         "queue": {
-          "queued": 1,
-          "running": 0
+          "queued": 0,
+          "running": 1
         },
-        "current_stage": null,
+        "current_stage": "RUNNING",
         "next_due_at": "2026-09-26T08:58:30+00:00",
         "run_now_pending": 0,
         "measured": true,
@@ -327,12 +335,12 @@
       "orchestrator_command_board_poller": {
         "progress_total": null,
         "progress_delta": null,
-        "window_sec": 3798,
+        "window_sec": 3648,
         "state": null,
         "health": "OK",
         "liveness": "LIVE",
         "pid": 1354817,
-        "heartbeat_age_sec": 8.1,
+        "heartbeat_age_sec": 11.2,
         "last_success": null,
         "queue": {},
         "current_stage": null,
@@ -344,12 +352,12 @@
       "relis_factory": {
         "progress_total": 139.0,
         "progress_delta": 1.0,
-        "window_sec": 3798,
+        "window_sec": 3648,
         "state": "IDLE_WAITING_SOURCE_CADENCE",
         "health": "WARN",
         "liveness": "LIVE",
         "pid": 239572,
-        "heartbeat_age_sec": 12.1,
+        "heartbeat_age_sec": 41.2,
         "last_success": "2026-09-26T08:48:54+00:00",
         "queue": {
           "queued": 0,
@@ -364,12 +372,12 @@
       "omnw_factory": {
         "progress_total": 12760.0,
         "progress_delta": 2.0,
-        "window_sec": 3798,
+        "window_sec": 3648,
         "state": "IDLE_WAITING_SOURCE_CADENCE",
         "health": "WARN",
         "liveness": "LIVE",
         "pid": 243220,
-        "heartbeat_age_sec": 44.1,
+        "heartbeat_age_sec": 11.2,
         "last_success": null,
         "queue": {},
         "current_stage": null,
@@ -381,12 +389,12 @@
       "sayaka_bulk_gmk": {
         "progress_total": 3.0,
         "progress_delta": 0.0,
-        "window_sec": 3798,
+        "window_sec": 3648,
         "state": "IDLE_NO_WORK",
         "health": "WARN",
         "liveness": "LIVE",
         "pid": 238457,
-        "heartbeat_age_sec": 4.1,
+        "heartbeat_age_sec": 3.2,
         "last_success": null,
         "queue": {},
         "current_stage": null,
@@ -398,12 +406,12 @@
       "nihon_wine_demand_radar": {
         "progress_total": 314.0,
         "progress_delta": 0.0,
-        "window_sec": 3798,
+        "window_sec": 3648,
         "state": "IDLE_WAITING_SOURCE_CADENCE",
         "health": "OK",
         "liveness": "LIVE",
         "pid": 296,
-        "heartbeat_age_sec": 8.6,
+        "heartbeat_age_sec": 8.4,
         "last_success": null,
         "queue": {
           "queued": 0,
@@ -460,7 +468,7 @@
     "task_id": "factory-wine-search-evidence-20260926t075830097z",
     "status": "PASS",
     "completed_at": "2026-09-26T07:59:02+00:00",
-    "age_sec": 3431.1,
+    "age_sec": 3581.2,
     "fresh": true
   },
   "command_board": {
